@@ -1,4 +1,6 @@
 syntax: glob
 
+_*
 *.8
 *.txt
+*.o

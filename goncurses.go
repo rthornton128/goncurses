@@ -125,6 +125,13 @@ func CursSet(vis byte) os.Error {
     return nil
 }
 
+func DoUpdate() os.Error {
+    if (C.doupdate() == C.ERR) {
+        return os.NewError("Failed to update")
+    }
+    return nil
+}
+
 // Turn on echoing characters to the terminal
 func Echo() os.Error {
     if (C.echo() == C.ERR) {
