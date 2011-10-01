@@ -50,6 +50,7 @@ var colorList = map[string] Color {
 }
 
 var keyList = map[C.int] string {
+    9: "tab",
     10: "enter", // On some keyboards?
     C.KEY_DOWN: "down",
     C.KEY_UP: "up",
@@ -417,6 +418,11 @@ func (w *Window) Getnstr(n int) (string, os.Error) {
 func (w *Window) Getyx() (int, int) {
     // This hack is necessary to make cgo happy
     return int(w._cury), int(w._curx)
+}
+
+func (w *Window) HLine(y, x, ch, width int) {
+    C.mvwhline((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(ch), C.int(width))
+    return
 }
 
 // Turn on/off accepting keypad characters like the F1-F12 keys and the 
