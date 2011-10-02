@@ -2,9 +2,17 @@ package goncurses
 
 // #cgo LDFLAGS: -lmenu
 // #include <menu.h>
+// #include <stdlib.h>
 import "C"
 
-var MenuErrors = map[C.int] string {
+import (
+    "os"
+    "unsafe"
+)
+
+type Errno int
+
+var MenuErrors = map[Errno] string {
     C.E_OK: "The routine succeeded.",
     C.E_BAD_ARGUMENT: "Routine detected an incorrect or out-of-range argument.",
     C.E_BAD_STATE: "Routine was called from an initialization or termination function.",
@@ -19,13 +27,77 @@ var MenuErrors = map[C.int] string {
     C.E_UNKNOWN_COMMAND: "The menu driver code saw an unknown request code.",
 }
 
+func (e Errno) String() string {
+    return MenuErrors[e]
+}
+
+var DriverActions = map[string] C.int {
+    "down": C.REQ_DOWN_ITEM,
+    "first": C.REQ_FIRST_ITEM,
+    "last": C.REQ_LAST_ITEM,
+    "left": C.REQ_LEFT_ITEM,
+    "next": C.REQ_NEXT_ITEM,
+    "page down": C.REQ_SCR_DPAGE,
+    "page up": C.REQ_SCR_UPAGE,
+    "prev": C.REQ_PREV_ITEM,
+    "right": C.REQ_RIGHT_ITEM,
+    "scroll down": C.REQ_SCR_DLINE,
+    "scroll up": C.REQ_SCR_ULINE,
+    "toggle": C.REQ_TOGGLE_ITEM,
+    "up": C.REQ_UP_ITEM,
+}
+
 type Menu C.MENU
 type MenuItem C.ITEM
 
-func NewMenu() *Menu {
+func NewMenu(items []*MenuItem) (*Menu, os.Error) {
+    citems := make([]*C.ITEM, len(items))
+    for index, item := range items {
+        citems[index] = (*C.ITEM)(item)
+    }
+    menu, errno := C.new_menu((**C.ITEM)(&citems[0]))
+    if menu == nil {
+        return nil, errno
+    }
+    return (*Menu)(menu), nil
+}
+
+func (m *Menu) Driver(action string) {
+    C.menu_driver((*C.MENU)(m), DriverActions[action])
+    return
+}
+
+func (m *Menu) Free() os.Error {
+    if res := C.free_menu((*C.MENU)(m)); res != C.E_OK {
+        return os.NewError(MenuErrors[Errno(res)])
+    }
     return nil
 }
 
-func (m *Menu) Free() {
+func (m *Menu) Post() os.Error {
+    if res := C.post_menu((*C.MENU)(m)); res != C.E_OK {
+        return os.NewError(MenuErrors[Errno(res)])
+    }
+    return nil
+}
+
+func NewItem(name, desc string) (*MenuItem, os.Error) {
+    cname := C.CString(name)    
+    cdesc := C.CString(desc)
+    
+    item, err := C.new_item(cname, cdesc)
+    if item == nil {
+        return nil, err
+    }
+    return (*MenuItem)(item), nil
+}
+
+func (mi *MenuItem) Free() {
+    C.free(unsafe.Pointer(C.item_name((*C.ITEM)(mi))))
+    C.free_item((*C.ITEM)(mi))
     return
+}
+
+func (mi *MenuItem) Name() string {
+    return C.GoString(C.item_name((*C.ITEM)(mi)))
 }
