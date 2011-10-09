@@ -7,23 +7,25 @@ package main
 import . "goncurses"
 
 func main() {
-    stdscr, _ := Initscr();
-    defer Endwin()
+    stdscr, _ := Init()
+    defer End()
     
-    Raw()
-    Echo()
+    Raw(true)
+    Echo(false)
     stdscr.Keypad(true)
     
+    stdscr.Print("Press a key...")
     stdscr.Refresh()
-    ch, _ := stdscr.Getch()
+    
+    ch, _ := stdscr.GetChar()
     if key := Key(ch); key == "F2" {
         stdscr.Print("The F2 key was pressed.")
     } else {
         stdscr.Print("The key pressed is: ")
         stdscr.Attron("bold")
-        stdscr.Addch(Chtype(ch))
+        stdscr.AddCharacter(Chtype(ch))
         stdscr.Attroff("bold")
     }
     stdscr.Refresh()
-    stdscr.Getch()
+    stdscr.GetChar()
 }

@@ -7,16 +7,16 @@ package main
 import . "goncurses"
 
 func main() {
-    stdscr, _ := Initscr();
-    defer Endwin()
+    stdscr, _ := Init();
+    defer End()
     
-    row, col := stdscr.Getmaxyx()
-    msg := "Enter a string"
-    stdscr.Mvprint(row/2, (col-len(msg))/2, msg)
+    row, col := stdscr.Maxyx()
+    msg := "Enter a string: "
+    stdscr.Print(row/2, (col-len(msg))/2, msg)
     
-    str, _ := stdscr.Getnstr(10)
-    stdscr.Mvprint(row-2, 0, "You entered: %s", str)
+    str, _ := stdscr.GetString(10)
+    stdscr.Print(row-2, 0, "You entered: %s", str)
 
     stdscr.Refresh()
-    stdscr.Getch()
+    stdscr.GetChar()
 }

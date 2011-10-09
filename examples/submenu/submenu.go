@@ -12,12 +12,12 @@ const (
 )
 
 func main() {
-    stdscr, _ := Initscr();
-    defer Endwin()
+    stdscr, _ := Init();
+    defer End()
     
-    Raw()
-    Noecho()
-    CursSet(0)
+    Raw(true)
+    Echo(false)
+    Cursor(0)
     stdscr.Clear()
     stdscr.Keypad(true)
     
@@ -39,12 +39,12 @@ func main() {
         return
     }
 
-    stdscr.Mvprint(20, 0, "'q' to exit")
+    stdscr.Print(20, 0, "'q' to exit")
     stdscr.Refresh()
     
     for {
-        DoUpdate()
-        ch, _ := stdscr.Getch()
+        Update()
+        ch, _ := stdscr.GetChar()
         
         switch (Key(ch)) {
         case "q":

@@ -7,14 +7,14 @@ package main
 import . "goncurses"
 
 func main() {
-    stdscr, _ := Initscr();
-    defer Endwin()
+    stdscr, _ := Init();
+    defer End()
     
     row, col := stdscr.Getmaxyx()
-    msg := "Just a string"
-    stdscr.Mvprint(row/2, (col-len(msg))/2, msg)
+    msg := "Just a string "
+    stdscr.Print(row/2, (col-len(msg))/2, msg)
     
-    stdscr.Mvprint(row-2, 0, "This screen has %d rows and %d columns. ",
+    stdscr.Print(row-2, 0, "This screen has %d rows and %d columns. ",
         row, col)
     stdscr.Print("Try resizing your window and then run this program again.")
 

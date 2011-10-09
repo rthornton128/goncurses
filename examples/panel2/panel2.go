@@ -6,12 +6,12 @@ import . "goncurses"
 import "fmt"
 
 func main() {
-    stdscr, _ := Initscr()
-    defer Endwin()
+    stdscr, _ := Init()
+    defer End()
 
     StartColor()
-    Cbreak()
-    Noecho()
+    CBreak(true)
+    Echo(true)
     stdscr.Keypad(true)
     stdscr.Print("Hit 'tab' to cycle through windows, 'q' to quit")
     
@@ -27,13 +27,13 @@ func main() {
         h, w := 10, 40
         title := fmt.Sprintf("Window Number %d", i+1)
         
-        window, _ := NewWin(h, w , y+(i*4), x+(i*10))
+        window, _ := NewWindow(h, w , y+(i*4), x+(i*10))
         window.Box(0, 0)
         //window.MvAddch(2, 0, ACS_LTEE)
         window.HLine(2, 1, '-', w - 2) //ACS_HLINE
         //window.MvAddch(2, 0, ACS_RTEE)
         window.ColorOn(byte(i+1))
-        window.Mvprint(1, (w/2)-(len(title)/2), title)
+        window.Print(1, (w/2)-(len(title)/2), title)
         window.ColorOff(byte(i+1))
         panels[i] = NewPanel(window)
         
@@ -43,9 +43,9 @@ func main() {
     
     for {
         UpdatePanels()
-        DoUpdate()
+        Update()
         
-        ch, _ := stdscr.Getch()
+        ch, _ := stdscr.GetChar()
         switch(Key(ch)) {
         case "q":
             return

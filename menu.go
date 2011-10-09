@@ -12,7 +12,7 @@ import (
 
 type Errno int
 
-var MenuErrors = map[Errno] string {
+var menuerrors = map[Errno] string {
     C.E_OK: "The routine succeeded.",
     C.E_BAD_ARGUMENT: "Routine detected an incorrect or out-of-range argument.",
     C.E_BAD_STATE: "Routine was called from an initialization or termination function.",
@@ -28,10 +28,10 @@ var MenuErrors = map[Errno] string {
 }
 
 func (e Errno) String() string {
-    return MenuErrors[e]
+    return menuerrors[e]
 }
 
-var DriverActions = map[string] C.int {
+var driveractions = map[string] C.int {
     "down": C.REQ_DOWN_ITEM,
     "first": C.REQ_FIRST_ITEM,
     "last": C.REQ_LAST_ITEM,
@@ -63,20 +63,20 @@ func NewMenu(items []*MenuItem) (*Menu, os.Error) {
 }
 
 func (m *Menu) Driver(action string) {
-    C.menu_driver((*C.MENU)(m), DriverActions[action])
+    C.menu_driver((*C.MENU)(m), driveractions[action])
     return
 }
 
 func (m *Menu) Free() os.Error {
     if res := C.free_menu((*C.MENU)(m)); res != C.E_OK {
-        return os.NewError(MenuErrors[Errno(res)])
+        return os.NewError(menuerrors[Errno(res)])
     }
     return nil
 }
 
 func (m *Menu) Post() os.Error {
     if res := C.post_menu((*C.MENU)(m)); res != C.E_OK {
-        return os.NewError(MenuErrors[Errno(res)])
+        return os.NewError(menuerrors[Errno(res)])
     }
     return nil
 }

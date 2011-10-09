@@ -14,29 +14,29 @@ func main() {
     var active int
     menu := []string{"Choice 1", "Choice 2", "Choice 3", "Choice 4", "Exit"}
     
-    stdscr, _ := Initscr();
-    defer Endwin()
+    stdscr, _ := Init();
+    defer End()
     
-    Raw()
-    Noecho()
-    CursSet(0)
+    Raw(true)
+    Echo(false)
+    Cursor(0)
     stdscr.Clear()
     stdscr.Keypad(true)
     
-    rows, cols := stdscr.Getmaxyx()
+    rows, cols := stdscr.Maxyx()
     y, x := (rows-HEIGHT)/2, (cols-WIDTH)/2
     
-    win, _ := NewWin(HEIGHT, WIDTH, y, x)
+    win, _ := NewWindow(HEIGHT, WIDTH, y, x)
     win.Keypad(true)
     
-    stdscr.Mvprint(0, 0, "Use arrow keys to go up and down, Press enter to select")
+    stdscr.Print(0, 0, "Use arrow keys to go up and down, Press enter to select")
     stdscr.Refresh()
     
     printmenu(win, menu, active)
     MouseMask("button1-clicked")
     
     for {
-        ch, _ := stdscr.Getch()
+        ch, _ := stdscr.GetChar()
         switch(Key(ch)) {
         case "q":
             return
@@ -58,17 +58,17 @@ func main() {
             if new != -1 {
                 active = new
             }
-            stdscr.Mvprint(23, 0, "Choice #%d: %s selected", active, 
+            stdscr.Print(23, 0, "Choice #%d: %s selected", active, 
                 menu[active])
             stdscr.ClearToEOL()
             stdscr.Refresh()
         case "enter":
-            stdscr.Mvprint(23, 0, "Choice #%d: %s selected", active, 
+            stdscr.Print(23, 0, "Choice #%d: %s selected", active, 
                 menu[active])
             stdscr.ClearToEOL()
             stdscr.Refresh()
         default:
-            stdscr.Mvprint(23, 0, "Character pressed = %3d/%c", ch, ch)
+            stdscr.Print(23, 0, "Character pressed = %3d/%c", ch, ch)
             stdscr.ClearToEOL()
             stdscr.Refresh()
         }
@@ -99,10 +99,10 @@ func printmenu(w *Window, menu []string, active int) {
     for i, s := range menu {
         if i == active {
             w.Attron("reverse")
-            w.Mvprint(y+i, x, s)
+            w.Print(y+i, x, s)
             w.Attroff("reverse")
         } else {
-            w.Mvprint(y+i, x, s)        
+            w.Print(y+i, x, s)        
         }
     }
     w.Refresh()

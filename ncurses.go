@@ -16,6 +16,7 @@ import "C"
 import (
     "fmt"
     "os"
+    "reflect"
     "unsafe"
 )
 
@@ -112,38 +113,43 @@ var mouseEvents = map[string] MMask {
 
 // Turn on/off buffering; raw user signals are passed to the program for
 // handling. Overrides raw mode
-func Cbreak() os.Error {
-    if (C.cbreak() == C.ERR) {
-        return os.NewError("Failed to enable cbreak mode")
+func CBreak(on bool) {
+    if on {
+        C.cbreak()
+        return
     }
-    return nil
+    C.nocbreak()
 }
 
-func CursSet(vis byte) os.Error {
+// Set the cursor visibility. Options are: 0 (invisible/hidden), 1 (normal)
+// and 2 (extra-visible)
+func Cursor(vis byte) os.Error {
     if (C.curs_set(C.int(vis)) == C.ERR) {
-        return os.NewError("Failed to enable cbreak mode")
+        return os.NewError("Failed to enable ")
     }
     return nil
 }
 
-func DoUpdate() os.Error {
+// Update the screen, refreshing all windows
+func Update() os.Error {
     if (C.doupdate() == C.ERR) {
         return os.NewError("Failed to update")
     }
     return nil
 }
 
-// Turn on echoing characters to the terminal
-func Echo() os.Error {
-    if (C.echo() == C.ERR) {
-        return os.NewError("Failed to enable character echoing")
+// Echo turns on/off the printing of typed characters
+func Echo(on bool) {
+    if on {
+        C.echo()
+        return
     }
-    return nil
+    C.noecho()
 }
 
 // Must be called prior to exiting the program in order to make sure the
 // terminal returns to normal operation
-func Endwin() {
+func End() {
     C.endwin()
 }
 
@@ -162,7 +168,7 @@ func GetMouse() ([]int, os.Error) {
 // Behaves like cbreak() but also adds a timeout for input. If timeout is
 // exceeded after a call to Getch() has been made then Getch will return
 // with an error
-func Halfdelay(delay int) os.Error {
+func HalfDelay(delay int) os.Error {
     var cerr C.int
     if delay > 0 {
         cerr = C.halfdelay(C.int(delay))
@@ -173,6 +179,8 @@ func Halfdelay(delay int) os.Error {
     return nil
 }
 
+// InitColor is used to set 'color' to the specified RGB values. Values may
+// be between 0 and 1000.
 func InitColor(color string, r, g, b int) os.Error {
     col, ok := colorList[color];
     if !ok {
@@ -184,6 +192,7 @@ func InitColor(color string, r, g, b int) os.Error {
     return nil
 }
 
+// InitPair sets a colour pair designated by 'pair' to fg and bg colors
 func InitPair(pair byte, fg, bg string) os.Error {
     if pair == 0 || C.int(pair) > (C.COLOR_PAIRS-1) {
         return os.NewError("Invalid color pair selected")
@@ -204,7 +213,7 @@ func InitPair(pair byte, fg, bg string) os.Error {
 
 // Initialize the ncurses library. You must run this function prior to any 
 // other goncurses function in order for the library to work
-func Initscr() (stdscr *Window, err os.Error) {
+func Init() (stdscr *Window, err os.Error) {
     stdscr = (*Window)(C.initscr())
     err = nil
     if (unsafe.Pointer(stdscr) == nil) {
@@ -214,11 +223,11 @@ func Initscr() (stdscr *Window, err os.Error) {
 }
 
 // Returns a string representing the value of input returned by Getch
-func Key(k C.int) (key string) {
+func Key(k int) (key string) {
     var ok bool
-    key, ok = keyList[k]
+    key, ok = keyList[C.int(k)]
     if !ok {
-        key = fmt.Sprintf("%c", int(k))
+        key = fmt.Sprintf("%c", k)
     }
     return
 }
@@ -231,7 +240,8 @@ func MouseMask(masks ...string) {
     C.mousemask((C.mmask_t)(mousemask), (*C.mmask_t)(unsafe.Pointer(nil)))
 }
 
-func NewWin(h, w, y, x int) (new *Window, err os.Error) {
+// NewWindow creates a windows of size h(eight) and w(idth) at y, x
+func NewWindow(h, w, y, x int) (new *Window, err os.Error) {
     new = (*Window)(C.newwin(C.int(h), C.int(w), C.int(y), C.int(x)))
     if (unsafe.Pointer(new) == unsafe.Pointer(nil)) {
         err = os.NewError("Failed to create a new window")
@@ -239,34 +249,15 @@ func NewWin(h, w, y, x int) (new *Window, err os.Error) {
     return
 }
 
-func Nocbreak() os.Error {
-    if (C.nocbreak() == C.ERR) {
-        return os.NewError("Failed to disable cbreak mode")
+// Raw turns on input buffering; user signals are disabled and the key strokes 
+// are passed directly to input. Set to false if you wish to turn this mode
+// off
+func Raw(on bool) {
+    if on {
+        C.raw()
+        return
     }
-    return nil
-}
-
-func Noecho() os.Error {
-    if (C.noecho() == C.ERR) {
-        return os.NewError("Failed to disable character echoing")
-    }
-    return nil
-}
-
-func Noraw() os.Error {
-    if C.noraw() == C.ERR {
-        return os.NewError("Failed to disable raw mode")
-    }
-    return nil
-}
-
-// Turn off input buffering; user signals are disabled and the key strokes are
-// passed directly to input
-func Raw() os.Error {
-    if (C.raw() == C.ERR) {
-        return os.NewError("Failed to enable raw mode")
-    }
-    return nil
+    C.noraw()
 }
 
 // Enables colors to be displayed. Will return an error if terminal is not
@@ -283,7 +274,8 @@ func StartColor() os.Error {
 
 type Window C.WINDOW
 
-func (w *Window) Addch(ch Chtype, attributes ...Attribute) {
+// AddCharacter to window
+func (w *Window) AddCharacter(ch Chtype, attributes ...Attribute) {
     var cattr C.int
     for _, attr := range attributes {
         cattr |= attrList[attr]
@@ -344,7 +336,7 @@ func (w *Window) Clear() os.Error {
 // bottom of window
 func (w *Window) ClearToBottom() os.Error {
     if C.wclrtobot((*C.WINDOW)(w)) == C.ERR {
-        return os.NewError("Failed to clear screen")
+        return os.NewError("Failed to clear bottom of window")
     }
     return nil
 }
@@ -353,7 +345,7 @@ func (w *Window) ClearToBottom() os.Error {
 // of the line
 func (w *Window) ClearToEOL() os.Error {
     if C.wclrtoeol((*C.WINDOW)(w)) == C.ERR {
-        return os.NewError("Failed to clear screen")
+        return os.NewError("Failed to clear to end of line")
     }
     return nil
 }
@@ -374,23 +366,23 @@ func (w *Window) ColorOn(pair byte) os.Error {
     return nil
 }
 
-func (w *Window) DelWin() os.Error {
+// Delete the window
+func (w *Window) Delete() os.Error {
     if C.delwin((*C.WINDOW)(w)) == C.ERR {
-        return os.NewError("Failed to enable delete window")
+        return os.NewError("Failed to delete window")
     }
+    w = nil
     return nil
 }
 
-func (w *Window) Erase() os.Error {
-        if C.werase((*C.WINDOW)(w)) == C.ERR {
-        return os.NewError("Failed to erase ??")
-    }
-    return nil
+// Erase the contents of the window, effectively clearing it
+func (w *Window) Erase() {
+    C.werase((*C.WINDOW)(w))
 }
 
 // Get a character from standard input
-func (w *Window) Getch() (ch C.int, err os.Error) {
-    if ch = C.wgetch((*C.WINDOW)(w)); ch == C.ERR {
+func (w *Window) GetChar() (ch int, err os.Error) {
+    if ch = int(C.wgetch((*C.WINDOW)(w))); ch == C.ERR {
         err = os.NewError("Failed to retrieve character from input stream")
     }
     return
@@ -398,14 +390,14 @@ func (w *Window) Getch() (ch C.int, err os.Error) {
 
 // Returns the maximum size of the Window. Note that it uses ncurses idiom
 // of returning y then x.
-func (w *Window) Getmaxyx() (int, int) {
+func (w *Window) Maxyx() (int, int) {
     // This hack is necessary to make cgo happy
     return int(w._maxy+1), int(w._maxx+1)
 }
 
 // Reads at most 'n' characters entered by the user from the Window. Attempts
 // to enter greater than 'n' characters will elicit a 'beep'
-func (w *Window) Getnstr(n int) (string, os.Error) {
+func (w *Window) GetString(n int) (string, os.Error) {
     cstr := make([]C.char, n)
     if C.wgetnstr((*C.WINDOW)(w), (*C.char)(&cstr[0]), C.int(n)) == C.ERR {
         return "", os.NewError("Failed to retrieve string from input stream")
@@ -413,20 +405,23 @@ func (w *Window) Getnstr(n int) (string, os.Error) {
     return C.GoString(&cstr[0]), nil
 }
 
-// Returns the current cursor location of the Window. Note that it uses 
+// Getyx returns the current cursor location in the Window. Note that it uses 
 // ncurses idiom of returning y then x.
 func (w *Window) Getyx() (int, int) {
-    // This hack is necessary to make cgo happy
+    // In some cases, getxy() and family are macros which don't play well with
+    // cgo
     return int(w._cury), int(w._curx)
 }
 
+// HLine draws a horizontal line starting at y, x and ending at width using 
+// the specified character
 func (w *Window) HLine(y, x, ch, width int) {
     C.mvwhline((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(ch), C.int(width))
     return
 }
 
-// Turn on/off accepting keypad characters like the F1-F12 keys and the 
-// arrow keys
+// Keypad turns on/off the keypad characters, including those like the F1-F12 
+// keys and the arrow keys
 func (w *Window)Keypad(keypad bool) os.Error {
     var err C.int
     if err = C.keypad((*C.WINDOW)(w), C.bool(keypad)); err == C.ERR {
@@ -435,33 +430,54 @@ func (w *Window)Keypad(keypad bool) os.Error {
     return nil
 }
 
-// Move the cursor to the specified coordinates
-func (w *Window) Move(y, x int) os.Error {
-    if C.wmove((*C.WINDOW)(w), C.int(y), C.int(x)) == C.ERR {
-        return os.NewError("Failed to move cursor")
-    }
-    return nil
-}
-    
-func (w *Window) Mvprint(y, x int, f string, s ...interface{}) {
-    str := fmt.Sprintf(f, s...)
+// Move the cursor to the specified coordinates within the window
+func (w *Window) Move(y, x int) {
     C.wmove((*C.WINDOW)(w), C.int(y), C.int(x))
-    for _, ch := range(str) {
-        w.Addch(Chtype(ch))
-    }
+    return
 }
 
-// Prints a formated string to the window similar to fmt.Printf family of 
-// functions.
-func (w *Window) Print(f string, a ...interface{}) {
-// Currently, cgo doesn't play nice with varargs functions so this hack is
-// used as a work around
-    str := fmt.Sprintf(f, a...)
-    for _, ch := range(str) {
-        w.Addch(Chtype(ch))
+// Print a string to the given window. The first two arguments may be
+// coordinates to print to. If only one integer is supplied, it is assumed to
+// be the y coordinate, x therefore defaults to 0. In order to simulate the 'n' 
+// versions of functions like addnstr use a string slice.
+// Examples:
+// goncurses.Print("hello!")
+// goncurses.Print("hello %s!", "world")
+// goncurses.Print(23, "hello!") // moves to 23, 0 and prints "hello!"
+// goncurses.Print(5, 10, "hello %s!", "world") // move to 5, 10 and print
+//                                              // "hello world!"
+func (w *Window) Print(args ...interface{}) {
+    var count, y, x int
+    
+    if len(args) > 1 {
+        if reflect.TypeOf(args[0]).String() == "int" {
+            y = args[0].(int)
+            count += 1
+        }
     }
+    if len(args) > 2 {
+        if reflect.TypeOf(args[1]).String() == "int" {
+            x = args[1].(int)
+            count += 1
+        }
+    }
+    
+    cstr := C.CString(fmt.Sprintf(args[count].(string), args[count+1:]...))
+    defer C.free(unsafe.Pointer(cstr))
+    
+    if count > 0 {
+        C.mvwaddstr((*C.WINDOW)(w), C.int(y), C.int(x), cstr)
+        return
+    }
+    C.waddstr((*C.WINDOW)(w), cstr)
 }
 
+// Refresh the window so it's contents will be displayed
 func (w *Window) Refresh() {
     C.wrefresh((*C.WINDOW)(w))
+}
+
+// Resize the window to new height, width
+func (w *Window) Resize(height, width int) {
+    C.wresize((*C.WINDOW)(w), C.int(height), C.int(width))
 }

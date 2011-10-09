@@ -6,8 +6,8 @@ package main
 import . "goncurses"
 
 func main() {
-    stdscr, _ := Initscr()
-    defer Endwin()
+    stdscr, _ := Init()
+    defer End()
     
     stdscr.Print("Hello, World!!!")
     stdscr.Refresh()

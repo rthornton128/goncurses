@@ -6,19 +6,19 @@ package main
 import . "goncurses"
 
 func main() {
-    stdscr, _ := Initscr()
-    defer Endwin()
+    stdscr, _ := Init()
+    defer End()
     StartColor()
     
-    Raw()
-    Echo()
+    Raw(true)
+    Echo(true)
     InitPair(1, "blue", "white")
     
     stdscr.Keypad(true)
-    stdscr.Mvprint(12, 30, "Hello, World!!!")
+    stdscr.Print(12, 30, "Hello, World!!!")
     stdscr.ColorOn(1)
-    stdscr.Mvprint(13, 30, "Hello, World in Color!!!")
+    stdscr.Print(13, 30, "Hello, World in Color!!!")
     stdscr.ColorOff(1)
     stdscr.Refresh()
-    stdscr.Getch()
+    stdscr.GetChar()
 }
