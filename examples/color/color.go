@@ -1,4 +1,4 @@
-/* This simnple example mirrors the "hello world" TLDP ncurses howto */
+/* This simnple example demonstrates some of the color facilities of ncurses */
 
 package main
 
@@ -13,7 +13,9 @@ func main() {
     Raw(true)
     Echo(true)
     InitPair(1, "blue", "white")
+    InitPair(2, "black", "cyan")
     
+    stdscr.Background(2)
     stdscr.Keypad(true)
     stdscr.Print(12, 30, "Hello, World!!!")
     stdscr.ColorOn(1)
