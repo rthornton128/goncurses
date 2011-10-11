@@ -67,6 +67,13 @@ func (m *Menu) Driver(action string) {
     return
 }
 
+func (m *Menu) Format(r, c int) os.Error {
+    if res := C.set_menu_format((*C.MENU)(m), C.int(r), C.int(c)); res != C.E_OK {
+        return os.NewError(menuerrors[Errno(res)])
+    }
+    return nil
+}
+
 func (m *Menu) Free() os.Error {
     if res := C.free_menu((*C.MENU)(m)); res != C.E_OK {
         return os.NewError(menuerrors[Errno(res)])
@@ -74,8 +81,38 @@ func (m *Menu) Free() os.Error {
     return nil
 }
 
+func (m *Menu) Mark(mark string) os.Error {
+    // should test and free previous mark
+    cmark := C.CString(mark)
+    if res := C.set_menu_mark((*C.MENU)(m), cmark); res != C.E_OK {
+        return os.NewError(menuerrors[Errno(res)])
+    }
+    return nil
+}
+
 func (m *Menu) Post() os.Error {
     if res := C.post_menu((*C.MENU)(m)); res != C.E_OK {
+        return os.NewError(menuerrors[Errno(res)])
+    }
+    return nil
+}
+
+func (m *Menu) SubWindow(sub *Window) os.Error {
+    if res := C.set_menu_sub((*C.MENU)(m), (*C.WINDOW)(sub)); res != C.E_OK {
+        return os.NewError(menuerrors[Errno(res)])
+    }
+    return nil
+}
+
+func (m *Menu) UnPost() os.Error {
+    if res := C.unpost_menu((*C.MENU)(m)); res != C.E_OK {
+        return os.NewError(menuerrors[Errno(res)])
+    }
+    return nil
+}
+
+func (m *Menu) Window(win *Window) os.Error {
+    if res := C.set_menu_win((*C.MENU)(m), (*C.WINDOW)(win)); res != C.E_OK {
         return os.NewError(menuerrors[Errno(res)])
     }
     return nil

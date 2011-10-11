@@ -65,6 +65,7 @@ var keyList = map[C.int]string{
 	C.KEY_RIGHT:     "right",
 	C.KEY_HOME:      "home",
 	C.KEY_BACKSPACE: "backspace",
+	C.KEY_ENTER:     "enter", // And not others?
 	C.KEY_F0:        "F0",
 	C.KEY_F0 + 1:    "F1",
 	C.KEY_F0 + 2:    "F2",
@@ -78,8 +79,9 @@ var keyList = map[C.int]string{
 	C.KEY_F0 + 10:   "F10",
 	C.KEY_F0 + 11:   "F11",
 	C.KEY_F0 + 12:   "F12",
-	C.KEY_ENTER:     "enter", // And not others?
 	C.KEY_MOUSE:     "mouse",
+	C.KEY_NPAGE:	 "page down",
+	C.KEY_PPAGE:	 "page up",
 }
 
 type MMask C.mmask_t
@@ -172,15 +174,16 @@ func GetMouse() ([]int, os.Error) {
 }
 
 // Behaves like cbreak() but also adds a timeout for input. If timeout is
-// exceeded after a call to Getch() has been made then Getch will return
-// with an error
+// exceeded after a call to Getch() has been made then GetChar will return
+// with an error. If delay is 0, then GetChar() will return to normal
+// behaviour
 func HalfDelay(delay int) os.Error {
 	var cerr C.int
 	if delay > 0 {
 		cerr = C.halfdelay(C.int(delay))
 	}
 	if cerr == C.ERR {
-		return os.NewError("Unable to set echo mode")
+		return os.NewError("Unable to set delay mode")
 	}
 	return nil
 }
@@ -414,14 +417,14 @@ func (w *Window) Delete() os.Error {
 // confining the derived window to the area of original window. See the
 // SubWindow function for additional notes.
 func (w *Window) DerivedWindow(height, width, y, x int) *Window {
-	res := C.subwin((*C.WINDOW)(w), C.int(height), C.int(width), C.int(y),
+	res := C.derwin((*C.WINDOW)(w), C.int(height), C.int(width), C.int(y),
 		C.int(x))
 	return (*Window)(res)
 }
 
 // Duplicate the window, creating an exact copy.
 func (w *Window) Duplicate() *Window {
-	return C.dupwin((*C.WINDOW)(w))
+	return (*Window)(C.dupwin((*C.WINDOW)(w)))
 }
 
 // Erase the contents of the window, effectively clearing it
@@ -542,6 +545,12 @@ func (w *Window) SubWindow(height, width, y, x int) *Window {
 	return (*Window)(res)
 }
 
+// Sync updates all parent or child windows which were created via
+// SubWindow() or DerivedWindow(). Argument can be one of: SYNC_DOWN, which
+// syncronizes all parent windows (done by Refresh() by default so should
+// rarely, if ever, need to be called); SYNC_UP, which updates all child
+// windows to match any updates made to the parent; and, SYNC_CURSOR, which
+// updates the cursor position only for all windows to match the parent window
 func (w *Window) Sync(sync int) {
 	switch sync {
 	case SYNC_DOWN:
