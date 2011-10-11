@@ -64,7 +64,9 @@ func main() {
     menuwin.HLine(2, 1, '-', WIDTH-2) 
     
     y, _ := stdscr.Maxyx()
-    stdscr.Print(y-2, 1, "'q' to exit")
+    stdscr.ColorOn(2)
+    stdscr.Print(y-3, 1, "Use up/down arrows or page up/down to navigate. 'q' to exit")
+    stdscr.ColorOff(2)
     stdscr.Refresh()
     
     menu.Post()
@@ -78,11 +80,7 @@ func main() {
         if x := Key(ch); x == "q" {
             return
         } else {
-            menu.Driver(x)        
-//        case "down":
-//            menu.Driver("down")
-//        case "up":
-//            menu.Driver("up")
+            menu.Driver(x)
         }
     }
 }

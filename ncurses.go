@@ -175,8 +175,7 @@ func GetMouse() ([]int, os.Error) {
 
 // Behaves like cbreak() but also adds a timeout for input. If timeout is
 // exceeded after a call to Getch() has been made then GetChar will return
-// with an error. If delay is 0, then GetChar() will return to normal
-// behaviour
+// with an error.
 func HalfDelay(delay int) os.Error {
 	var cerr C.int
 	if delay > 0 {
