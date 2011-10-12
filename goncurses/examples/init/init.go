@@ -4,7 +4,7 @@
 
 package main
 
-import . "goncurses"
+import . "goncurses.googlecode.com/hg/goncurses"
 
 func main() {
     stdscr, _ := Init()
@@ -23,7 +23,7 @@ func main() {
     } else {
         stdscr.Print("The key pressed is: ")
         stdscr.Attron("bold")
-        stdscr.AddCharacter(Chtype(ch))
+        stdscr.AddChar(Chtype(ch))
         stdscr.Attroff("bold")
     }
     stdscr.Refresh()

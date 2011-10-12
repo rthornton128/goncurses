@@ -3,7 +3,7 @@
 package main
 
 /* Note that is not considered idiomatic Go to import curses this way */
-import . "goncurses"
+import . "goncurses.googlecode.com/hg/goncurses"
 
 func main() {
     stdscr, _ := Initscr()
@@ -12,5 +12,5 @@ func main() {
     stdscr.Print("Hello, World!!!")
     stdscr.Addch('a' | BLUE)
     stdscr.Refresh()
-    stdscr.Getch()
+    stdscr.GetChar()
 }

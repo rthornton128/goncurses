@@ -4,13 +4,13 @@
 
 package main
 
-import . "goncurses"
+import . "goncurses.googlecode.com/hg/goncurses"
 
 func main() {
     stdscr, _ := Init();
     defer End()
     
-    row, col := stdscr.Getmaxyx()
+    row, col := stdscr.Maxyx()
     msg := "Just a string "
     stdscr.Print(row/2, (col-len(msg))/2, msg)
     
@@ -19,5 +19,5 @@ func main() {
     stdscr.Print("Try resizing your window and then run this program again.")
 
     stdscr.Refresh()
-    stdscr.Getch()
+    stdscr.GetChar()
 }

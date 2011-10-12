@@ -3,7 +3,7 @@
 
 package main
 
-import . "goncurses"
+import . "goncurses.googlecode.com/hg/goncurses"
 
 const (
     HEIGHT = 10
