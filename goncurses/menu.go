@@ -27,6 +27,19 @@ var menuerrors = map[Errno]string{
 	C.E_UNKNOWN_COMMAND: "The menu driver code saw an unknown request code.",
 }
 
+// Menu Options
+const (
+    O_ONEVALUE = C.O_ONEVALUE // Only one item can be selected
+    O_SHOWDESC = C.O_SHOWDESC // Display item descriptions
+    O_ROWMAJOR = C.O_ROWMAJOR // Display in row-major order
+    O_IGNORECASE = C.O_IGNORECASE // Ingore case when pattern-matching
+    O_SHOWMATCH = C.O_SHOWMATCH // Move cursor to item when pattern-matching
+    O_NONCYCLIC = C.O_NONCYCLIC // Don't wrap next/prev item
+)
+
+// Menu Item Options
+const O_SELECTABLE = C.O_SELECTABLE
+
 func (e Errno) String() string {
 	return menuerrors[e]
 }
@@ -54,10 +67,11 @@ type Menu C.MENU
 type MenuItem C.ITEM
 
 func NewMenu(items []*MenuItem) (*Menu, os.Error) {
-	citems := make([]*C.ITEM, len(items))
+	citems := make([]*C.ITEM, len(items)+1)
 	for index, item := range items {
 		citems[index] = (*C.ITEM)(item)
 	}
+	citems[len(items)] = nil
 	menu, errno := C.new_menu((**C.ITEM)(&citems[0]))
 	if menu == nil {
 		return nil, errno
@@ -87,10 +101,24 @@ func (m *Menu) Free() os.Error {
 }
 
 func (m *Menu) Mark(mark string) os.Error {
-	// should test and free previous mark
 	cmark := C.CString(mark)
+	defer C.free(unsafe.Pointer(cmark))
+	
 	if res := C.set_menu_mark((*C.MENU)(m), cmark); res != C.E_OK {
 		return os.NewError(menuerrors[Errno(res)])
+	}
+	return nil
+}
+
+func (m *Menu) Option(opts int, on bool) os.Error {
+    var res C.int
+    if on {
+        res = C.menu_opts_on((*C.MENU)(m), C.Menu_Options(opts))
+    } else {
+	    res = C.menu_opts_off((*C.MENU)(m), C.Menu_Options(opts))
+	}
+	if res != 0 {
+	    return os.NewError(menuerrors[Errno(res)])
 	}
 	return nil
 }
