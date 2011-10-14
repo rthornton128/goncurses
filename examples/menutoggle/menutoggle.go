@@ -3,8 +3,7 @@
 
 package main
 
-//import . "goncurses.googlecode.com/hg/goncurses"
-import . "goncurses"
+import . "goncurses.googlecode.com/hg/goncurses"
 
 func main() {
     stdscr, _ := Init();

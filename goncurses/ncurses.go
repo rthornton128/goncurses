@@ -27,6 +27,48 @@ const (
 	SYNC_UP     // Sync change in all child windows
 )
 
+// Ideally, these would not be hard-coded as they are potentially not the
+// same on all systems. However, some ncurses implementations seem to be
+// heavily reliant on macros which prevent these definitions from being
+// handled by cgo
+const (
+	ACS_LARROW = iota + 4194347
+	ACS_RARROW
+	ACS_DARROW
+	ACS_UARROW
+	ACS_BLOCK   = 4194352
+	ACS_DIAMOND = 4194400
+	ACS_CKBOARD = 4194401
+)
+
+const (
+	ACS_DEGREE = iota + 4194406
+	ACS_PLMINUS
+	ACS_BOARD
+	ACS_LANTERN
+	ACS_LRCORNER
+	ACS_URCORNER
+	ACS_LLCORNER
+	ACS_ULCORNER
+	ACS_PLUS
+	ACS_S1
+	ACS_S3
+	ACS_HLINE
+	ACS_S7
+	ACS_S9
+	ACS_LTEE
+	ACS_RTEE
+	ACS_BTEE
+	ACS_TTEE
+	ACS_VLINE
+	ACS_LEQUAL
+	ACS_GEQUAL
+	ACS_PI
+	ACS_NEQUAL
+	ACS_STERLING
+	ACS_BULLET
+)
+
 type Attribute string
 
 var attrList = map[Attribute]C.int{
@@ -56,6 +98,10 @@ var colorList = map[string]C.int{
 	"white":   C.COLOR_WHITE,
 }
 
+//var characterList = map[string]int {
+
+//}
+
 var keyList = map[C.int]string{
 	9:               "tab",
 	10:              "enter", // On some keyboards?
@@ -80,8 +126,8 @@ var keyList = map[C.int]string{
 	C.KEY_F0 + 11:   "F11",
 	C.KEY_F0 + 12:   "F12",
 	C.KEY_MOUSE:     "mouse",
-	C.KEY_NPAGE:	 "page down",
-	C.KEY_PPAGE:	 "page up",
+	C.KEY_NPAGE:     "page down",
+	C.KEY_PPAGE:     "page up",
 }
 
 type MMask C.mmask_t
@@ -283,12 +329,30 @@ func StartColor() os.Error {
 type Window C.WINDOW
 
 // AddCharacter to window
-func (w *Window) AddChar(ch Chtype, attributes ...Attribute) {
+func (w *Window) AddChar(args ...interface{}) {
 	var cattr C.int
-	for _, attr := range attributes {
-		cattr |= attrList[attr]
+	var count, y, x int
+
+	if len(args) > 1 {
+		if reflect.TypeOf(args[0]).String() == "int" {
+			y = args[0].(int)
+			count += 1
+		}
 	}
-	C.waddch((*C.WINDOW)(w), C.chtype(C.int(ch)|cattr))
+	if len(args) > 2 {
+		if reflect.TypeOf(args[1]).String() == "int" {
+			x = args[1].(int)
+			count += 1
+		}
+	}
+	cattr |= C.int(args[count].(int))
+	for _, attr := range args[count+1:] {
+		cattr |= attrList[Attribute(attr.(string))]
+	}
+	if count > 0 {
+		C.mvwaddch((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(cattr))
+	}
+	C.waddch((*C.WINDOW)(w), C.chtype(cattr))
 }
 
 // Turn off character attribute TODO: range through Attribute array

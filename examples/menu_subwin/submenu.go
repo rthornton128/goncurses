@@ -44,7 +44,7 @@ func main() {
     menuwin.Print(1, (x/2)-(len(title)/2), title)
     menuwin.ColorOff(1)
     // FIXME: ACS_* definitions not currently available
-    menuwin.HLine(2, 1, '-', x-2) 
+    menuwin.HLine(2, 1, ACS_HLINE, x-2) 
     
     y, x = stdscr.Maxyx()
     stdscr.Print(y-2, 1, "'q' to exit")
