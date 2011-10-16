@@ -71,9 +71,9 @@ func printmenu (w *Window, menu []string, active int) {
     w.Box(0, 0)
     for i, s := range menu {
         if i == active {
-            w.Attron("reverse")
+            w.Attron(A_REVERSE)
             w.Print(y+i, x, s)
-            w.Attroff("reverse")
+            w.Attroff(A_REVERSE)
         } else {
             w.Print(y+i, x, s)        
         }

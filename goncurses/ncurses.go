@@ -69,20 +69,32 @@ const (
 	ACS_BULLET
 )
 
-type Attribute string
+const (
+	A_NORMAL     = C.A_NORMAL
+	A_STANDOUT   = C.A_STANDOUT
+	A_UNDERLINE  = C.A_UNDERLINE
+	A_REVERSE    = C.A_REVERSE
+	A_BLINK      = C.A_BLINK
+	A_DIM        = C.A_DIM
+	A_BOLD       = C.A_BOLD
+	A_PROTECT    = C.A_PROTECT
+	A_INVIS      = C.A_INVIS
+	A_ALTCHARSET = C.A_ALTCHARSET
+	A_CHARTEXT   = C.A_CHARTEXT
+)
 
-var attrList = map[Attribute]C.int{
-	"normal":     C.A_NORMAL,
-	"standout":   C.A_STANDOUT,
-	"underline":  C.A_UNDERLINE,
-	"reverse":    C.A_REVERSE,
-	"blink":      C.A_BLINK,
-	"dim":        C.A_DIM,
-	"bold":       C.A_BOLD,
-	"protect":    C.A_PROTECT,
-	"invis":      C.A_INVIS,
-	"altcharset": C.A_ALTCHARSET,
-	"chartext":   C.A_CHARTEXT,
+var attrList = map[C.int]string{
+	C.A_NORMAL:     "normal",
+	C.A_STANDOUT:   "standout",
+	C.A_UNDERLINE:  "underline",
+	C.A_REVERSE:    "reverse",
+	C.A_BLINK:      "blink",
+	C.A_DIM:        "dim",
+	C.A_BOLD:       "bold",
+	C.A_PROTECT:    "protect",
+	C.A_INVIS:      "invis",
+	C.A_ALTCHARSET: "altcharset",
+	C.A_CHARTEXT:   "chartext",
 }
 
 type Chtype C.chtype
@@ -173,6 +185,10 @@ func CBreak(on bool) {
 		return
 	}
 	C.nocbreak()
+}
+
+func ColorPair(pair int) int {
+	return int(C.COLOR_PAIR(C.int(pair)))
 }
 
 // Set the cursor visibility. Options are: 0 (invisible/hidden), 1 (normal)
@@ -346,56 +362,32 @@ func (w *Window) AddChar(args ...interface{}) {
 		}
 	}
 	cattr |= C.int(args[count].(int))
-	for _, attr := range args[count+1:] {
-		cattr |= attrList[Attribute(attr.(string))]
-	}
 	if count > 0 {
 		C.mvwaddch((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(cattr))
 	}
 	C.waddch((*C.WINDOW)(w), C.chtype(cattr))
 }
 
-// Turn off character attribute TODO: range through Attribute array
-func (w *Window) Attroff(attrstr Attribute) (err os.Error) {
-	attr, ok := attrList[attrstr]
-	if !ok {
-		err = os.NewError(fmt.Sprintf("Invalid attribute: ", attrstr))
-	}
-	if C.wattroff((*C.WINDOW)(w), attr) == C.ERR {
-		err = os.NewError(fmt.Sprintf("Failed to unset attribute: %s", attrstr))
+// Turn off character attribute
+func (w *Window) AttrOff(attr int) (err os.Error) {
+	if C.wattroff((*C.WINDOW)(w), C.int(attr)) == C.ERR {
+		err = os.NewError(fmt.Sprintf("Failed to unset attribute: %s",
+			attrList[C.int(attr)]))
 	}
 	return
 }
 
-// Turn on character attribute TODO: range through Attribute array
-func (w *Window) Attron(attrstr Attribute) (err os.Error) {
-	attr, ok := attrList[attrstr]
-	if !ok {
-		err = os.NewError(fmt.Sprintf("Invalid attribute: ", attrstr))
-	}
-	if C.wattron((*C.WINDOW)(w), attr) == C.ERR {
-		err = os.NewError(fmt.Sprintf("Failed to set attribute: %s", attrstr))
+// Turn on character attribute
+func (w *Window) AttrOn(attr int) (err os.Error) {
+	if C.wattron((*C.WINDOW)(w), C.int(attr)) == C.ERR {
+		err = os.NewError(fmt.Sprintf("Failed to set attribute: %s",
+			attrList[C.int(attr)]))
 	}
 	return
 }
 
-func (w *Window) Background(args ...interface{}) {
-	var nattr C.chtype
-	for _, ch := range args {
-		switch reflect.TypeOf(ch).String() {
-		case "byte":
-		case "int":
-			nattr |= C.chtype(C.COLOR_PAIR(C.int(ch.(int))))
-		case "string":
-			if attr, ok := attrList[Attribute(ch.(string))]; ok {
-				nattr |= C.chtype(attr)
-			}
-			//            if attr, ok := attrList[ch.string()]; ok {
-			//                nattr |= attr
-			//            }
-		}
-	}
-	C.wbkgd((*C.WINDOW)(w), nattr)
+func (w *Window) Background(attr int) {
+	C.wbkgd((*C.WINDOW)(w), C.chtype(attr))
 }
 
 // Border uses the characters supplied to draw a border around the window.

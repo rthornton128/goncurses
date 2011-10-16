@@ -1,10 +1,9 @@
-/* This example show a basic menu similar to that found in the ncurses
- * examples from TLDP */
+/* This example shows a basic multi-column menu similar to that found in the 
+ * ncurses examples from TLDP */
 
 package main
 
-//import . "goncurses.googlecode.com/hg/goncurses"
-import . "goncurses"
+import . "goncurses.googlecode.com/hg/goncurses"
 
 const (
     HEIGHT = 10
@@ -66,7 +65,6 @@ func main() {
     menu.Mark(" * ")
     
     // Print centered menu title
-    //y, x := menuwin.Maxyx()
     title := "My Menu"
     menuwin.Box(0, 0)
     menuwin.ColorOn(1)

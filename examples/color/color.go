@@ -15,7 +15,7 @@ func main() {
     InitPair(1, "blue", "white")
     InitPair(2, "black", "cyan")
     
-    stdscr.Background(2)
+    stdscr.Background(ColorPair(2))
     stdscr.Keypad(true)
     stdscr.Print(12, 30, "Hello, World!!!")
     stdscr.ColorOn(1)

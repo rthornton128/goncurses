@@ -22,9 +22,9 @@ func main() {
         stdscr.Print("The F2 key was pressed.")
     } else {
         stdscr.Print("The key pressed is: ")
-        stdscr.Attron("bold")
-        stdscr.AddChar(Chtype(ch))
-        stdscr.Attroff("bold")
+        stdscr.AttrOn(A_BOLD)
+        stdscr.AddChar(ch)
+        stdscr.AttrOff(A_BOLD)
     }
     stdscr.Refresh()
     stdscr.GetChar()
