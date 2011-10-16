@@ -99,7 +99,18 @@ var attrList = map[C.int]string{
 
 type Chtype C.chtype
 
-var colorList = map[string]C.int{
+const (
+	C_BLACK =   C.COLOR_BLACK
+	C_BLUE =    C.COLOR_BLUE
+	C_CYAN =    C.COLOR_CYAN
+	C_GREEN =   C.COLOR_GREEN
+	C_MAGENTA = C.COLOR_MAGENTA
+	C_RED =     C.COLOR_RED
+	C_WHITE =   C.COLOR_WHITE
+	C_YELLOW =  C.COLOR_YELLOW	
+)
+
+/*var colorList = map[string]C.int{
 	"black":   C.COLOR_BLACK,
 	"red":     C.COLOR_RED,
 	"green":   C.COLOR_GREEN,
@@ -108,11 +119,7 @@ var colorList = map[string]C.int{
 	"magenta": C.COLOR_MAGENTA,
 	"cyan":    C.COLOR_CYAN,
 	"white":   C.COLOR_WHITE,
-}
-
-//var characterList = map[string]int {
-
-//}
+}*/
 
 var keyList = map[C.int]string{
 	9:               "tab",
@@ -143,6 +150,34 @@ var keyList = map[C.int]string{
 }
 
 type MMask C.mmask_t
+
+const (
+	M_ALL            = C.ALL_MOUSE_EVENTS
+	M_ALT            = C.BUTTON_ALT      // alt-click
+	M_B1_PRESSED     = C.BUTTON1_PRESSED // button 1
+	M_B1_RELEASED    = C.BUTTON1_RELEASED
+	M_B1_CLICKED     = C.BUTTON1_CLICKED
+	M_B1_DBL_CLICKED = C.BUTTON1_DOUBLE_CLICKED
+	M_B1_TPL_CLICKED = C.BUTTON1_TRIPLE_CLICKED
+	M_B2_PRESSED     = C.BUTTON2_PRESSED // button 2
+	M_B2_RELEASED    = C.BUTTON2_RELEASED
+	M_B2_CLICKED     = C.BUTTON2_CLICKED
+	M_B2_DBL_CLICKED = C.BUTTON2_DOUBLE_CLICKED
+	M_B2_TPL_CLICKED = C.BUTTON2_TRIPLE_CLICKED
+	M_B3_PRESSED     = C.BUTTON3_PRESSED // button 3
+	M_B3_RELEASED    = C.BUTTON3_RELEASED
+	M_B3_CLICKED     = C.BUTTON3_CLICKED
+	M_B3_DBL_CLICKED = C.BUTTON3_DOUBLE_CLICKED
+	M_B3_TPL_CLICKED = C.BUTTON3_TRIPLE_CLICKED
+	M_B4_PRESSED     = C.BUTTON4_PRESSED // button 4
+	M_B4_RELEASED    = C.BUTTON4_RELEASED
+	M_B4_CLICKED     = C.BUTTON4_CLICKED
+	M_B4_DBL_CLICKED = C.BUTTON4_DOUBLE_CLICKED
+	M_B4_TPL_CLICKED = C.BUTTON4_TRIPLE_CLICKED
+	M_CTRL           = C.BUTTON_CTRL           // ctrl-click
+	M_SHIFT          = C.BUTTON_SHIFT          // shift-click
+	M_POSITION       = C.REPORT_MOUSE_POSITION // mouse moved
+)
 
 var mouseEvents = map[string]MMask{
 	"button1-pressed":        C.BUTTON1_PRESSED,
@@ -187,6 +222,8 @@ func CBreak(on bool) {
 	C.nocbreak()
 }
 
+// Return the value of a color pair which can be passed to functions which
+// accept attributes like AddChar or AttrOn/Off.
 func ColorPair(pair int) int {
 	return int(C.COLOR_PAIR(C.int(pair)))
 }
@@ -251,11 +288,7 @@ func HalfDelay(delay int) os.Error {
 
 // InitColor is used to set 'color' to the specified RGB values. Values may
 // be between 0 and 1000.
-func InitColor(color string, r, g, b int) os.Error {
-	col, ok := colorList[color]
-	if !ok {
-		return os.NewError("Failed to set new color definition")
-	}
+func InitColor(col int, r, g, b int) os.Error {
 	if C.init_color(C.short(col), C.short(r), C.short(g), C.short(b)) == C.ERR {
 		return os.NewError("Failed to set new color definition")
 	}
@@ -263,19 +296,11 @@ func InitColor(color string, r, g, b int) os.Error {
 }
 
 // InitPair sets a colour pair designated by 'pair' to fg and bg colors
-func InitPair(pair byte, fg, bg string) os.Error {
+func InitPair(pair byte, fg, bg int) os.Error {
 	if pair == 0 || C.int(pair) > (C.COLOR_PAIRS-1) {
 		return os.NewError("Invalid color pair selected")
 	}
-	fg_color, fg_ok := colorList[fg]
-	bg_color, bg_ok := colorList[bg]
-	if !fg_ok {
-		return os.NewError("Invalid foreground color")
-	}
-	if !bg_ok {
-		return os.NewError("Invalid foreground color")
-	}
-	if C.init_pair(C.short(pair), C.short(fg_color), C.short(bg_color)) == C.ERR {
+	if C.init_pair(C.short(pair), C.short(fg), C.short(bg)) == C.ERR {
 		return os.NewError("Failed to init color pair")
 	}
 	return nil
@@ -302,6 +327,8 @@ func Key(k int) (key string) {
 	return
 }
 
+// MouseMask accepts a single int of OR'd mouse events which should be
+// accepted as input events to GetChar. 
 func MouseMask(masks ...string) {
 	var mousemask MMask
 	for _, mask := range masks {
@@ -344,31 +371,31 @@ func StartColor() os.Error {
 
 type Window C.WINDOW
 
-// AddCharacter to window
-func (w *Window) AddChar(args ...interface{}) {
+// AddChar prints a single character to the window. The character can be
+// OR'd together with attributes and colors. If optional first or second
+// arguments are given they are the y and x coordinates on the screen
+// respectively. If only y is given, x is assumed to be zero.
+func (w *Window) AddChar(args ...int) {
 	var cattr C.int
 	var count, y, x int
 
 	if len(args) > 1 {
-		if reflect.TypeOf(args[0]).String() == "int" {
-			y = args[0].(int)
-			count += 1
-		}
+		y = args[0]
+		count += 1
 	}
 	if len(args) > 2 {
-		if reflect.TypeOf(args[1]).String() == "int" {
-			x = args[1].(int)
-			count += 1
-		}
+		x = args[1]
+		count += 1
 	}
-	cattr |= C.int(args[count].(int))
+	cattr |= C.int(args[count])
 	if count > 0 {
 		C.mvwaddch((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(cattr))
+		return
 	}
 	C.waddch((*C.WINDOW)(w), C.chtype(cattr))
 }
 
-// Turn off character attribute
+// Turn off character attribute.
 func (w *Window) AttrOff(attr int) (err os.Error) {
 	if C.wattroff((*C.WINDOW)(w), C.int(attr)) == C.ERR {
 		err = os.NewError(fmt.Sprintf("Failed to unset attribute: %s",

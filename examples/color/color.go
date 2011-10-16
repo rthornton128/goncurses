@@ -12,8 +12,12 @@ func main() {
     
     Raw(true)
     Echo(true)
-    InitPair(1, "blue", "white")
-    InitPair(2, "black", "cyan")
+    InitPair(1, C_BLUE, C_WHITE)
+    InitPair(2, C_BLACK, C_CYAN)
+    
+    // An example of trying to set an invalid color pair
+    err := InitPair(255, C_BLACK, C_CYAN)
+    stdscr.Print(err.String())
     
     stdscr.Background(ColorPair(2))
     stdscr.Keypad(true)

@@ -19,8 +19,8 @@ func main() {
     Echo(false)
     Cursor(0)
     stdscr.Keypad(true)
-    InitPair(1, "red", "black")
-    InitPair(2, "cyan", "black")
+    InitPair(1, C_RED, C_BLACK)
+    InitPair(2, C_CYAN, C_BLACK)
     
     // build the menu items
     menu_items := []string{
