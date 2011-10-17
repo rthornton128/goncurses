@@ -20,6 +20,7 @@ import (
 	"unsafe"
 )
 
+// Synconize options for Sync() function
 const (
 	SYNC_NONE   = iota
 	SYNC_CURSOR // Sync cursor in all sub/derived windows
@@ -27,20 +28,14 @@ const (
 	SYNC_UP     // Sync change in all child windows
 )
 
-// Ideally, these would not be hard-coded as they are potentially not the
-// same on all systems. However, some ncurses implementations seem to be
+// Definitions for printed characters not found on most keyboards. Ideally, 
+// these would not be hard-coded as they are potentially different on
+// different systems. However, some ncurses implementations seem to be
 // heavily reliant on macros which prevent these definitions from being
-// handled by cgo
-const (
-	ACS_LARROW = iota + 4194347
-	ACS_RARROW
-	ACS_DARROW
-	ACS_UARROW
-	ACS_BLOCK   = 4194352
-	ACS_DIAMOND = 4194400
-	ACS_CKBOARD = 4194401
-)
-
+// handled by cgo properly. If they don't work for you, you won't be able
+// to use them until either a) the Go team works out a way to overcome this
+// limitation in godefs/cgo or b) an alternative method is found. Work is
+// being done to find a solution from the ncurses source code.
 const (
 	ACS_DEGREE = iota + 4194406
 	ACS_PLMINUS
@@ -67,8 +62,16 @@ const (
 	ACS_NEQUAL
 	ACS_STERLING
 	ACS_BULLET
+	ACS_LARROW  = 4194347
+	ACS_RARROW  = 4194348
+	ACS_DARROW  = 4194349
+	ACS_UARROW  = 4194350
+	ACS_BLOCK   = 4194352
+	ACS_DIAMOND = 4194400
+	ACS_CKBOARD = 4194401
 )
 
+// Text attributes
 const (
 	A_NORMAL     = C.A_NORMAL
 	A_STANDOUT   = C.A_STANDOUT
@@ -99,15 +102,18 @@ var attrList = map[C.int]string{
 
 type Chtype C.chtype
 
+// Colors available to ncurses. Combine these with the dim/bold attributes
+// for bright/dark versions of each color. These colors can be used for
+// both background and foreground colors.
 const (
-	C_BLACK =   C.COLOR_BLACK
-	C_BLUE =    C.COLOR_BLUE
-	C_CYAN =    C.COLOR_CYAN
-	C_GREEN =   C.COLOR_GREEN
+	C_BLACK   = C.COLOR_BLACK
+	C_BLUE    = C.COLOR_BLUE
+	C_CYAN    = C.COLOR_CYAN
+	C_GREEN   = C.COLOR_GREEN
 	C_MAGENTA = C.COLOR_MAGENTA
-	C_RED =     C.COLOR_RED
-	C_WHITE =   C.COLOR_WHITE
-	C_YELLOW =  C.COLOR_YELLOW	
+	C_RED     = C.COLOR_RED
+	C_WHITE   = C.COLOR_WHITE
+	C_YELLOW  = C.COLOR_YELLOW
 )
 
 /*var colorList = map[string]C.int{
@@ -151,6 +157,7 @@ var keyList = map[C.int]string{
 
 type MMask C.mmask_t
 
+// Mouse button events
 const (
 	M_ALL            = C.ALL_MOUSE_EVENTS
 	M_ALT            = C.BUTTON_ALT      // alt-click

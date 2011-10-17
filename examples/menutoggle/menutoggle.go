@@ -38,7 +38,8 @@ func main() {
     menu.Option(O_ONEVALUE, false)
     
     y, _ := stdscr.Maxyx()
-    stdscr.Print(y-3, 1, "Use up/down arrows or page up/down to navigate. 'q' to exit")
+    stdscr.Print(y-3, "Use up/down arrows to move, spacebar to toggle and " +
+        "enter to print. 'q' to exit")
     stdscr.Refresh()
     
     menu.Post()
@@ -51,9 +52,21 @@ func main() {
         if x := Key(ch); x == "q" {
             return
         } else {
-            if x == " " {
+            switch x {
+            case " ":
                 menu.Driver("toggle")
-            } else {
+            case "enter":
+                var list string
+                for _, item := range menu.Items(nil) {
+                    if item.Value() {
+                        list += "\"" + item.Name() + "\" "
+                    }
+                }
+                stdscr.Move(20, 0)
+                stdscr.ClearToEOL()
+                stdscr.Print(20, list)
+                stdscr.Refresh()
+            default:
                 menu.Driver(x)
             }
         }

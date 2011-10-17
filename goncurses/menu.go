@@ -1,8 +1,12 @@
 package goncurses
+/*
+#cgo LDFLAGS: -lmenu
+#include <menu.h>
+#include <stdlib.h>
 
-// #cgo LDFLAGS: -lmenu
-// #include <menu.h>
-// #include <stdlib.h>
+ITEM* menu_item_at(ITEM** ilist, int i) {
+	return ilist[i];
+}*/
 import "C"
 
 import (
@@ -10,6 +14,7 @@ import (
 	"unsafe"
 )
 
+// Not currently used
 type Errno int
 
 var menuerrors = map[Errno]string{
@@ -66,6 +71,7 @@ var driveractions = map[string]C.int{
 type Menu C.MENU
 type MenuItem C.ITEM
 
+// NewMenu returns a pointer to a new menu.
 func NewMenu(items []*MenuItem) (*Menu, os.Error) {
 	citems := make([]*C.ITEM, len(items)+1)
 	for index, item := range items {
@@ -79,6 +85,13 @@ func NewMenu(items []*MenuItem) (*Menu, os.Error) {
 	return (*Menu)(menu), nil
 }
 
+// Count returns the number of MenuItems in the Menu
+func (m *Menu) Count() int {
+	return int(C.item_count((*C.MENU)(m)))
+}
+
+// Driver controls how the menu is activated. Action usually corresponds
+// to the string return by the Key() function in goncurses.
 func (m *Menu) Driver(action string) {
 	if da, ok := driveractions[action]; ok {
 		C.menu_driver((*C.MENU)(m), da)
@@ -86,6 +99,7 @@ func (m *Menu) Driver(action string) {
 	return
 }
 
+// Format sets the menu format. See the O_* menu options.
 func (m *Menu) Format(r, c int) os.Error {
 	if res := C.set_menu_format((*C.MENU)(m), C.int(r), C.int(c)); res != C.E_OK {
 		return os.NewError(menuerrors[Errno(res)])
@@ -93,6 +107,8 @@ func (m *Menu) Format(r, c int) os.Error {
 	return nil
 }
 
+// Free deallocates memory set aside for the menu. This must be called
+// before exiting.
 func (m *Menu) Free() os.Error {
 	if res := C.free_menu((*C.MENU)(m)); res != C.E_OK {
 		return os.NewError(menuerrors[Errno(res)])
@@ -100,6 +116,30 @@ func (m *Menu) Free() os.Error {
 	return nil
 }
 
+// Items will either set or return the items in the menu. When setting
+// items you must make sure the prior menu items will be freed. Pass
+// nil to get the items in the menu.
+func (m *Menu) Items(items []*MenuItem) []*MenuItem {
+	if items == nil {
+		type ItemArray [10]*C.ITEM
+		citems := C.menu_items((*C.MENU)(m))
+		count := m.Count()
+		mitems := make([]*MenuItem, count)
+		for index := 0; index < count; index++ {
+			mitems[index] = (*MenuItem)(C.menu_item_at(citems, C.int(index)))
+		}
+		return mitems
+	}
+	citems := make([]*C.ITEM, len(items)+1)
+	for index, item := range items {
+		citems[index] = (*C.ITEM)(item)
+	}
+	citems[len(items)] = nil
+	C.set_menu_items((*C.MENU)(m), (**C.ITEM)(&citems[0]))
+	return nil
+}
+
+// Mark sets the indicator for the currently selected menu item
 func (m *Menu) Mark(mark string) os.Error {
 	cmark := C.CString(mark)
 	defer C.free(unsafe.Pointer(cmark))
@@ -110,6 +150,8 @@ func (m *Menu) Mark(mark string) os.Error {
 	return nil
 }
 
+// Option sets the options for the menu. See the O_* definitions for
+// a list of values which can be OR'd together
 func (m *Menu) Option(opts int, on bool) os.Error {
 	var res C.int
 	if on {
@@ -123,6 +165,7 @@ func (m *Menu) Option(opts int, on bool) os.Error {
 	return nil
 }
 
+// Post the menu, making it visible
 func (m *Menu) Post() os.Error {
 	if res := C.post_menu((*C.MENU)(m)); res != C.E_OK {
 		return os.NewError(menuerrors[Errno(res)])
@@ -130,6 +173,7 @@ func (m *Menu) Post() os.Error {
 	return nil
 }
 
+// SubWindow for the menu
 func (m *Menu) SubWindow(sub *Window) os.Error {
 	if res := C.set_menu_sub((*C.MENU)(m), (*C.WINDOW)(sub)); res != C.E_OK {
 		return os.NewError(menuerrors[Errno(res)])
@@ -137,6 +181,7 @@ func (m *Menu) SubWindow(sub *Window) os.Error {
 	return nil
 }
 
+// UnPost the menu, effectively hiding it.
 func (m *Menu) UnPost() os.Error {
 	if res := C.unpost_menu((*C.MENU)(m)); res != C.E_OK {
 		return os.NewError(menuerrors[Errno(res)])
@@ -144,6 +189,7 @@ func (m *Menu) UnPost() os.Error {
 	return nil
 }
 
+// Window container for the menu
 func (m *Menu) Window(win *Window) os.Error {
 	if res := C.set_menu_win((*C.MENU)(m), (*C.WINDOW)(win)); res != C.E_OK {
 		return os.NewError(menuerrors[Errno(res)])
@@ -151,6 +197,7 @@ func (m *Menu) Window(win *Window) os.Error {
 	return nil
 }
 
+// NewItem creates a new menu item with name and description.
 func NewItem(name, desc string) (*MenuItem, os.Error) {
 	cname := C.CString(name)
 	cdesc := C.CString(desc)
@@ -162,12 +209,24 @@ func NewItem(name, desc string) (*MenuItem, os.Error) {
 	return (*MenuItem)(item), nil
 }
 
+// Description returns the second value passed to NewItem 
+func (mi *MenuItem) Description() string {
+	return C.GoString(C.item_description((*C.ITEM)(mi)))
+}
+
+// Free must be called on all menu items to avoid memory leaks
 func (mi *MenuItem) Free() {
 	C.free(unsafe.Pointer(C.item_name((*C.ITEM)(mi))))
 	C.free_item((*C.ITEM)(mi))
 	return
 }
 
+// Name of the menu item
 func (mi *MenuItem) Name() string {
 	return C.GoString(C.item_name((*C.ITEM)(mi)))
+}
+
+// Value returns true if menu item is toggled/active, otherwise false
+func (mi *MenuItem) Value() bool {
+	return bool(C.item_value((*C.ITEM)(mi)))
 }
