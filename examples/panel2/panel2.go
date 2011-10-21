@@ -44,7 +44,7 @@ func main() {
         UpdatePanels()
         Update()
         
-        ch, _ := stdscr.GetChar()
+        ch := stdscr.GetChar()
         switch(Key(ch)) {
         case "q":
             return

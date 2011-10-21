@@ -1,3 +1,36 @@
+// goncurses - ncurses library for Go.
+//
+// Copyright (c) 2011, Rob Thornton 
+//
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without 
+// modification, are permitted provided that the following conditions are met:
+//
+//   * Redistributions of source code must retain the above copyright notice, 
+//     this list of conditions and the following disclaimer.
+//
+//   * Redistributions in binary form must reproduce the above copyright notice, 
+//     this list of conditions and the following disclaimer in the documentation 
+//     and/or other materials provided with the distribution.
+//  
+//   * Neither the name of the copyright holder nor the names of its 
+//     contributors may be used to endorse or promote products derived from this 
+//     software without specific prior written permission.
+//      
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+// POSSIBILITY OF SUCH DAMAGE.
+
+/* Menu library */
 package goncurses
 /*
 #cgo LDFLAGS: -lmenu
@@ -85,9 +118,23 @@ func NewMenu(items []*MenuItem) (*Menu, os.Error) {
 	return (*Menu)(menu), nil
 }
 
+// Background sets the attributes of un-highlighted items in the menu
+func (m *Menu) Background(ch int) {
+	C.set_menu_back((*C.MENU)(m), C.chtype(ch))
+}
+
 // Count returns the number of MenuItems in the Menu
 func (m *Menu) Count() int {
 	return int(C.item_count((*C.MENU)(m)))
+}
+
+// Current returns the selected item in the menu
+func (m *Menu) Current(mi *MenuItem) *MenuItem {
+    if mi == nil {
+        return (*MenuItem)(C.current_item((*C.MENU)(m)))
+    }
+    C.set_current_item((*C.MENU)(m), (*C.ITEM)(mi))
+	return nil
 }
 
 // Driver controls how the menu is activated. Action usually corresponds
@@ -97,6 +144,11 @@ func (m *Menu) Driver(action string) {
 		C.menu_driver((*C.MENU)(m), da)
 	}
 	return
+}
+
+// Foreground sets the attributes of highlighted items in the menu
+func (m *Menu) Foreground(ch int) {
+	C.set_menu_fore((*C.MENU)(m), C.chtype(ch))
 }
 
 // Format sets the menu format. See the O_* menu options.
@@ -114,6 +166,11 @@ func (m *Menu) Free() os.Error {
 		return os.NewError(menuerrors[Errno(res)])
 	}
 	return nil
+}
+
+// Grey sets the attributes of non-selectable items in the menu
+func (m *Menu) Grey(ch int) {
+	C.set_menu_grey((*C.MENU)(m), C.chtype(ch))
 }
 
 // Items will either set or return the items in the menu. When setting
@@ -163,6 +220,11 @@ func (m *Menu) Option(opts int, on bool) os.Error {
 		return os.NewError(menuerrors[Errno(res)])
 	}
 	return nil
+}
+
+// PositionCursor sets the cursor over the currently selected menu item.
+func (m *Menu) PositionCursor() {
+	C.pos_menu_cursor((*C.MENU)(m))
 }
 
 // Post the menu, making it visible
@@ -218,12 +280,21 @@ func (mi *MenuItem) Description() string {
 func (mi *MenuItem) Free() {
 	C.free(unsafe.Pointer(C.item_name((*C.ITEM)(mi))))
 	C.free_item((*C.ITEM)(mi))
-	return
 }
 
 // Name of the menu item
 func (mi *MenuItem) Name() string {
 	return C.GoString(C.item_name((*C.ITEM)(mi)))
+}
+
+// Selectable turns on/off whether a menu option is "greyed out"
+func (mi *MenuItem) Selectable(on bool) {
+	if on {
+		C.item_opts_on((*C.ITEM)(mi), O_SELECTABLE)
+	} else {
+		C.item_opts_off((*C.ITEM)(mi), O_SELECTABLE)
+	}
+	
 }
 
 // Value returns true if menu item is toggled/active, otherwise false

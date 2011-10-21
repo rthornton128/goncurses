@@ -1,11 +1,44 @@
-/* 1. No functions which operate only on stdscr have been implemented because 
- * it makes little sense to do so in a Go implementation. Stdscr is treated the
- * same as any other window.
- * 
- * 2. Whenever possible, versions of ncurses functions which could potentially
- * have a buffer overflow, like the getstr() family of functions, have been
- * implemented. Instead, only the mvwgetnstr() and wgetnstr() can be used. */
+// goncurses - ncurses library for Go.
+//
+// Copyright (c) 2011, Rob Thornton 
+//
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without 
+// modification, are permitted provided that the following conditions are met:
+//
+//   * Redistributions of source code must retain the above copyright notice, 
+//     this list of conditions and the following disclaimer.
+//
+//   * Redistributions in binary form must reproduce the above copyright notice, 
+//     this list of conditions and the following disclaimer in the documentation 
+//     and/or other materials provided with the distribution.
+//  
+//   * Neither the name of the copyright holder nor the names of its 
+//     contributors may be used to endorse or promote products derived from this 
+//     software without specific prior written permission.
+//      
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+// POSSIBILITY OF SUCH DAMAGE.
 
+/* ncurses library
+
+   1. No functions which operate only on stdscr have been implemented because 
+   it makes little sense to do so in a Go implementation. Stdscr is treated the
+   same as any other window.
+  
+   2. Whenever possible, versions of ncurses functions which could potentially
+   have a buffer overflow, like the getstr() family of functions, have not been
+   implemented. Instead, only the mvwgetnstr() and wgetnstr() can be used. */
 package goncurses
 
 // #cgo LDFLAGS: -lncurses
@@ -522,11 +555,20 @@ func (w *Window) Erase() {
 }
 
 // Get a character from standard input
-func (w *Window) GetChar() (ch int, err os.Error) {
-	if ch = int(C.wgetch((*C.WINDOW)(w))); ch == C.ERR {
-		err = os.NewError("Failed to retrieve character from input stream")
+func (w *Window) GetChar(coords ...int) int {
+	var y, x, count int
+	if len(coords) > 1 {
+		y = coords[0]
+		count++
 	}
-	return
+	if len(coords) > 2 {
+		x = coords[1]
+		count++
+	}
+	if count > 0 {
+		return int(C.mvwgetch((*C.WINDOW)(w), C.int(y), C.int(x)))
+	}
+	return int(C.wgetch((*C.WINDOW)(w)))
 }
 
 // Returns the maximum size of the Window. Note that it uses ncurses idiom
@@ -556,8 +598,9 @@ func (w *Window) Getyx() (int, int) {
 
 // HLine draws a horizontal line starting at y, x and ending at width using 
 // the specified character
-func (w *Window) HLine(y, x, ch, width int) {
-	C.mvwhline((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(ch), C.int(width))
+func (w *Window) HLine(y, x, ch, wid int) {
+	C.mvwhline((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(ch), 
+		C.int(wid))
 	return
 }
 
@@ -650,6 +693,7 @@ func (w *Window) Sync(sync int) {
 		C.wsyncup((*C.WINDOW)(w))
 	}
 }
+
 // Touch indicates that the window contains changes which should be updated
 // on the next call to Refresh
 func (w *Window) Touch() {
