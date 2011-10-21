@@ -35,7 +35,7 @@
    1. No functions which operate only on stdscr have been implemented because 
    it makes little sense to do so in a Go implementation. Stdscr is treated the
    same as any other window.
-  
+
    2. Whenever possible, versions of ncurses functions which could potentially
    have a buffer overflow, like the getstr() family of functions, have not been
    implemented. Instead, only the mvwgetnstr() and wgetnstr() can be used. */
@@ -525,6 +525,22 @@ func (w *Window) ColorOn(pair byte) os.Error {
 	return nil
 }
 
+// Copy is similar to Overlay and Overwrite but provides a finer grain of
+// control. 
+func (w *Window) Copy(src *Window, sy, sx, dtr, dtc, dbr, dbc int,
+overlay bool) os.Error {
+	var ol int
+	if overlay {
+		ol = 1
+	}
+	if C.copywin((*C.WINDOW)(src), (*C.WINDOW)(w), C.int(sy), C.int(sx),
+		C.int(dtr), C.int(dtc), C.int(dbr), C.int(dbc), C.int(ol)) ==
+		C.ERR {
+		return os.NewError("Failed to copy window")
+	}
+	return nil
+}
+
 // Delete the window
 func (w *Window) Delete() os.Error {
 	if C.delwin((*C.WINDOW)(w)) == C.ERR {
@@ -599,7 +615,7 @@ func (w *Window) Getyx() (int, int) {
 // HLine draws a horizontal line starting at y, x and ending at width using 
 // the specified character
 func (w *Window) HLine(y, x, ch, wid int) {
-	C.mvwhline((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(ch), 
+	C.mvwhline((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(ch),
 		C.int(wid))
 	return
 }
@@ -618,6 +634,25 @@ func (w *Window) Keypad(keypad bool) os.Error {
 func (w *Window) Move(y, x int) {
 	C.wmove((*C.WINDOW)(w), C.int(y), C.int(x))
 	return
+}
+
+// Overlay copies overlapping sections of src window onto the destination
+// window. Non-blank elements are not overwritten.
+func (w *Window) Overlay(src *Window) os.Error {
+	if C.overlay((*C.WINDOW)(src), (*C.WINDOW)(w)) == C.ERR {
+		return os.NewError("Failed to overlay window")
+	}
+	return nil
+}
+
+// Overwrite copies overlapping sections of src window onto the destination
+// window. This function is considered "destructive" by copying all
+// elements of src onto the destination window.
+func (w *Window) Overwrite(src *Window) os.Error {
+	if C.overwrite((*C.WINDOW)(src), (*C.WINDOW)(w)) == C.ERR {
+		return os.NewError("Failed to overwrite window")
+	}
+	return nil
 }
 
 // Print a string to the given window. The first two arguments may be
@@ -698,4 +733,12 @@ func (w *Window) Sync(sync int) {
 // on the next call to Refresh
 func (w *Window) Touch() {
 	C.touchwin((*C.WINDOW)(w))
+}
+
+// VLine draws a verticle line starting at y, x and ending at height using 
+// the specified character
+func (w *Window) VLine(y, x, ch, h int) {
+	C.mvwvline((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(ch),
+		C.int(wid))
+	return
 }
