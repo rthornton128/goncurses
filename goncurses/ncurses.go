@@ -377,7 +377,7 @@ func MouseMask(masks ...string) {
 	C.mousemask((C.mmask_t)(mousemask), (*C.mmask_t)(unsafe.Pointer(nil)))
 }
 
-// NewWindow creates a windows of size h(eight) and w(idth) at y, x
+// NewWindow creates a window of size h(eight) and w(idth) at y, x
 func NewWindow(h, w, y, x int) (new *Window, err os.Error) {
 	new = (*Window)(C.newwin(C.int(h), C.int(w), C.int(y), C.int(x)))
 	if unsafe.Pointer(new) == unsafe.Pointer(nil) {
@@ -407,6 +407,45 @@ func StartColor() os.Error {
 		return os.NewError("Failed to enable color mode")
 	}
 	return nil
+}
+
+type Pad C.WINDOW
+
+// NewPad creates a window which is not restricted by the terminal's 
+// dimentions (unlike a Window)
+func NewPad(lines, cols int) *Pad {
+	return (*Pad)(C.newpad(C.int(lines), C.int(cols)))
+}
+
+// Echo prints a single character to the pad immediately. This has the
+// same effect of calling AddChar() + Refresh() but has a significant
+// speed advantage
+func (p *Pad) Echo(ch int) {
+	C.pechochar((*C.WINDOW)(p), C.chtype(ch))
+}
+
+func (p *Pad) NoutRefresh(py, px, ty, tx, by, bx int) {
+	C.pnoutrefresh((*C.WINDOW)(p), C.int(py), C.int(px), C.int(ty),
+		C.int(tx), C.int(by), C.int(bx))
+}
+
+// Refresh the pad at location py, px using the rectangle specified by
+// ty, tx, by, bx (bottom/top y/x)
+func (p *Pad) Refresh(py, px, ty, tx, by, bx int) {
+	C.prefresh((*C.WINDOW)(p), C.int(py), C.int(px), C.int(ty), C.int(tx),
+		C.int(by), C.int(bx))
+}
+
+// Sub creates a sub-pad lines by columns in size
+func (p *Pad) Sub(y, x, h, w int) *Pad {
+	return (*Pad)(C.subpad((*C.WINDOW)(p), C.int(h), C.int(w), C.int(y),
+		C.int(x)))
+}
+
+// Window is a helper function for calling Window functions on a pad like
+// Print(). Convention would be to use Pad.Window().Print().
+func (p *Pad) Window() *Window {
+	return (*Window)(p)
 }
 
 type Window C.WINDOW
@@ -739,6 +778,6 @@ func (w *Window) Touch() {
 // the specified character
 func (w *Window) VLine(y, x, ch, h int) {
 	C.mvwvline((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(ch),
-		C.int(wid))
+		C.int(h))
 	return
 }
