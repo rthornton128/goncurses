@@ -397,15 +397,6 @@ func Raw(on bool) {
 	C.noraw()
 }
 
-// ScrollOk sets whether scrolling will work
-func ScrollOk(ok bool) {
-	if ok {
-		C.scrollok(1)
-	} else {
-		C.scrollok(0)
-	}
-}
-
 // Enables colors to be displayed. Will return an error if terminal is not
 // capable of displaying colors
 func StartColor() os.Error {
@@ -753,6 +744,11 @@ func (w *Window) Resize(height, width int) {
 // a positive number to scroll down. ScrollOk Must have been called prior.
 func (w *Window) Scroll(n int) {
 	C.wscrl((*C.WINDOW)(w), C.int(n))
+}
+
+// ScrollOk sets whether scrolling will work
+func (w *Window) ScrollOk(ok bool) {
+	C.scrollok((*C.WINDOW)(w), C.bool(ok))
 }
 
 // SubWindow creates a new window of height and width at the coordinates
