@@ -37,11 +37,43 @@ package goncurses
 //#include <form.h>
 import "C"
 
+import (
+	"fmt"
+	"os"
+)
+
+var errList = map[C.int]string{
+	C.E_OK:              "Routine succeeded",
+	C.E_SYSTEM_ERROR:    "System error occurred",
+	C.E_BAD_ARGUMENT:    "Incorrect or out-of-range argument",
+	C.E_POSTED:          "Form has already been posted",
+	C.E_CONNECTED:       "Field is already connected to a form",
+	C.E_BAD_STATE:       "Bad state",
+	C.E_NO_ROOM:         "No room",
+	C.E_NOT_POSTED:      "Form has not been posted",
+	C.E_UNKNOWN_COMMAND: "Unknown command",
+	C.E_NO_MATCH:        "No match",
+	C.E_NOT_SELECTABLE:  "Not selectable",
+	C.E_NOT_CONNECTED:   "Field is not connected to a form",
+	C.E_REQUEST_DENIED:  "Request denied",
+	C.E_INVALID_FIELD:   "Invalid field",
+	C.E_CURRENT:         "Current",
+}
+
+func error(e os.Error) os.Error {
+	s, ok := errList[C.int(e.(os.Errno))]
+	if !ok {
+		return os.NewError(fmt.Sprintf("Error %d", int(e.(os.Errno))))
+	}
+	return os.NewError(s)
+}
+
 type Field C.FIELD
 
-func NewField(h, w, tr, lc, os, nbuf int) *Field {
-	return (*Field)(C.new_field(C.int(h), C.int(w), C.int(tr), C.int(lc),
-			C.int(os), C.int(nbuf)))
+func NewField(h, w, tr, lc, oscr, nbuf int) (*Field, os.Error) {
+	field, err := C.new_field(C.int(h), C.int(w), C.int(tr), C.int(lc),
+		C.int(oscr), C.int(nbuf))
+	return (*Field)(field), error(err)
 }
 
 func (f *Field) Background(ch int) {
@@ -63,8 +95,14 @@ func (f *Field) Options(opts int) {
 
 type Form C.FORM
 
-func NewForm(fields []*Field) {
-	
+func NewForm(fields []*Field) (*Form, os.Error) {
+	cfields := make([]*C.FIELD, len(fields)+1)
+	for index, field := range fields {
+		cfields[index] = (*C.FIELD)(field)
+	}
+	cfields[len(fields)] = nil
+	f, e := C.new_form((**C.FIELD)(&cfields[0]))
+	return (*Form)(f), error(e)
 }
 
 func (f *Form) Free() {
