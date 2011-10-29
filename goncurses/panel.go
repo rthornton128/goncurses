@@ -60,7 +60,7 @@ func (w *Window) Panel() *Panel {
 	return nil
 }
 
-// UpdateaPanels refreshes the panel stack. It must be called prior to 
+// UpdatePanels refreshes the panel stack. It must be called prior to 
 // using ncurses's DoUpdate()
 func UpdatePanels() {
 	C.update_panels()

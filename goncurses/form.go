@@ -42,6 +42,19 @@ import (
 	"os"
 )
 
+const (
+	FO_VISIBLE  = C.O_VISIBLE  // Field visibility
+	FO_ACTIVE   = C.O_ACTIVE   // Field is sensitive/accessable
+	FO_PUBLIC   = C.O_PUBLIC   // Typed characters are echoed
+	FO_EDIT     = C.O_EDIT     // Editable
+	FO_WRAP     = C.O_WRAP     // Line wrapping
+	FO_BLANK    = C.O_BLANK    // Clear on entry
+	FO_AUTOSKIP = C.O_AUTOSKIP // Skip to next field when current filled
+	FO_NULLOK   = C.O_NULLOK   // Blank ok 
+	FO_STATIC   = C.O_STATIC   // Fixed size
+	FO_PASSOK   = C.O_PASSOK   // Field validation
+)
+
 var errList = map[C.int]string{
 	C.E_OK:              "Routine succeeded",
 	C.E_SYSTEM_ERROR:    "System error occurred",
@@ -71,9 +84,12 @@ func error(e os.Error) os.Error {
 type Field C.FIELD
 
 func NewField(h, w, tr, lc, oscr, nbuf int) (*Field, os.Error) {
-	field, err := C.new_field(C.int(h), C.int(w), C.int(tr), C.int(lc),
+	field, e := C.new_field(C.int(h), C.int(w), C.int(tr), C.int(lc),
 		C.int(oscr), C.int(nbuf))
-	return (*Field)(field), error(err)
+	if e != nil {
+		return (*Field)(field), error(e)
+	}
+	return (*Field)(field), nil
 }
 
 func (f *Field) Background(ch int) {
@@ -89,8 +105,12 @@ func (f *Field) Free() {
 	f = nil
 }
 
-func (f *Field) Options(opts int) {
-	C.set_field_fore((*C.FIELD)(f), C.chtype(opts))
+func (f *Field) Options(opts int, on bool) {
+	if on {
+		C.field_opts_on((*C.FIELD)(f), C.Field_Options(opts))
+		return
+	}
+	C.field_opts_off((*C.FIELD)(f), C.Field_Options(opts))
 }
 
 type Form C.FORM
@@ -102,7 +122,14 @@ func NewForm(fields []*Field) (*Form, os.Error) {
 	}
 	cfields[len(fields)] = nil
 	f, e := C.new_form((**C.FIELD)(&cfields[0]))
-	return (*Form)(f), error(e)
+	if e != nil {
+		return (*Form)(f), error(e)
+	}
+	return (*Form)(f), nil
+}
+
+func (f *Form) Driver(s string) {
+
 }
 
 func (f *Form) Free() {
