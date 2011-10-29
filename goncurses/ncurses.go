@@ -589,11 +589,11 @@ func (w *Window) Delete() os.Error {
 	return nil
 }
 
-// DerivedWindow creates a new window of height and width at the coordinates
+// Derived creates a new window of height and width at the coordinates
 // y, x.  These coordinates are relative to the original window thereby 
 // confining the derived window to the area of original window. See the
 // SubWindow function for additional notes.
-func (w *Window) DerivedWindow(height, width, y, x int) *Window {
+func (w *Window) Derived(height, width, y, x int) *Window {
 	res := C.derwin((*C.WINDOW)(w), C.int(height), C.int(width), C.int(y),
 		C.int(x))
 	return (*Window)(res)
@@ -626,16 +626,10 @@ func (w *Window) GetChar(coords ...int) int {
 	return int(C.wgetch((*C.WINDOW)(w)))
 }
 
-// Returns the maximum size of the Window. Note that it uses ncurses idiom
-// of returning y then x.
-func (w *Window) Maxyx() (int, int) {
-	// This hack is necessary to make cgo happy
-	return int(w._maxy + 1), int(w._maxx + 1)
-}
-
 // Reads at most 'n' characters entered by the user from the Window. Attempts
 // to enter greater than 'n' characters will elicit a 'beep'
 func (w *Window) GetString(n int) (string, os.Error) {
+// TODO: add move portion of code...
 	cstr := make([]C.char, n)
 	if C.wgetnstr((*C.WINDOW)(w), (*C.char)(&cstr[0]), C.int(n)) == C.ERR {
 		return "", os.NewError("Failed to retrieve string from input stream")
@@ -654,6 +648,7 @@ func (w *Window) Getyx() (int, int) {
 // HLine draws a horizontal line starting at y, x and ending at width using 
 // the specified character
 func (w *Window) HLine(y, x, ch, wid int) {
+// TODO: move portion	
 	C.mvwhline((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(ch),
 		C.int(wid))
 	return
@@ -667,6 +662,13 @@ func (w *Window) Keypad(keypad bool) os.Error {
 		return os.NewError("Unable to set keypad mode")
 	}
 	return nil
+}
+
+// Returns the maximum size of the Window. Note that it uses ncurses idiom
+// of returning y then x.
+func (w *Window) Maxyx() (int, int) {
+	// This hack is necessary to make cgo happy
+	return int(w._maxy + 1), int(w._maxx + 1)
 }
 
 // Move the cursor to the specified coordinates within the window
@@ -756,7 +758,7 @@ func (w *Window) ScrollOk(ok bool) {
 // made to one window are reflected in the other. It is necessary to call
 // Touch() on this window prior to calling Refresh in order for it to be
 // displayed.
-func (w *Window) SubWindow(height, width, y, x int) *Window {
+func (w *Window) Sub(height, width, y, x int) *Window {
 	res := C.subwin((*C.WINDOW)(w), C.int(height), C.int(width), C.int(y),
 		C.int(x))
 	return (*Window)(res)
@@ -788,6 +790,7 @@ func (w *Window) Touch() {
 // VLine draws a verticle line starting at y, x and ending at height using 
 // the specified character
 func (w *Window) VLine(y, x, ch, h int) {
+// TODO: move portion
 	C.mvwvline((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(ch),
 		C.int(h))
 	return

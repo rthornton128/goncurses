@@ -49,7 +49,7 @@ func main() {
     menuwin.Keypad(true)
     
     menu.Window(menuwin)
-    menu.SubWindow(menuwin.DerivedWindow(6, 38, 3, 1))
+    menu.Sub(menuwin.Derived(6, 38, 3, 1))
     menu.Format(5, 1)
     menu.Mark(" * ")
     

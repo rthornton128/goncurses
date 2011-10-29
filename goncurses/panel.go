@@ -30,7 +30,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 // POSSIBILITY OF SUCH DAMAGE.
 
-/* Panel library
+/* ncurses panel extension
 
 The following functions have not been implemented because there are far more
 effective manners by which they can be done in Go: set_panel_userptr() and
@@ -48,16 +48,11 @@ import (
 
 type Panel C.PANEL
 
-// Delete panel, removing from the stack. 
-func DeletePanel(p *Panel) os.Error {
-	if C.del_panel((*C.PANEL)(p)) == C.ERR {
-		return os.NewError("Failed to delete panel")
-	}
-	return nil
-}
-
-// Add a window to the panel stack
-func NewPanel(w *Window) *Panel {
+// Panel creates a new panel derived from the window, adding it to the 
+// panel stack. The pointer to the original window can still be used to
+// excute most window functions with the exception of Refresh(). Always
+// use panel's Refresh() function.
+func (w *Window) Panel() *Panel {
 	p := (*Panel)(C.new_panel((*C.WINDOW)(w)))
 	if p != nil {
 		return p
@@ -65,8 +60,8 @@ func NewPanel(w *Window) *Panel {
 	return nil
 }
 
-// Update the panel stack. Must be called prior to using ncurses's DoUpdate()
-// Never use Refresh() with the panel library
+// UpdateaPanels refreshes the panel stack. It must be called prior to 
+// using ncurses's DoUpdate()
 func UpdatePanels() {
 	C.update_panels()
 	return
@@ -92,7 +87,16 @@ func (p *Panel) Bottom() os.Error {
 	return nil
 }
 
-// Returns true if panel is visible, false if not
+// Delete panel, removing from the stack. 
+func (p *Panel) Delete() os.Error {
+	if C.del_panel((*C.PANEL)(p)) == C.ERR {
+		return os.NewError("Failed to delete panel")
+	}
+	p = nil
+	return nil
+}
+
+// Hidden returns true if panel is visible, false if not
 func (p *Panel) Hidden() bool {
 	return C.panel_hidden((*C.PANEL)(p)) == C.TRUE
 }
@@ -115,7 +119,7 @@ func (p *Panel) Move(y, x int) os.Error {
 	return nil
 }
 
-// Replace panel's window with a new one.
+// Replace panel's associated window with a new one.
 func (p *Panel) Replace(w *Window) os.Error {
 	if C.replace_panel((*C.PANEL)(p), (*C.WINDOW)(w)) == C.ERR {
 		return os.NewError("Failed to replace window")
@@ -123,7 +127,7 @@ func (p *Panel) Replace(w *Window) os.Error {
 	return nil
 }
 
-// Make the window visible. Also places it on the top of the stack.
+// Show the panel, if hidden, and place it on the top of the stack.
 func (p *Panel) Show() os.Error {
 	if C.show_panel((*C.PANEL)(p)) == C.ERR {
 		return os.NewError("Failed to show panel")
@@ -139,7 +143,7 @@ func (p *Panel) Top() os.Error {
 	return nil
 }
 
-// Return the window governed by panel
+// Window returns the window governed by panel
 func (p *Panel) Window() *Window {
 	return (*Window)(C.panel_window((*C.PANEL)(p)))
 }

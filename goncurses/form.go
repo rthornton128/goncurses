@@ -30,7 +30,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 // POSSIBILITY OF SUCH DAMAGE.
 
-/* Form library */
+/* ncurses form extension */
 package goncurses
 
 //#cgo LDFLAGS: -lform

@@ -34,7 +34,7 @@ func main() {
         window.ColorOn(byte(i+1))
         window.Print(1, (w/2)-(len(title)/2), title, i+1)
         window.ColorOff(byte(i+1))
-        panels[i] = NewPanel(window)
+        panels[i] = window.Panel()
         
     }
 
