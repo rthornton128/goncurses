@@ -49,23 +49,23 @@ import (
 
 // Menu Driver Requests
 const (
-	MD_LEFT = C.REQ_LEFT_ITEM
-	MD_RIGHT = C.REQ_RIGHT_ITEM
-	MD_UP = C.REQ_UP_ITEM
-	MD_DOWN = C.REQ_DOWN_ITEM
-	MD_ULINE = C.REQ_SCR_ULINE
-	MD_DLINE = C.REQ_SCR_DLINE
-	MD_PAGE_DOWN = C.REQ_SCR_DPAGE
-	MD_PAGE_UP = C.REQ_SCR_UPAGE
-	MD_FIRST = C.REQ_FIRST_ITEM
-	MD_LAST = C.REQ_LAST_ITEM
-	MD_NEXT = C.REQ_NEXT_ITEM
-	MD_PREV = C.REQ_PREV_ITEM
-	MD_TOGGLE = C.REQ_TOGGLE_ITEM
-	MD_CLEAR_PATTERN = C.REQ_CLEAR_PATTERN
-	MD_BACK_PATTERN = C.REQ_BACK_PATTERN
-	MD_NEXT_MATCH = C.REQ_NEXT_MATCH
-	MD_PREV_MATCH = C.REQ_PREV_MATCH
+	REQ_LEFT          = C.REQ_LEFT_ITEM
+	REQ_RIGHT         = C.REQ_RIGHT_ITEM
+	REQ_UP            = C.REQ_UP_ITEM
+	REQ_DOWN          = C.REQ_DOWN_ITEM
+	REQ_ULINE         = C.REQ_SCR_ULINE
+	REQ_DLINE         = C.REQ_SCR_DLINE
+	REQ_PAGE_DOWN     = C.REQ_SCR_DPAGE
+	REQ_PAGE_UP       = C.REQ_SCR_UPAGE
+	REQ_FIRST         = C.REQ_FIRST_ITEM
+	REQ_LAST          = C.REQ_LAST_ITEM
+	REQ_NEXT          = C.REQ_NEXT_ITEM
+	REQ_PREV          = C.REQ_PREV_ITEM
+	REQ_TOGGLE        = C.REQ_TOGGLE_ITEM
+	REQ_CLEAR_PATTERN = C.REQ_CLEAR_PATTERN
+	REQ_BACK_PATTERN  = C.REQ_BACK_PATTERN
+	REQ_NEXT_MATCH    = C.REQ_NEXT_MATCH
+	REQ_PREV_MATCH    = C.REQ_PREV_MATCH
 )
 
 // Menu Options
@@ -103,14 +103,14 @@ var driveractions = map[string]C.int{
 // DriverActions is a convenience mapping for common responses
 // to keyboard input
 var DriverActions = map[int]int{
-	KEY_DOWN:        C.REQ_DOWN_ITEM,
-	KEY_HOME:       C.REQ_FIRST_ITEM,
-	KEY_END:        C.REQ_LAST_ITEM,
-	KEY_LEFT:        C.REQ_LEFT_ITEM,
-	KEY_PAGEDOWN:   C.REQ_SCR_DPAGE,
-	KEY_PAGEUP:     C.REQ_SCR_UPAGE,
-	KEY_RIGHT:       C.REQ_RIGHT_ITEM,
-	KEY_UP:          C.REQ_UP_ITEM,
+	KEY_DOWN:     C.REQ_DOWN_ITEM,
+	KEY_HOME:     C.REQ_FIRST_ITEM,
+	KEY_END:      C.REQ_LAST_ITEM,
+	KEY_LEFT:     C.REQ_LEFT_ITEM,
+	KEY_PAGEDOWN: C.REQ_SCR_DPAGE,
+	KEY_PAGEUP:   C.REQ_SCR_UPAGE,
+	KEY_RIGHT:    C.REQ_RIGHT_ITEM,
+	KEY_UP:       C.REQ_UP_ITEM,
 }
 
 type Menu C.MENU
@@ -141,10 +141,10 @@ func (m *Menu) Count() int {
 
 // Current returns the selected item in the menu
 func (m *Menu) Current(mi *MenuItem) *MenuItem {
-    if mi == nil {
-        return (*MenuItem)(C.current_item((*C.MENU)(m)))
-    }
-    C.set_current_item((*C.MENU)(m), (*C.ITEM)(mi))
+	if mi == nil {
+		return (*MenuItem)(C.current_item((*C.MENU)(m)))
+	}
+	C.set_current_item((*C.MENU)(m), (*C.ITEM)(mi))
 	return nil
 }
 
@@ -307,7 +307,6 @@ func (mi *MenuItem) Selectable(on bool) {
 	} else {
 		C.item_opts_off((*C.ITEM)(mi), O_SELECTABLE)
 	}
-	
 }
 
 // Value returns true if menu item is toggled/active, otherwise false

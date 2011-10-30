@@ -63,9 +63,9 @@ func main() {
         case 'q':
             return
         case KEY_DOWN:
-            menu.Driver(MD_DOWN)
+            menu.Driver(REQ_DOWN)
         case KEY_UP:
-            menu.Driver(MD_UP)
+            menu.Driver(REQ_UP)
         }
     }
 }

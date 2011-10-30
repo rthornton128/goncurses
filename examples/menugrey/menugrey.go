@@ -56,7 +56,7 @@ func main() {
         ch := stdscr.GetChar()
         switch ch {
         case ' ':
-            menu.Driver(MD_TOGGLE)
+            menu.Driver(REQ_TOGGLE)
         case 'q':
             return
         case KEY_RETURN:

@@ -73,6 +73,67 @@ var errList = map[C.int]string{
 	C.E_CURRENT:         "Current",
 }
 
+// Form Driver Requests
+const (
+	REQ_NEXT_PAGE    = C.REQ_NEXT_PAGE    // next page
+	REQ_PREV_PAGE    = C.REQ_PREV_PAGE    // previous page
+	REQ_FIRST_PAGE   = C.REQ_FIRST_PAGE   // first page
+	REQ_LAST_PAGE    = C.REQ_LAST_PAGE    // last page
+	REQ_NEXT_FIELD   = C.REQ_NEXT_FIELD   // next field
+	REQ_PREV_FIELD   = C.REQ_PREV_FIELD   // previous field
+	REQ_FIRST_FIELD  = C.REQ_FIRST_FIELD  // first field
+	REQ_LAST_FIELD   = C.REQ_LAST_FIELD   // last field
+	REQ_SNEXT_FIELD  = C.REQ_SNEXT_FIELD  // sorted next field
+	REQ_SPREV_FIELD  = C.REQ_SPREV_FIELD  // sorted previous field
+	REQ_SFIRST_FIELD = C.REQ_SFIRST_FIELD // sorted first field
+	REQ_SLAST_FIELD  = C.REQ_SLAST_FIELD  // sorted last field
+	REQ_LEFT_FIELD   = C.REQ_LEFT_FIELD   // left field
+	REQ_RIGHT_FIELD  = C.REQ_RIGHT_FIELD  // right field
+	REQ_UP_FIELD     = C.REQ_UP_FIELD     // up to a field
+	REQ_DOWN_FIELD   = C.REQ_DOWN_FIELD   // down to a field
+	REQ_NEXT_CHAR    = C.REQ_NEXT_CHAR    // next character in field
+	REQ_PREV_CHAR    = C.REQ_PREV_CHAR    // previous character in field
+	REQ_NEXT_LINE    = C.REQ_NEXT_LINE    // next line
+	REQ_PREV_LINE    = C.REQ_PREV_LINE    // previous line
+	REQ_NEXT_WORD    = C.REQ_NEXT_WORD    // next word
+	REQ_PREV_WORD    = C.REQ_PREV_WORD    // previous word
+	REQ_BEG_FIELD    = C.REQ_BEG_FIELD    // beginning of field
+	REQ_END_FIELD    = C.REQ_END_FIELD    // end of field
+	REQ_BEG_LINE     = C.REQ_BEG_LINE     // beginning of line
+	REQ_END_LINE     = C.REQ_END_LINE     // end of line
+	REQ_LEFT_CHAR    = C.REQ_LEFT_CHAR    // character to the left
+	REQ_RIGHT_CHAR   = C.REQ_RIGHT_CHAR   // character to the right
+	REQ_UP_CHAR      = C.REQ_UP_CHAR      // up a character
+	REQ_DOWN_CHAR    = C.REQ_DOWN_CHAR    // down a character
+	REQ_NEW_LINE     = C.REQ_NEW_LINE     // insert of overlay a new line
+	REQ_INS_CHAR     = C.REQ_INS_CHAR     // insert a blank character at cursor
+	REQ_INS_LINE     = C.REQ_INS_LINE     // insert a blank line at cursor
+	REQ_DEL_CHAR     = C.REQ_DEL_CHAR     // delete character at cursor
+	REQ_DEL_PREV     = C.REQ_DEL_PREV     // delete character before cursor
+	REQ_DEL_LINE     = C.REQ_DEL_LINE     // delete line
+	REQ_DEL_WORD     = C.REQ_DEL_WORD     // delete word
+	REQ_CLR_EOL      = C.REQ_CLR_EOL      // clear from cursor to end of line
+	REQ_CLR_EOF      = C.REQ_CLR_EOF      // clear from cursor to end of field
+	REQ_CLR_FIELD    = C.REQ_CLR_FIELD    // clear field
+	REQ_OVL_MODE     = C.REQ_OVL_MODE     // overlay mode
+	REQ_INS_MODE     = C.REQ_INS_MODE     // insert mode
+	REQ_SCR_FLINE    = C.REQ_SCR_FLINE    // scroll field forward a line
+	REQ_SCR_BLINE    = C.REQ_SCR_BLINE    // scroll field back a line
+	REQ_SCR_FPAGE    = C.REQ_SCR_FPAGE    // scroll field forward a page
+	REQ_SCR_BPAGE    = C.REQ_SCR_BPAGE    // scroll field back a page
+	REQ_SCR_FHPAGE   = C.REQ_SCR_FHPAGE   // scroll field forward half a page
+	REQ_SCR_BHPAGE   = C.REQ_SCR_BHPAGE   // scroll field back half a page
+	REQ_SCR_FCHAR    = C.REQ_SCR_FCHAR    // scroll field forward a character
+	REQ_SCR_BCHAR    = C.REQ_SCR_BCHAR    // scroll field back a character
+	REQ_SCR_HFLINE   = C.REQ_SCR_HFLINE   // horisontal scroll field forward a line
+	REQ_SCR_HBLINE   = C.REQ_SCR_HBLINE   // horisontal scroll field back a line
+	REQ_SCR_HFHALF   = C.REQ_SCR_HFHALF   // horisontal scroll field forward half a line
+	REQ_SCR_HBHALF   = C.REQ_SCR_HBHALF   // horisontal scroll field back half a line
+	REQ_VALIDATION   = C.REQ_VALIDATION   // validate field
+	REQ_NEXT_CHOICE  = C.REQ_NEXT_CHOICE  // display next field choice
+	REQ_PREV_CHOICE  = C.REQ_PREV_CHOICE  // display previous field choice
+)
+
 func error(e os.Errno) os.Error {
 	s, ok := errList[C.int(e)]
 	if !ok {
@@ -92,17 +153,26 @@ func NewField(h, w, tr, lc, oscr, nbuf int) (*Field, os.Error) {
 	return (*Field)(field), nil
 }
 
-func (f *Field) Background(ch int) {
-	C.set_field_back((*C.FIELD)(f), C.chtype(ch))
+func (f *Field) Background(ch int) os.Error {
+	if res := C.set_field_back((*C.FIELD)(f), C.chtype(ch)); res != C.E_OK {
+		return error(os.Errno(res))
+	}
+	return nil
 }
 
-func (f *Field) Foreground(ch int) {
-	C.set_field_fore((*C.FIELD)(f), C.chtype(ch))
+func (f *Field) Foreground(ch int) os.Error {
+	if res := C.set_field_fore((*C.FIELD)(f), C.chtype(ch)); res != C.E_OK {
+		return error(os.Errno(res))
+	}
+	return nil
 }
 
-func (f *Field) Free() {
-	C.free_field((*C.FIELD)(f))
+func (f *Field) Free() os.Error {
+	if res := C.free_field((*C.FIELD)(f)); res != C.E_OK {
+		return error(os.Errno(res))
+	}
 	f = nil
+	return nil
 }
 
 func (f *Field) Options(opts int, on bool) {
@@ -129,21 +199,30 @@ func NewForm(fields []*Field) (*Form, os.Error) {
 }
 
 func (f *Form) Driver(drvract int) os.Error {
-	if err := C.form_driver((*C.FORM)(f), C.int(drvract)); err != C.E_OK {
-		return error(os.Errno(err))
+	if res := C.form_driver((*C.FORM)(f), C.int(drvract)); res != C.E_OK {
+		return error(os.Errno(res))
 	}
 	return nil
 }
 
-func (f *Form) Free() {
-	C.free_form((*C.FORM)(f))
+func (f *Form) Free() os.Error {
+	if res := C.free_form((*C.FORM)(f)); res != C.E_OK {
+		return error(os.Errno(res))
+	}
 	f = nil
+	return nil
 }
 
-func (f *Form) Post() {
-	C.post_form((*C.FORM)(f))
+func (f *Form) Post() os.Error {
+	if res := C.post_form((*C.FORM)(f)); res != C.E_OK {
+		return error(os.Errno(res))
+	}
+	return nil
 }
 
-func (f *Form) UnPost() {
-	C.unpost_form((*C.FORM)(f))
+func (f *Form) UnPost() os.Error {
+	if res := C.unpost_form((*C.FORM)(f)); res != C.E_OK {
+		return error(os.Errno(res))
+	}
+	return nil
 }

@@ -50,9 +50,9 @@ func main() {
         case "q":
             return
         case "down":
-            menu.Driver(MD_DOWN)
+            menu.Driver(REQ_DOWN)
         case "up":
-            menu.Driver(MD_UP)
+            menu.Driver(REQ_UP)
         }
     }
 }

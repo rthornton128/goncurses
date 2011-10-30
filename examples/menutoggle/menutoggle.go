@@ -53,7 +53,7 @@ func main() {
         case 'q':
             return
         case ' ':
-            menu.Driver(MD_TOGGLE)
+            menu.Driver(REQ_TOGGLE)
         case KEY_RETURN:
             var list string
             for _, item := range menu.Items(nil) {

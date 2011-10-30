@@ -11,7 +11,6 @@ func main() {
     
     Echo(false)
     CBreak(true)
-    Cursor(0)
     stdscr.Keypad(true)
     
     fields := make([]*Field, 2)
@@ -35,13 +34,18 @@ func main() {
     stdscr.Print(6, 10, "Value 2:")
     stdscr.Refresh()
     
-    x := stdscr.GetChar()
-    for x != 'q' {
-        if act, ok := DriverActions[x]; ok {
-            form.Driver(act)
+    ch := stdscr.GetChar()
+    for ch != 'q' {
+        switch (ch) {
+        case KEY_DOWN:
+            form.Driver(REQ_NEXT_FIELD)
+            form.Driver(REQ_END_LINE)
+        case KEY_UP:
+            form.Driver(REQ_PREV_FIELD)
+            form.Driver(REQ_END_LINE)
+        default:
+            form.Driver(ch)
         }
-        form.Driver(x)
-        x = stdscr.GetChar()
+        ch = stdscr.GetChar()
     }
-    
 }
