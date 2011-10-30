@@ -1,16 +1,15 @@
-/* This simnple example mirrors the "hello world" TLDP ncurses howto */
+/* An example of using AddChar to show a non-standard character */
 
 package main
 
-/* Note that is not considered idiomatic Go to import curses this way */
 import . "goncurses.googlecode.com/hg/goncurses"
 
 func main() {
-    stdscr, _ := Initscr()
-    defer Endwin()
+    stdscr, _ := Init()
+    defer End()
     
-    stdscr.Print("Hello, World!!!")
-    stdscr.Addch('a' | BLUE)
+    stdscr.Print("A reversed color diamond: ")
+    stdscr.AddChar(ACS_DIAMOND | A_REVERSE)
     stdscr.Refresh()
     stdscr.GetChar()
 }

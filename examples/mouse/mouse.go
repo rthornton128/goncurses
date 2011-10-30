@@ -29,41 +29,42 @@ func main() {
     win, _ := NewWindow(HEIGHT, WIDTH, y, x)
     win.Keypad(true)
     
-    stdscr.Print(0, 0, "Use arrow keys to go up and down, Press enter to select")
+    stdscr.Print(0, 0, 
+        "Use arrow keys to go up and down, Press enter to select")
     stdscr.Refresh()
     
     printmenu(win, menu, active)
     MouseMask("button1-clicked")
     
     for {
-        ch, _ := stdscr.GetChar()
-        switch(Key(ch)) {
-        case "q":
+        ch := stdscr.GetChar()
+        switch ch {
+        case 'q':
             return
-        case "up":
+        case KEY_UP:
             if active == 0 {
                 active = len(menu)-1
             } else {
                 active -= 1
             }
-        case "down":
+        case KEY_DOWN:
             if active == len(menu)-1 {
                 active = 0
             } else {
                 active += 1
             }
-        case "mouse":
+        case KEY_MOUSE:
             md, _ := GetMouse()
             new := getactive(x, y, md[0], md[1], menu)
             if new != -1 {
                 active = new
             }
-            stdscr.Print(23, 0, "Choice #%d: %s selected", active, 
+            stdscr.Print(23, 0, "Choice #%d: %s selected", active+1, 
                 menu[active])
             stdscr.ClearToEOL()
             stdscr.Refresh()
-        case "enter":
-            stdscr.Print(23, 0, "Choice #%d: %s selected", active, 
+        case KEY_RETURN:
+            stdscr.Print(23, 0, "Choice #%d: %s selected", active+1, 
                 menu[active])
             stdscr.ClearToEOL()
             stdscr.Refresh()

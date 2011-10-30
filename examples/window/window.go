@@ -22,25 +22,21 @@ func main() {
     win, _ := NewWindow(height, width, y, x)
     win.Refresh()
     
-    ch, _ := stdscr.GetChar()
-    
     for {
-        switch(Key(ch)) {
-        case "q":
+        switch stdscr.GetChar() {
+        case 'q':
             return
-        case "left":
+        case KEY_LEFT:
             x -= 1
-        case "right":
+        case KEY_RIGHT:
             x += 1
-        case "up":
+        case KEY_UP:
             y -= 1
-        case "down":
+        case KEY_DOWN:
             y += 1
         }
         destroy(win)
         win = createWin(height, width, y, x)
-        
-        ch, _ = stdscr.GetChar()
     }
 }
 

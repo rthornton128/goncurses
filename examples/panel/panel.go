@@ -14,11 +14,10 @@ func main() {
     for i := 0; i < 3; i++ {
         window, _ := NewWindow(10, 40 , y+i, x+(i*5))
         window.Box(0, 0)
-        panels[i] = window.Panel()
+        panels[i] = NewPanel(window)
     }
     
     UpdatePanels()
-    
     Update()
 
     stdscr.GetChar()

@@ -33,7 +33,7 @@ func main() {
     menuwin.Keypad(true)
     
     menu.Window(menuwin)
-    menu.Sub(menuwin.Derived(6, 38, 3, 1))
+    menu.SubWindow(menuwin.Derived(6, 38, 3, 1))
     menu.Mark(" * ")
     
     // Print centered menu title
@@ -57,15 +57,15 @@ func main() {
     
     for {
         Update()
-        ch, _ := menuwin.GetChar()
+        ch := menuwin.GetChar()
         
-        switch (Key(ch)) {
-        case "q":
+        switch ch {
+        case 'q':
             return
-        case "down":
-            menu.Driver("down")
-        case "up":
-            menu.Driver("up")
+        case KEY_DOWN:
+            menu.Driver(MD_DOWN)
+        case KEY_UP:
+            menu.Driver(MD_UP)
         }
     }
 }

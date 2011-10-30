@@ -9,6 +9,11 @@ func main() {
     stdscr, _ := Init()
     defer End()
     
+    Echo(false)
+    CBreak(true)
+    Cursor(0)
+    stdscr.Keypad(true)
+    
     fields := make([]*Field, 2)
     fields[0], _ = NewField(1, 10, 4, 18, 0, 0)
     defer fields[0].Free()
@@ -30,10 +35,13 @@ func main() {
     stdscr.Print(6, 10, "Value 2:")
     stdscr.Refresh()
     
-    x := Key(stdscr.GetChar())
-    for x != "q" {
+    x := stdscr.GetChar()
+    for x != 'q' {
+        if act, ok := DriverActions[x]; ok {
+            form.Driver(act)
+        }
         form.Driver(x)
-        x = Key(stdscr.GetChar())
+        x = stdscr.GetChar()
     }
     
 }

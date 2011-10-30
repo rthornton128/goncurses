@@ -3,7 +3,7 @@
 
 package main
 
-import . "goncurses"//".googlecode.com/hg/goncurses"
+import . "goncurses.googlecode.com/hg/goncurses"
 
 func main() {
     stdscr, _ := Init();
@@ -54,19 +54,18 @@ func main() {
     for {
         Update()
         ch := stdscr.GetChar()
-        x := Key(ch)
-        switch x {
-        case " ":
-            menu.Driver("toggle")
-        case "q":
+        switch ch {
+        case ' ':
+            menu.Driver(MD_TOGGLE)
+        case 'q':
             return
-        case "enter":
+        case KEY_RETURN:
             stdscr.Move(20, 0)
             stdscr.ClearToEOL()
             stdscr.Print(20, 0, "Item selected is: %s", menu.Current(nil).Name())
             menu.PositionCursor()
         default:
-            menu.Driver(x)
+            menu.Driver(DriverActions[ch])
         }
     }
 }

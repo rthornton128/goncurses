@@ -44,15 +44,15 @@ func main() {
     
     for {
         Update()
-        ch, _ := stdscr.GetChar()
+        ch := stdscr.GetChar()
         
         switch (Key(ch)) {
         case "q":
             return
         case "down":
-            menu.Driver("down")
+            menu.Driver(MD_DOWN)
         case "up":
-            menu.Driver("up")
+            menu.Driver(MD_UP)
         }
     }
 }

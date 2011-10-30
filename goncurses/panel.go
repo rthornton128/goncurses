@@ -52,7 +52,7 @@ type Panel C.PANEL
 // panel stack. The pointer to the original window can still be used to
 // excute most window functions with the exception of Refresh(). Always
 // use panel's Refresh() function.
-func (w *Window) Panel() *Panel {
+func NewPanel(w *Window) *Panel {
 	p := (*Panel)(C.new_panel((*C.WINDOW)(w)))
 	if p != nil {
 		return p

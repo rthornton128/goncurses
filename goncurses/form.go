@@ -73,10 +73,10 @@ var errList = map[C.int]string{
 	C.E_CURRENT:         "Current",
 }
 
-func error(e os.Error) os.Error {
-	s, ok := errList[C.int(e.(os.Errno))]
+func error(e os.Errno) os.Error {
+	s, ok := errList[C.int(e)]
 	if !ok {
-		return os.NewError(fmt.Sprintf("Error %d", int(e.(os.Errno))))
+		return os.NewError(fmt.Sprintf("Error %d", int(e)))
 	}
 	return os.NewError(s)
 }
@@ -87,7 +87,7 @@ func NewField(h, w, tr, lc, oscr, nbuf int) (*Field, os.Error) {
 	field, e := C.new_field(C.int(h), C.int(w), C.int(tr), C.int(lc),
 		C.int(oscr), C.int(nbuf))
 	if e != nil {
-		return (*Field)(field), error(e)
+		return (*Field)(field), error(e.(os.Errno))
 	}
 	return (*Field)(field), nil
 }
@@ -123,13 +123,16 @@ func NewForm(fields []*Field) (*Form, os.Error) {
 	cfields[len(fields)] = nil
 	f, e := C.new_form((**C.FIELD)(&cfields[0]))
 	if e != nil {
-		return (*Form)(f), error(e)
+		return (*Form)(f), error(e.(os.Errno))
 	}
 	return (*Form)(f), nil
 }
 
-func (f *Form) Driver(s string) {
-
+func (f *Form) Driver(drvract int) os.Error {
+	if err := C.form_driver((*C.FORM)(f), C.int(drvract)); err != C.E_OK {
+		return error(os.Errno(err))
+	}
+	return nil
 }
 
 func (f *Form) Free() {

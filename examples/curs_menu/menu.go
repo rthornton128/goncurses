@@ -1,5 +1,5 @@
 /* This example show a basic menu similar to that found in the ncurses
- * examples from TLDP */
+ * examples from TLDP. Errors are intentionally discarded */
 
 package main
 
@@ -35,7 +35,7 @@ func main() {
     printmenu(win, menu, active)
     
     for {
-        ch, _ := stdscr.GetChar()
+        ch:= stdscr.GetChar()
         switch(Key(ch)) {
         case "q":
             return
@@ -71,9 +71,9 @@ func printmenu (w *Window, menu []string, active int) {
     w.Box(0, 0)
     for i, s := range menu {
         if i == active {
-            w.Attron(A_REVERSE)
+            w.AttrOn(A_REVERSE)
             w.Print(y+i, x, s)
-            w.Attroff(A_REVERSE)
+            w.AttrOff(A_REVERSE)
         } else {
             w.Print(y+i, x, s)        
         }

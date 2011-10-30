@@ -47,23 +47,26 @@ import (
 	"unsafe"
 )
 
-// Not currently used
-type Errno int
-
-var menuerrors = map[Errno]string{
-	C.E_OK:              "The routine succeeded.",
-	C.E_BAD_ARGUMENT:    "Routine detected an incorrect or out-of-range argument.",
-	C.E_BAD_STATE:       "Routine was called from an initialization or termination function.",
-	C.E_NO_MATCH:        "Character failed to match.",
-	C.E_NO_ROOM:         "Menu is too large for its window.",
-	C.E_NOT_CONNECTED:   "No items are connected to the menu.",
-	C.E_NOT_POSTED:      "The menu has not been posted.",
-	C.E_NOT_SELECTABLE:  "The designated item cannot be selected.",
-	C.E_POSTED:          "The menu is already posted.",
-	C.E_REQUEST_DENIED:  "The menu driver could not process the request.",
-	C.E_SYSTEM_ERROR:    "System error occurred (see errno).",
-	C.E_UNKNOWN_COMMAND: "The menu driver code saw an unknown request code.",
-}
+// Menu Driver Requests
+const (
+	MD_LEFT = C.REQ_LEFT_ITEM
+	MD_RIGHT = C.REQ_RIGHT_ITEM
+	MD_UP = C.REQ_UP_ITEM
+	MD_DOWN = C.REQ_DOWN_ITEM
+	MD_ULINE = C.REQ_SCR_ULINE
+	MD_DLINE = C.REQ_SCR_DLINE
+	MD_PAGE_DOWN = C.REQ_SCR_DPAGE
+	MD_PAGE_UP = C.REQ_SCR_UPAGE
+	MD_FIRST = C.REQ_FIRST_ITEM
+	MD_LAST = C.REQ_LAST_ITEM
+	MD_NEXT = C.REQ_NEXT_ITEM
+	MD_PREV = C.REQ_PREV_ITEM
+	MD_TOGGLE = C.REQ_TOGGLE_ITEM
+	MD_CLEAR_PATTERN = C.REQ_CLEAR_PATTERN
+	MD_BACK_PATTERN = C.REQ_BACK_PATTERN
+	MD_NEXT_MATCH = C.REQ_NEXT_MATCH
+	MD_PREV_MATCH = C.REQ_PREV_MATCH
+)
 
 // Menu Options
 const (
@@ -77,10 +80,6 @@ const (
 
 // Menu Item Options
 const O_SELECTABLE = C.O_SELECTABLE
-
-func (e Errno) String() string {
-	return menuerrors[e]
-}
 
 // The strings in this mapping correspond to those found in the keyList mapping in
 // ncurses.go. If changing any of these values, the corresponding value should be
@@ -101,8 +100,20 @@ var driveractions = map[string]C.int{
 	"up":          C.REQ_UP_ITEM,
 }
 
+// DriverActions is a convenience mapping for common responses
+// to keyboard input
+var DriverActions = map[int]int{
+	KEY_DOWN:        C.REQ_DOWN_ITEM,
+	KEY_HOME:       C.REQ_FIRST_ITEM,
+	KEY_END:        C.REQ_LAST_ITEM,
+	KEY_LEFT:        C.REQ_LEFT_ITEM,
+	KEY_PAGEDOWN:   C.REQ_SCR_DPAGE,
+	KEY_PAGEUP:     C.REQ_SCR_UPAGE,
+	KEY_RIGHT:       C.REQ_RIGHT_ITEM,
+	KEY_UP:          C.REQ_UP_ITEM,
+}
+
 type Menu C.MENU
-type MenuItem C.ITEM
 
 // NewMenu returns a pointer to a new menu.
 func NewMenu(items []*MenuItem) (*Menu, os.Error) {
@@ -139,11 +150,11 @@ func (m *Menu) Current(mi *MenuItem) *MenuItem {
 
 // Driver controls how the menu is activated. Action usually corresponds
 // to the string return by the Key() function in goncurses.
-func (m *Menu) Driver(action string) {
-	if da, ok := driveractions[action]; ok {
-		C.menu_driver((*C.MENU)(m), da)
+func (m *Menu) Driver(daction int) os.Error {
+	if err := C.menu_driver((*C.MENU)(m), C.int(daction)); err != C.E_OK {
+		return error(os.Errno(err))
 	}
-	return
+	return nil
 }
 
 // Foreground sets the attributes of highlighted items in the menu
@@ -154,7 +165,7 @@ func (m *Menu) Foreground(ch int) {
 // Format sets the menu format. See the O_* menu options.
 func (m *Menu) Format(r, c int) os.Error {
 	if res := C.set_menu_format((*C.MENU)(m), C.int(r), C.int(c)); res != C.E_OK {
-		return os.NewError(menuerrors[Errno(res)])
+		return error(os.Errno(res))
 	}
 	return nil
 }
@@ -163,7 +174,7 @@ func (m *Menu) Format(r, c int) os.Error {
 // before exiting.
 func (m *Menu) Free() os.Error {
 	if res := C.free_menu((*C.MENU)(m)); res != C.E_OK {
-		return os.NewError(menuerrors[Errno(res)])
+		return error(os.Errno(res))
 	}
 	return nil
 }
@@ -202,7 +213,7 @@ func (m *Menu) Mark(mark string) os.Error {
 	defer C.free(unsafe.Pointer(cmark))
 
 	if res := C.set_menu_mark((*C.MENU)(m), cmark); res != C.E_OK {
-		return os.NewError(menuerrors[Errno(res)])
+		return error(os.Errno(res))
 	}
 	return nil
 }
@@ -217,7 +228,7 @@ func (m *Menu) Option(opts int, on bool) os.Error {
 		res = C.menu_opts_off((*C.MENU)(m), C.Menu_Options(opts))
 	}
 	if res != 0 {
-		return os.NewError(menuerrors[Errno(res)])
+		return error(os.Errno(res))
 	}
 	return nil
 }
@@ -230,7 +241,7 @@ func (m *Menu) PositionCursor() {
 // Post the menu, making it visible
 func (m *Menu) Post() os.Error {
 	if res := C.post_menu((*C.MENU)(m)); res != C.E_OK {
-		return os.NewError(menuerrors[Errno(res)])
+		return error(os.Errno(res))
 	}
 	return nil
 }
@@ -238,7 +249,7 @@ func (m *Menu) Post() os.Error {
 // SubWindow for the menu
 func (m *Menu) SubWindow(sub *Window) os.Error {
 	if res := C.set_menu_sub((*C.MENU)(m), (*C.WINDOW)(sub)); res != C.E_OK {
-		return os.NewError(menuerrors[Errno(res)])
+		return error(os.Errno(res))
 	}
 	return nil
 }
@@ -246,7 +257,7 @@ func (m *Menu) SubWindow(sub *Window) os.Error {
 // UnPost the menu, effectively hiding it.
 func (m *Menu) UnPost() os.Error {
 	if res := C.unpost_menu((*C.MENU)(m)); res != C.E_OK {
-		return os.NewError(menuerrors[Errno(res)])
+		return error(os.Errno(res))
 	}
 	return nil
 }
@@ -254,10 +265,12 @@ func (m *Menu) UnPost() os.Error {
 // Window container for the menu
 func (m *Menu) Window(win *Window) os.Error {
 	if res := C.set_menu_win((*C.MENU)(m), (*C.WINDOW)(win)); res != C.E_OK {
-		return os.NewError(menuerrors[Errno(res)])
+		return error(os.Errno(res))
 	}
 	return nil
 }
+
+type MenuItem C.ITEM
 
 // NewItem creates a new menu item with name and description.
 func NewItem(name, desc string) (*MenuItem, os.Error) {

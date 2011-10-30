@@ -34,7 +34,7 @@ func main() {
         window.ColorOn(byte(i+1))
         window.Print(1, (w/2)-(len(title)/2), title, i+1)
         window.ColorOff(byte(i+1))
-        panels[i] = window.Panel()
+        panels[i] = NewPanel(window)
         
     }
 
@@ -44,11 +44,10 @@ func main() {
         UpdatePanels()
         Update()
         
-        ch := stdscr.GetChar()
-        switch(Key(ch)) {
-        case "q":
+        switch stdscr.GetChar() {
+        case 'q':
             return
-        case "tab":
+        case KEY_TAB:
             active += 1
             if active > 2 {
                 active = 0

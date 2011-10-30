@@ -149,16 +149,111 @@ const (
 	C_YELLOW  = C.COLOR_YELLOW
 )
 
-/*var colorList = map[string]C.int{
-	"black":   C.COLOR_BLACK,
-	"red":     C.COLOR_RED,
-	"green":   C.COLOR_GREEN,
-	"yellow":  C.COLOR_YELLOW,
-	"blue":    C.COLOR_BLUE,
-	"magenta": C.COLOR_MAGENTA,
-	"cyan":    C.COLOR_CYAN,
-	"white":   C.COLOR_WHITE,
-}*/
+const (
+	KEY_TAB       = 9           // tab
+	KEY_RETURN    = 10          // enter key vs. KEY_ENTER
+	KEY_DOWN      = C.KEY_DOWN  // down arrow key
+	KEY_UP        = C.KEY_UP    // up arrow key
+	KEY_LEFT      = C.KEY_LEFT  // left arrow key
+	KEY_RIGHT     = C.KEY_RIGHT // right arrow key
+	KEY_HOME      = C.KEY_HOME
+	KEY_BACKSPACE = C.KEY_BACKSPACE
+	KEY_F1        = C.KEY_F0 + 1
+	KEY_F2        = C.KEY_F0 + 2
+	KEY_F3        = C.KEY_F0 + 3
+	KEY_F4        = C.KEY_F0 + 4
+	KEY_F5        = C.KEY_F0 + 5
+	KEY_F6        = C.KEY_F0 + 6
+	KEY_F7        = C.KEY_F0 + 7
+	KEY_F8        = C.KEY_F0 + 8
+	KEY_F9        = C.KEY_F0 + 9
+	KEY_F10       = C.KEY_F0 + 10
+	KEY_F11       = C.KEY_F0 + 11
+	KEY_F12       = C.KEY_F0 + 12
+	KEY_DL        = C.KEY_DL    // delete-line key
+	KEY_IL        = C.KEY_IL    // insert-line key
+	KEY_DC        = C.KEY_DC    // delete-character key
+	KEY_IC        = C.KEY_IC    // insert-character key
+	KEY_EIC       = C.KEY_EIC   // sent by rmir or smir in insert mode
+	KEY_CLEAR     = C.KEY_CLEAR // clear-screen or erase key 
+	KEY_EOS       = C.KEY_EOS   // clear-to-end-of-screen key 
+	KEY_EOL       = C.KEY_EOL   // clear-to-end-of-line key 
+	KEY_SF        = C.KEY_SF    // scroll-forward key 
+	KEY_SR        = C.KEY_SR    // scroll-backward key 
+	KEY_PAGEDOWN  = C.KEY_NPAGE
+	KEY_PAGEUP    = C.KEY_PPAGE
+	KEY_STAB      = C.KEY_STAB      // set-tab key 
+	KEY_CTAB      = C.KEY_CTAB      // clear-tab key 
+	KEY_CATAB     = C.KEY_CATAB     // clear-all-tabs key 
+	KEY_ENTER     = C.KEY_ENTER     // enter/send key
+	KEY_PRINT     = C.KEY_PRINT     // print key 
+	KEY_LL        = C.KEY_LL        // lower-left key (home down) 
+	KEY_A1        = C.KEY_A1        // upper left of keypad 
+	KEY_A3        = C.KEY_A3        // upper right of keypad 
+	KEY_B2        = C.KEY_B2        // center of keypad 
+	KEY_C1        = C.KEY_C1        // lower left of keypad 
+	KEY_C3        = C.KEY_C3        // lower right of keypad 
+	KEY_BTAB      = C.KEY_BTAB      // back-tab key 
+	KEY_BEG       = C.KEY_BEG       // begin key 
+	KEY_CANCEL    = C.KEY_CANCEL    // cancel key 
+	KEY_CLOSE     = C.KEY_CLOSE     // close key 
+	KEY_COMMAND   = C.KEY_COMMAND   // command key 
+	KEY_COPY      = C.KEY_COPY      // copy key 
+	KEY_CREATE    = C.KEY_CREATE    // create key 
+	KEY_END       = C.KEY_END       // end key 
+	KEY_EXIT      = C.KEY_EXIT      // exit key 
+	KEY_FIND      = C.KEY_FIND      // find key 
+	KEY_HELP      = C.KEY_HELP      // help key 
+	KEY_MARK      = C.KEY_MARK      // mark key 
+	KEY_MESSAGE   = C.KEY_MESSAGE   // message key 
+	KEY_MOVE      = C.KEY_MOVE      // move key 
+	KEY_NEXT      = C.KEY_NEXT      // next key 
+	KEY_OPEN      = C.KEY_OPEN      // open key 
+	KEY_OPTIONS   = C.KEY_OPTIONS   // options key 
+	KEY_PREVIOUS  = C.KEY_PREVIOUS  // previous key 
+	KEY_REDO      = C.KEY_REDO      // redo key 
+	KEY_REFERENCE = C.KEY_REFERENCE // reference key 
+	KEY_REFRESH   = C.KEY_REFRESH   // refresh key 
+	KEY_REPLACE   = C.KEY_REPLACE   // replace key 
+	KEY_RESTART   = C.KEY_RESTART   // restart key 
+	KEY_RESUME    = C.KEY_RESUME    // resume key
+	KEY_SAVE      = C.KEY_SAVE      // save key 
+	KEY_SBEG      = C.KEY_SBEG      // shifted begin key 
+	KEY_SCANCEL   = C.KEY_SCANCEL   // shifted cancel key 
+	KEY_SCOMMAND  = C.KEY_SCOMMAND  // shifted command key 
+	KEY_SCOPY     = C.KEY_SCOPY     // shifted copy key 
+	KEY_SCREATE   = C.KEY_SCREATE   // shifted create key 
+	KEY_SDC       = C.KEY_SDC       // shifted delete-character key 
+	KEY_SDL       = C.KEY_SDL       // shifted delete-line key 
+	KEY_SELECT    = C.KEY_SELECT    // select key 
+	KEY_SEND      = C.KEY_SEND      // shifted end key 
+	KEY_SEOL      = C.KEY_SEOL      // shifted clear-to-end-of-line key 
+	KEY_SEXIT     = C.KEY_SEXIT     // shifted exit key 
+	KEY_SFIND     = C.KEY_SFIND     // shifted find key 
+	KEY_SHELP     = C.KEY_SHELP     // shifted help key 
+	KEY_SHOME     = C.KEY_SHOME     // shifted home key 
+	KEY_SIC       = C.KEY_SIC       // shifted insert-character key 
+	KEY_SLEFT     = C.KEY_SLEFT     // shifted left-arrow key 
+	KEY_SMESSAGE  = C.KEY_SMESSAGE  // shifted message key 
+	KEY_SMOVE     = C.KEY_SMOVE     // shifted move key 
+	KEY_SNEXT     = C.KEY_SNEXT     // shifted next key 
+	KEY_SOPTIONS  = C.KEY_SOPTIONS  // shifted options key 
+	KEY_SPREVIOUS = C.KEY_SPREVIOUS // shifted previous key 
+	KEY_SPRINT    = C.KEY_SPRINT    // shifted print key 
+	KEY_SREDO     = C.KEY_SREDO     // shifted redo key 
+	KEY_SREPLACE  = C.KEY_SREPLACE  // shifted replace key 
+	KEY_SRIGHT    = C.KEY_SRIGHT    // shifted right-arrow key 
+	KEY_SRSUME    = C.KEY_SRSUME    // shifted resume key 
+	KEY_SSAVE     = C.KEY_SSAVE     // shifted save key 
+	KEY_SSUSPEND  = C.KEY_SSUSPEND  // shifted suspend key 
+	KEY_SUNDO     = C.KEY_SUNDO     // shifted undo key 
+	KEY_SUSPEND   = C.KEY_SUSPEND   // suspend key 
+	KEY_UNDO      = C.KEY_UNDO      // undo key 
+	KEY_MOUSE     = C.KEY_MOUSE     // any mouse event
+	KEY_RESIZE    = C.KEY_RESIZE    // Terminal resize event 
+	KEY_EVENT     = C.KEY_EVENT     // We were interrupted by an event 
+	KEY_MAX       = C.KEY_MAX       // Maximum key value is KEY_EVENT (0633)
+)
 
 var keyList = map[C.int]string{
 	9:               "tab",
@@ -629,7 +724,7 @@ func (w *Window) GetChar(coords ...int) int {
 // Reads at most 'n' characters entered by the user from the Window. Attempts
 // to enter greater than 'n' characters will elicit a 'beep'
 func (w *Window) GetString(n int) (string, os.Error) {
-// TODO: add move portion of code...
+	// TODO: add move portion of code...
 	cstr := make([]C.char, n)
 	if C.wgetnstr((*C.WINDOW)(w), (*C.char)(&cstr[0]), C.int(n)) == C.ERR {
 		return "", os.NewError("Failed to retrieve string from input stream")
@@ -648,7 +743,7 @@ func (w *Window) Getyx() (int, int) {
 // HLine draws a horizontal line starting at y, x and ending at width using 
 // the specified character
 func (w *Window) HLine(y, x, ch, wid int) {
-// TODO: move portion	
+	// TODO: move portion	
 	C.mvwhline((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(ch),
 		C.int(wid))
 	return
@@ -790,7 +885,7 @@ func (w *Window) Touch() {
 // VLine draws a verticle line starting at y, x and ending at height using 
 // the specified character
 func (w *Window) VLine(y, x, ch, h int) {
-// TODO: move portion
+	// TODO: move portion
 	C.mvwvline((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(ch),
 		C.int(h))
 	return

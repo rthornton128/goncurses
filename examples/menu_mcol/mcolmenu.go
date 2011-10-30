@@ -59,7 +59,7 @@ func main() {
     menuwin.Keypad(true)
     
     menu.Window(menuwin)
-    menu.Sub(menuwin.Derived(6, 38, 3, 1))
+    menu.SubWindow(menuwin.Derived(6, 38, 3, 1))
     menu.Option(O_SHOWDESC, true)
     menu.Format(5, 3)
     menu.Mark(" * ")
@@ -76,7 +76,8 @@ func main() {
     
     y, _ := stdscr.Maxyx()
     stdscr.ColorOn(2)
-    stdscr.Print(y-3, 1, "Use up/down arrows or page up/down to navigate. 'q' to exit")
+    stdscr.Print(y-3, 1, 
+            "Use up/down arrows or page up/down to navigate. 'q' to exit")
     stdscr.ColorOff(2)
     stdscr.Refresh()
     
@@ -86,12 +87,11 @@ func main() {
     
     for {
         Update()
-        ch, _ := menuwin.GetChar()
-        
-        if x := Key(ch); x == "q" {
+
+        if ch := menuwin.GetChar(); ch == 'q' {
             return
         } else {
-            menu.Driver(x)
+            menu.Driver(DriverActions[ch])
         }
     }
 }

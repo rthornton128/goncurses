@@ -1,4 +1,4 @@
-/* This example show a basic menu similar to that found in the ncurses
+/* This example shows a scrolling menu similar to that found in the ncurses
  * examples from TLDP */
 
 package main
@@ -49,23 +49,24 @@ func main() {
     menuwin.Keypad(true)
     
     menu.Window(menuwin)
-    menu.Sub(menuwin.Derived(6, 38, 3, 1))
+    menu.SubWindow(menuwin.Derived(6, 38, 3, 1))
     menu.Format(5, 1)
     menu.Mark(" * ")
     
     // Print centered menu title
-    //y, x := menuwin.Maxyx()
     title := "My Menu"
     menuwin.Box(0, 0)
     menuwin.ColorOn(1)
     menuwin.Print(1, (WIDTH/2)-(len(title)/2), title)
     menuwin.ColorOff(1)
-    // FIXME: ACS_* definitions not currently available
-    menuwin.HLine(2, 1, '-', WIDTH-2) 
+    menuwin.AddChar(2, ACS_LTEE)
+    menuwin.HLine(2, 1, ACS_HLINE, WIDTH-2) 
+    menuwin.AddChar(2, WIDTH-1, ACS_RTEE)
     
     y, _ := stdscr.Maxyx()
     stdscr.ColorOn(2)
-    stdscr.Print(y-3, 1, "Use up/down arrows or page up/down to navigate. 'q' to exit")
+    stdscr.Print(y-3, 1, 
+        "Use up/down arrows or page up/down to navigate. 'q' to exit")
     stdscr.ColorOff(2)
     stdscr.Refresh()
     
@@ -74,13 +75,11 @@ func main() {
     menuwin.Refresh()
     
     for {
-        Update()
-        ch, _ := menuwin.GetChar()
-        
-        if x := Key(ch); x == "q" {
+        Update()        
+        if ch := menuwin.GetChar(); ch == 'q' {
             return
         } else {
-            menu.Driver(x)
+            menu.Driver(DriverActions[ch])
         }
     }
 }

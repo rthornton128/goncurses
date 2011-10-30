@@ -17,11 +17,13 @@ func main() {
     
     // An example of trying to set an invalid color pair
     err := InitPair(255, C_BLACK, C_CYAN)
-    stdscr.Print(err.String())
+    stdscr.Print("An intentional error: %s", err.String())
     
-    stdscr.Background(ColorPair(2))
     stdscr.Keypad(true)
     stdscr.Print(12, 30, "Hello, World!!!")
+    stdscr.Refresh()
+    stdscr.GetChar()
+    stdscr.Background(ColorPair(2))
     stdscr.ColorOn(1)
     stdscr.Print(13, 30, "Hello, World in Color!!!")
     stdscr.ColorOff(1)

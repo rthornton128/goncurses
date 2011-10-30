@@ -47,28 +47,26 @@ func main() {
     
     for {
         Update()
-        ch, _ := stdscr.GetChar()
-        
-        if x := Key(ch); x == "q" {
+        ch := stdscr.GetChar()
+
+        switch ch {
+        case 'q':
             return
-        } else {
-            switch x {
-            case " ":
-                menu.Driver("toggle")
-            case "enter":
-                var list string
-                for _, item := range menu.Items(nil) {
-                    if item.Value() {
-                        list += "\"" + item.Name() + "\" "
-                    }
+        case ' ':
+            menu.Driver(MD_TOGGLE)
+        case KEY_RETURN:
+            var list string
+            for _, item := range menu.Items(nil) {
+                if item.Value() {
+                    list += "\"" + item.Name() + "\" "
                 }
-                stdscr.Move(20, 0)
-                stdscr.ClearToEOL()
-                stdscr.Print(20, list)
-                stdscr.Refresh()
-            default:
-                menu.Driver(x)
             }
+            stdscr.Move(20, 0)
+            stdscr.ClearToEOL()
+            stdscr.Print(20, list)
+            stdscr.Refresh()
+        default:
+            menu.Driver(DriverActions[ch])
         }
     }
 }

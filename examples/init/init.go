@@ -17,8 +17,7 @@ func main() {
     stdscr.Print("Press a key...")
     stdscr.Refresh()
     
-    ch, _ := stdscr.GetChar()
-    if key := Key(ch); key == "F2" {
+    if ch := stdscr.GetChar(); ch == KEY_F2 {
         stdscr.Print("The F2 key was pressed.")
     } else {
         stdscr.Print("The key pressed is: ")
