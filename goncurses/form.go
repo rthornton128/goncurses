@@ -40,6 +40,7 @@ import "C"
 import (
 	"fmt"
 	"os"
+	"unsafe"
 )
 
 const (
@@ -175,12 +176,55 @@ func (f *Field) Free() os.Error {
 	return nil
 }
 
+func (f *Field) Info(h, w, y, x, off, nbuf *int) os.Error {
+	res := C.field_info((*C.FIELD)(f), (*C.int)(unsafe.Pointer(h)),
+		(*C.int)(unsafe.Pointer(w)), (*C.int)(unsafe.Pointer(y)),
+		(*C.int)(unsafe.Pointer(x)), (*C.int)(unsafe.Pointer(off)),
+		(*C.int)(unsafe.Pointer(nbuf)))
+	if res != C.E_OK {
+		return error(os.Errno(res))
+	}
+	return nil
+}
+
+func (f *Field) Just(just ...int) (j int, err os.Error) {
+	if len(just) > 0 {
+		if res := C.set_field_just((*C.FIELD)(f), C.int(just[0])); res != C.E_OK {
+			err = error(os.Errno(res))
+		}
+		return
+	}
+	j = int(C.field_just((*C.FIELD)(f)))
+	return
+}
+
+func (f *Field) Move(y, x int) os.Error {
+	if res := C.move_field((*C.FIELD)(f), C.int(y), C.int(x)); res != C.E_OK {
+		return error(os.Errno(res))
+	}
+	return nil
+}
+
 func (f *Field) Options(opts int, on bool) {
 	if on {
 		C.field_opts_on((*C.FIELD)(f), C.Field_Options(opts))
 		return
 	}
 	C.field_opts_off((*C.FIELD)(f), C.Field_Options(opts))
+}
+
+func (f *Field) Pad(pad ...int) (p int, err os.Error) {
+	switch len(pad) {
+	case 0:
+		p = int(C.field_pad((*C.FIELD)(f)))
+	case 1:
+		if res := C.set_field_pad((*C.FIELD)(f), C.int(pad[0])); res != C.E_OK {
+			err = error(os.Errno(res))
+		}
+	default:
+		panic("Invalid number of arguments")
+	}
+	return
 }
 
 type Form C.FORM
