@@ -133,8 +133,6 @@ var attrList = map[C.int]string{
 	C.A_CHARTEXT:   "chartext",
 }
 
-type Chtype C.chtype
-
 // Colors available to ncurses. Combine these with the dim/bold attributes
 // for bright/dark versions of each color. These colors can be used for
 // both background and foreground colors.
@@ -283,7 +281,7 @@ var keyList = map[C.int]string{
 	C.KEY_PPAGE:     "page up",
 }
 
-type MMask C.mmask_t
+//type MMask C.mmask_t
 
 // Mouse button events
 const (
@@ -313,7 +311,7 @@ const (
 	M_SHIFT          = C.BUTTON_SHIFT          // shift-click
 	M_POSITION       = C.REPORT_MOUSE_POSITION // mouse moved
 )
-
+/*
 var mouseEvents = map[string]MMask{
 	"button1-pressed":        C.BUTTON1_PRESSED,
 	"button1-released":       C.BUTTON1_RELEASED,
@@ -345,7 +343,7 @@ var mouseEvents = map[string]MMask{
 	"alt":      C.BUTTON_ALT,
 	"all":      C.ALL_MOUSE_EVENTS,
 	"position": C.REPORT_MOUSE_POSITION,
-}
+}*/
 
 // Turn on/off buffering; raw user signals are passed to the program for
 // handling. Overrides raw mode
@@ -399,6 +397,9 @@ func End() {
 // x, y and z coordinates, id of the device, and a bit masked state of
 // the devices buttons
 func GetMouse() ([]int, os.Error) {
+	if bool(C.has_mouse()) != true {
+		return nil, os.NewError("Mouse support not enabled")
+	}
 	var event C.MEVENT
 	if C.getmouse(&event) != C.OK {
 		return nil, os.NewError("Failed to get mouse event")
@@ -462,20 +463,28 @@ func Key(k int) (key string) {
 	return
 }
 
-// MouseMask accepts a single int of OR'd mouse events which should be
-// accepted as input events to GetChar. 
-func MouseMask(masks ...string) {
-	var mousemask MMask
-	for _, mask := range masks {
-		mousemask |= mouseEvents[mask]
+func MouseInterval() {
+	//	if bool(C.has_mouse()) != true {
+	//		return nil, os.NewError("Mouse support not enabled")
+	//	}
+}
+
+// MouseMask accepts a single int of OR'd mouse events. If a mouse event
+// is triggered, GetChar() will return KEY_MOUSE. To retrieve the actual
+// event use GetMouse() to pop it off the queue. Pass a pointer as the 
+// second argument to store the prior events being monitored or nil.
+func MouseMask(mask int, old *int) (m int) {
+	if bool(C.has_mouse()) {
+		m = int(C.mousemask((C.mmask_t)(mask),
+			(*C.mmask_t)(unsafe.Pointer(old))))
 	}
-	C.mousemask((C.mmask_t)(mousemask), (*C.mmask_t)(unsafe.Pointer(nil)))
+	return
 }
 
 // NewWindow creates a window of size h(eight) and w(idth) at y, x
-func NewWindow(h, w, y, x int) (new *Window, err os.Error) {
-	new = (*Window)(C.newwin(C.int(h), C.int(w), C.int(y), C.int(x)))
-	if unsafe.Pointer(new) == unsafe.Pointer(nil) {
+func NewWindow(h, w, y, x int) (win *Window, err os.Error) {
+	win = (*Window)(C.newwin(C.int(h), C.int(w), C.int(y), C.int(x)))
+	if unsafe.Pointer(win) == unsafe.Pointer(nil) {
 		err = os.NewError("Failed to create a new window")
 	}
 	return
@@ -697,6 +706,11 @@ func (w *Window) Derived(height, width, y, x int) *Window {
 // Duplicate the window, creating an exact copy.
 func (w *Window) Duplicate() *Window {
 	return (*Window)(C.dupwin((*C.WINDOW)(w)))
+}
+
+// Test whether the given mouse coordinates are within the window or not
+func (w *Window) Enclose(y, x int) bool {
+	return bool(C.wenclose((*C.WINDOW)(w), C.int(y), C.int(x)))
 }
 
 // Erase the contents of the window, effectively clearing it

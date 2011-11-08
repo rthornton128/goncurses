@@ -81,25 +81,6 @@ const (
 // Menu Item Options
 const O_SELECTABLE = C.O_SELECTABLE
 
-// The strings in this mapping correspond to those found in the keyList mapping in
-// ncurses.go. If changing any of these values, the corresponding value should be
-// modified too.
-var driveractions = map[string]C.int{
-	"down":        C.REQ_DOWN_ITEM,
-	"first":       C.REQ_FIRST_ITEM,
-	"last":        C.REQ_LAST_ITEM,
-	"left":        C.REQ_LEFT_ITEM,
-	"next":        C.REQ_NEXT_ITEM,
-	"page down":   C.REQ_SCR_DPAGE,
-	"page up":     C.REQ_SCR_UPAGE,
-	"prev":        C.REQ_PREV_ITEM,
-	"right":       C.REQ_RIGHT_ITEM,
-	"scroll down": C.REQ_SCR_DLINE,
-	"scroll up":   C.REQ_SCR_ULINE,
-	"toggle":      C.REQ_TOGGLE_ITEM,
-	"up":          C.REQ_UP_ITEM,
-}
-
 // DriverActions is a convenience mapping for common responses
 // to keyboard input
 var DriverActions = map[int]int{
@@ -129,9 +110,9 @@ func NewMenu(items []*MenuItem) (*Menu, os.Error) {
 	return (*Menu)(menu), nil
 }
 
-// Background sets the attributes of un-highlighted items in the menu
-func (m *Menu) Background(ch int) {
-	C.set_menu_back((*C.MENU)(m), C.chtype(ch))
+// Background returns the menu's background character setting
+func (m *Menu) Background() int {
+	return int(C.menu_back((*C.MENU)(m)))
 }
 
 // Count returns the number of MenuItems in the Menu
@@ -157,9 +138,9 @@ func (m *Menu) Driver(daction int) os.Error {
 	return nil
 }
 
-// Foreground sets the attributes of highlighted items in the menu
-func (m *Menu) Foreground(ch int) {
-	C.set_menu_fore((*C.MENU)(m), C.chtype(ch))
+// Foreground gets the attributes of highlighted items in the menu
+func (m *Menu) Foreground() int {
+	return int(C.menu_fore((*C.MENU)(m)))
 }
 
 // Format sets the menu format. See the O_* menu options.
@@ -184,27 +165,15 @@ func (m *Menu) Grey(ch int) {
 	C.set_menu_grey((*C.MENU)(m), C.chtype(ch))
 }
 
-// Items will either set or return the items in the menu. When setting
-// items you must make sure the prior menu items will be freed. Pass
-// nil to get the items in the menu.
-func (m *Menu) Items(items []*MenuItem) []*MenuItem {
-	if items == nil {
-		type ItemArray [10]*C.ITEM
-		citems := C.menu_items((*C.MENU)(m))
-		count := m.Count()
-		mitems := make([]*MenuItem, count)
-		for index := 0; index < count; index++ {
-			mitems[index] = (*MenuItem)(C.menu_item_at(citems, C.int(index)))
-		}
-		return mitems
+// Items will return the items in the menu.
+func (m *Menu) Items() []*MenuItem {
+	citems := C.menu_items((*C.MENU)(m))
+	count := m.Count()
+	mitems := make([]*MenuItem, count)
+	for index := 0; index < count; index++ {
+		mitems[index] = (*MenuItem)(C.menu_item_at(citems, C.int(index)))
 	}
-	citems := make([]*C.ITEM, len(items)+1)
-	for index, item := range items {
-		citems[index] = (*C.ITEM)(item)
-	}
-	citems[len(items)] = nil
-	C.set_menu_items((*C.MENU)(m), (**C.ITEM)(&citems[0]))
-	return nil
+	return mitems
 }
 
 // Mark sets the indicator for the currently selected menu item
@@ -233,6 +202,16 @@ func (m *Menu) Option(opts int, on bool) os.Error {
 	return nil
 }
 
+// Pad sets the padding character for menu items.
+func (m *Menu) Pad() int {
+	return int(C.menu_pad((*C.MENU)(m)))
+}
+
+// Pattern returns the menu's pattern buffer
+func (m *Menu) Pattern() string {
+	return C.GoString(C.menu_pattern((*C.MENU)(m)))
+}
+
 // PositionCursor sets the cursor over the currently selected menu item.
 func (m *Menu) PositionCursor() {
 	C.pos_menu_cursor((*C.MENU)(m))
@@ -244,6 +223,85 @@ func (m *Menu) Post() os.Error {
 		return error(os.Errno(res))
 	}
 	return nil
+}
+
+// SetBackground set the attributes of the un-highlighted items in the 
+// menu
+func (m *Menu) SetBackground(ch int) os.Error {
+	err := C.set_menu_back((*C.MENU)(m), C.chtype(ch))
+	if err != C.E_OK {
+		return error(os.Errno(err))
+	}
+	return nil
+}
+
+// SetForeground sets the attributes of the highlighted items in the menu
+func (m *Menu) SetForeground(ch int) os.Error {
+	err := C.set_menu_fore((*C.MENU)(m), C.chtype(ch))
+	if err != C.E_OK {
+		return error(os.Errno(err))
+	}
+	return nil
+}
+
+// SetItems will either set the items in the menu. When setting
+// items you must make sure the prior menu items will be freed.
+func (m *Menu) SetItems(items []*MenuItem) os.Error {
+	citems := make([]*C.ITEM, len(items)+1)
+	for index, item := range items {
+		citems[index] = (*C.ITEM)(item)
+	}
+	citems[len(items)] = nil
+	err := C.set_menu_items((*C.MENU)(m), (**C.ITEM)(&citems[0]))
+	if err != C.E_OK {
+		return error(os.Errno(err))
+	}
+	return nil
+}
+
+// SetPad sets the padding character for menu items.
+func (m *Menu) SetPad(ch int) os.Error {
+	if res := C.set_menu_pad((*C.MENU)(m), C.int(ch)); res != C.E_OK {
+		return error(os.Errno(res))
+	}
+	return nil
+}
+
+// SetPattern sets the padding character for menu items.
+func (m *Menu) SetPattern(pattern string) os.Error {
+	cpattern := C.CString(pattern)
+	defer C.free(unsafe.Pointer(cpattern))
+	res := C.set_menu_pattern((*C.MENU)(m), (*C.char)(cpattern))
+	if res != C.E_OK {
+		return error(os.Errno(res))
+	}
+	return nil
+}
+
+// SetSpacing of the the menu's items. 'desc' is the space between the
+// item and it's description andmay not be larger than TAB_SIZE. 'row' 
+// is the number of rows separating each item and may not be larger than 
+// three. 'col' is the spacing between each column of items in 
+// multi-column mode. Use values of 0 or 1 to reset spacing to default, 
+// which is one
+func (m *Menu) SetSpacing(desc, row, col int) os.Error {
+	err := C.set_menu_spacing((*C.MENU)(m), C.int(desc), C.int(row),
+		C.int(col))
+	if err != C.E_OK {
+		return error(os.Errno(err))
+	}
+	return nil
+}
+
+// Spacing returns the menu item spacing. See SetSpacing for a description
+func (m *Menu) Spacing() (int, int, int) {
+	var desc, row, col C.int
+	err := C.menu_spacing((*C.MENU)(m), (*C.int)(&desc), (*C.int)(&row),
+		(*C.int)(&col))
+	if err != C.E_OK {
+		return int(desc), int(row), int(col)
+	}
+	return 0, 0, 0
 }
 
 // SubWindow for the menu
