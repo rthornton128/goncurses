@@ -110,6 +110,27 @@ func NewMenu(items []*MenuItem) (*Menu, os.Error) {
 	return (*Menu)(menu), nil
 }
 
+// RequestName of menu request code
+func RequestName(request int) (string, os.Error) {
+	cstr, err := C.menu_request_name(C.int(request))
+	if cstr == nil {
+		return "", error(err.(os.Errno))
+	}
+	return C.GoString(cstr), nil
+}
+
+// RequestByName returns the request ID of the provide request
+func RequestByName(request string) (res int, err os.Error) {
+	cstr := C.CString(request)
+	defer C.free(unsafe.Pointer(cstr))
+	
+	res = int(C.menu_request_by_name(cstr))
+	if res == int(C.E_NO_MATCH) {
+		err = error(os.Errno(res))
+	}
+	return res, nil
+}
+
 // Background returns the menu's background character setting
 func (m *Menu) Background() int {
 	return int(C.menu_back((*C.MENU)(m)))
@@ -225,6 +246,16 @@ func (m *Menu) Post() os.Error {
 	return nil
 }
 
+// Scale
+func (m *Menu) Scale() (int, int, os.Error) {
+	var y, x C.int
+	err := C.scale_menu((*C.MENU)(m), (*C.int)(&y), (*C.int)(&x))
+	if err != C.E_OK {
+		return  0, 0, error(os.Errno(err))
+	}
+	return int(y), int(x), nil
+}
+
 // SetBackground set the attributes of the un-highlighted items in the 
 // menu
 func (m *Menu) SetBackground(ch int) os.Error {
@@ -293,6 +324,14 @@ func (m *Menu) SetSpacing(desc, row, col int) os.Error {
 	return nil
 }
 
+// SetWindow container for the menu
+func (m *Menu) SetWindow(win *Window) os.Error {
+	if res := C.set_menu_win((*C.MENU)(m), (*C.WINDOW)(win)); res != C.E_OK {
+		return error(os.Errno(res))
+	}
+	return nil
+}
+
 // Spacing returns the menu item spacing. See SetSpacing for a description
 func (m *Menu) Spacing() (int, int, int) {
 	var desc, row, col C.int
@@ -320,12 +359,9 @@ func (m *Menu) UnPost() os.Error {
 	return nil
 }
 
-// Window container for the menu
-func (m *Menu) Window(win *Window) os.Error {
-	if res := C.set_menu_win((*C.MENU)(m), (*C.WINDOW)(win)); res != C.E_OK {
-		return error(os.Errno(res))
-	}
-	return nil
+// Window container for the menu. Returns nil on failure
+func (m *Menu) Window() *Window {
+	return (*Window)(C.menu_win((*C.MENU)(m)))
 }
 
 type MenuItem C.ITEM
@@ -353,6 +389,11 @@ func (mi *MenuItem) Free() {
 	C.free_item((*C.ITEM)(mi))
 }
 
+// Index of the menu item in it's parent menu
+func (mi *MenuItem) Index() int {
+	return int(C.item_index((*C.ITEM)(mi)))
+}
+
 // Name of the menu item
 func (mi *MenuItem) Name() string {
 	return C.GoString(C.item_name((*C.ITEM)(mi)))
@@ -367,7 +408,22 @@ func (mi *MenuItem) Selectable(on bool) {
 	}
 }
 
+// SetValue sets whether an item is active or not
+func (mi *MenuItem) SetValue(val bool) os.Error {
+	err := int(C.set_item_value((*C.ITEM)(mi), C.bool(val)))
+	if err != C.E_OK {
+		return error(os.Errno(err))
+	}
+	return nil
+}
+
 // Value returns true if menu item is toggled/active, otherwise false
 func (mi *MenuItem) Value() bool {
 	return bool(C.item_value((*C.ITEM)(mi)))
 }
+
+// Visible returns true if the item is visible, false if not
+func (mi *MenuItem) Visible() bool {
+	return bool(C.item_visible((*C.ITEM)(mi)))
+}
+
