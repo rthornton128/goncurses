@@ -154,20 +154,28 @@ func NewField(h, w, tr, lc, oscr, nbuf int) (*Field, os.Error) {
 	return (*Field)(field), nil
 }
 
-func (f *Field) Background(ch int) os.Error {
-	if res := C.set_field_back((*C.FIELD)(f), C.chtype(ch)); res != C.E_OK {
-		return error(os.Errno(res))
-	}
-	return nil
+// Background returns the field's background character attributes
+func (f *Field) Background() int {
+	return int(C.field_back((*C.FIELD)(f)))
 }
 
-func (f *Field) Foreground(ch int) os.Error {
-	if res := C.set_field_fore((*C.FIELD)(f), C.chtype(ch)); res != C.E_OK {
-		return error(os.Errno(res))
+// Duplicate the field at the specified coordinates, returning a pointer 
+// to the newly allocated object.
+func (f *Field) Duplicate(y, x int) (*Field, os.Error) {
+	newfield, err := C.dup_field((*C.FIELD)(f), C.int(y), C.int(x))
+	if newfield == nil {
+		return nil, error(err.(os.Errno))
 	}
-	return nil
+	return (*Field)(newfield), nil
 }
 
+// Foreground returns the field's foreground character attributes
+func (f *Field) Foreground() int {
+	return int(C.field_fore((*C.FIELD)(f)))
+}
+
+// Free field's allocated memory. This must be called to prevent memory
+// leaks
 func (f *Field) Free() os.Error {
 	if res := C.free_field((*C.FIELD)(f)); res != C.E_OK {
 		return error(os.Errno(res))
@@ -176,6 +184,9 @@ func (f *Field) Free() os.Error {
 	return nil
 }
 
+// Info retrieves the height, width, y, x, offset and buffer size of the 
+// given field. Pass the memory addess of the variable to store the data
+// in or nil.
 func (f *Field) Info(h, w, y, x, off, nbuf *int) os.Error {
 	res := C.field_info((*C.FIELD)(f), (*C.int)(unsafe.Pointer(h)),
 		(*C.int)(unsafe.Pointer(w)), (*C.int)(unsafe.Pointer(y)),
@@ -187,17 +198,12 @@ func (f *Field) Info(h, w, y, x, off, nbuf *int) os.Error {
 	return nil
 }
 
-func (f *Field) Just(just ...int) (j int, err os.Error) {
-	if len(just) > 0 {
-		if res := C.set_field_just((*C.FIELD)(f), C.int(just[0])); res != C.E_OK {
-			err = error(os.Errno(res))
-		}
-		return
-	}
-	j = int(C.field_just((*C.FIELD)(f)))
-	return
+// Just returns the justification type of the field
+func (f *Field) Justification() int {
+	return int(C.field_just((*C.FIELD)(f)))
 }
 
+// Move the field to the location of the specified coordinates
 func (f *Field) Move(y, x int) os.Error {
 	if res := C.move_field((*C.FIELD)(f), C.int(y), C.int(x)); res != C.E_OK {
 		return error(os.Errno(res))
@@ -205,6 +211,7 @@ func (f *Field) Move(y, x int) os.Error {
 	return nil
 }
 
+// Options turns features on and off
 func (f *Field) Options(opts int, on bool) {
 	if on {
 		C.field_opts_on((*C.FIELD)(f), C.Field_Options(opts))
@@ -213,22 +220,49 @@ func (f *Field) Options(opts int, on bool) {
 	C.field_opts_off((*C.FIELD)(f), C.Field_Options(opts))
 }
 
-func (f *Field) Pad(pad ...int) (p int, err os.Error) {
-	switch len(pad) {
-	case 0:
-		p = int(C.field_pad((*C.FIELD)(f)))
-	case 1:
-		if res := C.set_field_pad((*C.FIELD)(f), C.int(pad[0])); res != C.E_OK {
-			err = error(os.Errno(res))
-		}
-	default:
-		panic("Invalid number of arguments")
+// Pad returns the padding character of the field
+func (f *Field) Pad() int {
+	return int(C.field_pad((*C.FIELD)(f)))
+}
+
+// SetJustification of the field
+func (f *Field) SetJustification(just int) os.Error {
+	res := C.set_field_just((*C.FIELD)(f), C.int(just))
+	if res != C.E_OK {
+		return error(os.Errno(res))
 	}
-	return
+	return nil
+}
+
+// SetPad sets the padding character of the field
+func (f *Field) SetPad(padch int) os.Error {
+	res := C.set_field_pad((*C.FIELD)(f), C.int(padch))
+	if res != C.E_OK {
+		return error(os.Errno(res))
+	}
+	return nil
+}
+
+// SetBackground character and attributes (colours, etc)
+func (f *Field) SetBackground(ch int) os.Error {
+	if res := C.set_field_back((*C.FIELD)(f), C.chtype(ch)); res != C.E_OK {
+		return error(os.Errno(res))
+	}
+	return nil
+}
+
+// SetForeground character and attributes (colours, etc)
+func (f *Field) SetForeground(ch int) os.Error {
+	if res := C.set_field_fore((*C.FIELD)(f), C.chtype(ch)); res != C.E_OK {
+		return error(os.Errno(res))
+	}
+	return nil
 }
 
 type Form C.FORM
 
+// NewForm returns a new form object using the fields array supplied as
+// an argument
 func NewForm(fields []*Field) (*Form, os.Error) {
 	cfields := make([]*C.FIELD, len(fields)+1)
 	for index, field := range fields {
@@ -242,6 +276,8 @@ func NewForm(fields []*Field) (*Form, os.Error) {
 	return (*Form)(f), nil
 }
 
+// Driver issues the actions requested to the form itself. See the
+// corresponding REQ_* constants
 func (f *Form) Driver(drvract int) os.Error {
 	if res := C.form_driver((*C.FORM)(f), C.int(drvract)); res != C.E_OK {
 		return error(os.Errno(res))
@@ -249,6 +285,9 @@ func (f *Form) Driver(drvract int) os.Error {
 	return nil
 }
 
+// Free the memory allocated to the form. Forms are not automatically
+// free'd by Go's garbage collection system so the memory allocated to
+// it must be explicitely free'd
 func (f *Form) Free() os.Error {
 	if res := C.free_form((*C.FORM)(f)); res != C.E_OK {
 		return error(os.Errno(res))
@@ -257,6 +296,7 @@ func (f *Form) Free() os.Error {
 	return nil
 }
 
+// Post the form, making it visible and interactive
 func (f *Form) Post() os.Error {
 	if res := C.post_form((*C.FORM)(f)); res != C.E_OK {
 		return error(os.Errno(res))
@@ -264,6 +304,21 @@ func (f *Form) Post() os.Error {
 	return nil
 }
 
+// Sub returns the subwindow assocaiated with the form
+func (f *Form) SetSub(w *Window) os.Error {
+	err := int(C.set_form_sub((*C.FORM)(f), (*C.WINDOW)(w)))
+	if err != C.E_OK {
+		return error(os.Errno(err))
+	}
+	return nil
+}
+
+// Sub returns the subwindow assocaiated with the form
+func (f *Form) Sub() *Window {
+	return (*Window)(C.form_sub((*C.FORM)(f)))
+}
+
+// UnPost the form, removing it from the interface
 func (f *Form) UnPost() os.Error {
 	if res := C.unpost_form((*C.FORM)(f)); res != C.E_OK {
 		return error(os.Errno(res))
