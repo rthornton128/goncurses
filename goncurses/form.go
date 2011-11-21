@@ -234,6 +234,15 @@ func (f *Field) SetJustification(just int) os.Error {
 	return nil
 }
 
+// Options turns features on and off
+func (f *Field) SetOptions(opts int) os.Error {
+	err := int(C.set_field_opts((*C.FIELD)(f), C.Field_Options(opts)))
+	if err != C.E_OK {
+		return error(os.Errno(err))
+	}
+	return nil
+}
+
 // SetPad sets the padding character of the field
 func (f *Field) SetPad(padch int) os.Error {
 	res := C.set_field_pad((*C.FIELD)(f), C.int(padch))
@@ -276,6 +285,11 @@ func NewForm(fields []*Field) (*Form, os.Error) {
 	return (*Form)(f), nil
 }
 
+// FieldCount returns the number of fields attached to the Form
+func (f *Form) FieldCount() int {
+	return int(C.field_count((*C.FORM)(f)))
+}
+
 // Driver issues the actions requested to the form itself. See the
 // corresponding REQ_* constants
 func (f *Form) Driver(drvract int) os.Error {
@@ -304,9 +318,43 @@ func (f *Form) Post() os.Error {
 	return nil
 }
 
-// Sub returns the subwindow assocaiated with the form
+// SetFields overwrites the current fields for the Form with new ones.
+// It is important to make sure all prior fields have been freed otherwise
+// this action will result in a memory leak
+func (f *Form) SetFields(fields []*Field) os.Error {
+	cfields := make([]*C.FIELD, len(fields)+1)
+	for index, field := range fields {
+		cfields[index] = (*C.FIELD)(field)
+	}
+	cfields[len(fields)] = nil
+	err := C.set_form_fields((*C.FORM)(f), (**C.FIELD)(&cfields[0]))
+	if err != C.E_OK {
+		return error(os.Errno(err))
+	}
+	return nil
+}
+
+// SetOptions for the form
+func (f *Form) SetOptions(opts int) os.Error {
+	res, err := C.set_form_opts((*C.FORM)(f), (C.Form_Options)(opts))
+	if res != C.E_OK {
+		return error(err.(os.Errno))
+	}
+	return nil
+}
+
+// SetSub sets the subwindow associated with the form
 func (f *Form) SetSub(w *Window) os.Error {
 	err := int(C.set_form_sub((*C.FORM)(f), (*C.WINDOW)(w)))
+	if err != C.E_OK {
+		return error(os.Errno(err))
+	}
+	return nil
+}
+
+// SetWindow sets the window associated with the form
+func (f *Form) SetWindow(w *Window) os.Error {
+	err := int(C.set_form_win((*C.FORM)(f), (*C.WINDOW)(w)))
 	if err != C.E_OK {
 		return error(os.Errno(err))
 	}
