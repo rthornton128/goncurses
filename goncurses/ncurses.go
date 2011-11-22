@@ -345,6 +345,13 @@ var mouseEvents = map[string]MMask{
 	"position": C.REPORT_MOUSE_POSITION,
 }*/
 
+// Beep requests the terminal make an audible bell or, if not available,
+// flashes the screen. Note that screen flashing doesn't work on all
+// terminals
+func Beep() {
+	C.beep()
+}
+
 // Turn on/off buffering; raw user signals are passed to the program for
 // handling. Overrides raw mode
 func CBreak(on bool) {
@@ -370,14 +377,6 @@ func Cursor(vis byte) os.Error {
 	return nil
 }
 
-// Update the screen, refreshing all windows
-func Update() os.Error {
-	if C.doupdate() == C.ERR {
-		return os.NewError("Failed to update")
-	}
-	return nil
-}
-
 // Echo turns on/off the printing of typed characters
 func Echo(on bool) {
 	if on {
@@ -391,6 +390,13 @@ func Echo(on bool) {
 // terminal returns to normal operation
 func End() {
 	C.endwin()
+}
+
+// Flash requests the terminal flashes the screen or, if not available,
+// make an audible bell. Note that screen flashing doesn't work on all
+// terminals
+func Flash() {
+	C.flash()
 }
 
 // Returns an array of integers representing the following, in order:
@@ -490,6 +496,15 @@ func NewWindow(h, w, y, x int) (win *Window, err os.Error) {
 	return
 }
 
+// NL turns newline translation on/off.
+func NL(on bool) {
+	if on {
+		C.nl()
+		return
+	}
+	C.nonl()
+}
+
 // Raw turns on input buffering; user signals are disabled and the key strokes 
 // are passed directly to input. Set to false if you wish to turn this mode
 // off
@@ -509,6 +524,14 @@ func StartColor() os.Error {
 	}
 	if C.start_color() == C.ERR {
 		return os.NewError("Failed to enable color mode")
+	}
+	return nil
+}
+
+// Update the screen, refreshing all windows
+func Update() os.Error {
+	if C.doupdate() == C.ERR {
+		return os.NewError("Failed to update")
 	}
 	return nil
 }
@@ -629,6 +652,13 @@ func (w *Window) Clear() os.Error {
 	return nil
 }
 
+// ClearOk clears the window completely prior to redrawing it. If called
+// on stdscr then the whole screen is redrawn no matter which window has
+// Refresh() called on it. Defaults to False.
+func (w *Window) ClearOk(ok bool) {
+	C.clearok((*C.WINDOW)(w), C.bool(ok))
+}
+
 // Clear starting at the current cursor position, moving to the right, to the 
 // bottom of window
 func (w *Window) ClearToBottom() os.Error {
@@ -652,6 +682,7 @@ func (w *Window) Color(pair byte) {
 	C.wcolor_set((*C.WINDOW)(w), C.short(C.COLOR_PAIR(C.int(pair))), nil)
 }
 
+// ColorOff turns the specified color pair off
 func (w *Window) ColorOff(pair byte) os.Error {
 	if C.wattroff((*C.WINDOW)(w), C.COLOR_PAIR(C.int(pair))) == C.ERR {
 		return os.NewError("Failed to enable color pair")
@@ -680,6 +711,30 @@ overlay bool) os.Error {
 		C.int(dtr), C.int(dtc), C.int(dbr), C.int(dbc), C.int(ol)) ==
 		C.ERR {
 		return os.NewError("Failed to copy window")
+	}
+	return nil
+}
+
+// DelChar
+func (w *Window) DelChar(coord ...int) os.Error {
+	if len(coord) > 2 {
+		return os.NewError(fmt.Sprintf("Invalid number of arguments, " +
+			"expected 2, got %d", len(coord)))
+	}
+	var err C.int
+	if len(coord) > 1 {
+		var x int
+		y := coord[0]
+		if len(coord) > 2 {
+			x = coord[1]
+		}
+		err = C.mvwdelch((*C.WINDOW)(w), C.int(y), C.int(x))
+	} else {
+		err = C.wdelch((*C.WINDOW)(w))
+	}
+	if err != C.OK {
+		return os.NewError("An error occurred when trying to delete " +
+			"character")
 	}
 	return nil
 }
@@ -783,6 +838,14 @@ func (w *Window) Maxyx() (int, int) {
 // Move the cursor to the specified coordinates within the window
 func (w *Window) Move(y, x int) {
 	C.wmove((*C.WINDOW)(w), C.int(y), C.int(x))
+	return
+}
+
+// NoutRefresh flags the window for redrawing. In order to actually perform
+// the changes, Update() must be called. This function when coupled with
+// Update() provides a speed increase over using Refresh() on each window.
+func (w *Window) NoutRefresh() {
+	C.wnoutrefresh((*C.WINDOW)(w))
 	return
 }
 
