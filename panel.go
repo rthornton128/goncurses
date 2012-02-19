@@ -42,9 +42,7 @@ package goncurses
 // #include <ncurses.h>
 import "C"
 
-import (
-	"os"
-)
+import "errors"
 
 type Panel C.PANEL
 
@@ -80,17 +78,17 @@ func Below(p *Panel) *Panel {
 }
 
 // Move the panel to the bottom of the stack.
-func (p *Panel) Bottom() os.Error {
+func (p *Panel) Bottom() error {
 	if C.bottom_panel((*C.PANEL)(p)) == C.ERR {
-		return os.NewError("Failed to move panel to bottom of stack")
+		return errors.New("Failed to move panel to bottom of stack")
 	}
 	return nil
 }
 
 // Delete panel, removing from the stack. 
-func (p *Panel) Delete() os.Error {
+func (p *Panel) Delete() error {
 	if C.del_panel((*C.PANEL)(p)) == C.ERR {
-		return os.NewError("Failed to delete panel")
+		return errors.New("Failed to delete panel")
 	}
 	p = nil
 	return nil
@@ -102,9 +100,9 @@ func (p *Panel) Hidden() bool {
 }
 
 // Hide the panel
-func (p *Panel) Hide() os.Error {
+func (p *Panel) Hide() error {
 	if C.hide_panel((*C.PANEL)(p)) == C.ERR {
-		return os.NewError("Failed to hide panel")
+		return errors.New("Failed to hide panel")
 	}
 	return nil
 }
@@ -112,33 +110,33 @@ func (p *Panel) Hide() os.Error {
 // Move the panel to the specified location. It is important to never use
 // ncurses movement functions on the window governed by panel. Always use
 // this function
-func (p *Panel) Move(y, x int) os.Error {
+func (p *Panel) Move(y, x int) error {
 	if C.move_panel((*C.PANEL)(p), C.int(y), C.int(x)) == C.ERR {
-		return os.NewError("Failed to move panel")
+		return errors.New("Failed to move panel")
 	}
 	return nil
 }
 
 // Replace panel's associated window with a new one.
-func (p *Panel) Replace(w *Window) os.Error {
+func (p *Panel) Replace(w *Window) error {
 	if C.replace_panel((*C.PANEL)(p), (*C.WINDOW)(w)) == C.ERR {
-		return os.NewError("Failed to replace window")
+		return errors.New("Failed to replace window")
 	}
 	return nil
 }
 
 // Show the panel, if hidden, and place it on the top of the stack.
-func (p *Panel) Show() os.Error {
+func (p *Panel) Show() error {
 	if C.show_panel((*C.PANEL)(p)) == C.ERR {
-		return os.NewError("Failed to show panel")
+		return errors.New("Failed to show panel")
 	}
 	return nil
 }
 
 // Move panel to the top of the stack
-func (p *Panel) Top() os.Error {
+func (p *Panel) Top() error {
 	if C.top_panel((*C.PANEL)(p)) == C.ERR {
-		return os.NewError("Failed to move panel to top of stack")
+		return errors.New("Failed to move panel to top of stack")
 	}
 	return nil
 }

@@ -47,8 +47,8 @@ package goncurses
 import "C"
 
 import (
+	"errors"
 	"fmt"
-	"os"
 	"reflect"
 	"unsafe"
 )
@@ -358,9 +358,9 @@ func CursesVersion() string {
 
 // Set the cursor visibility. Options are: 0 (invisible/hidden), 1 (normal)
 // and 2 (extra-visible)
-func Cursor(vis byte) os.Error {
+func Cursor(vis byte) error {
 	if C.curs_set(C.int(vis)) == C.ERR {
-		return os.NewError("Failed to enable ")
+		return errors.New("Failed to enable ")
 	}
 	return nil
 }
@@ -390,13 +390,13 @@ func Flash() {
 // Returns an array of integers representing the following, in order:
 // x, y and z coordinates, id of the device, and a bit masked state of
 // the devices buttons
-func GetMouse() ([]int, os.Error) {
+func GetMouse() ([]int, error) {
 	if bool(C.has_mouse()) != true {
-		return nil, os.NewError("Mouse support not enabled")
+		return nil, errors.New("Mouse support not enabled")
 	}
 	var event C.MEVENT
 	if C.getmouse(&event) != C.OK {
-		return nil, os.NewError("Failed to get mouse event")
+		return nil, errors.New("Failed to get mouse event")
 	}
 	return []int{int(event.x), int(event.y), int(event.z), int(event.id),
 		int(event.bstate)}, nil
@@ -405,13 +405,13 @@ func GetMouse() ([]int, os.Error) {
 // Behaves like cbreak() but also adds a timeout for input. If timeout is
 // exceeded after a call to Getch() has been made then GetChar will return
 // with an error.
-func HalfDelay(delay int) os.Error {
+func HalfDelay(delay int) error {
 	var cerr C.int
 	if delay > 0 {
 		cerr = C.halfdelay(C.int(delay))
 	}
 	if cerr == C.ERR {
-		return os.NewError("Unable to set delay mode")
+		return errors.New("Unable to set delay mode")
 	}
 	return nil
 }
@@ -431,32 +431,32 @@ func HasKey(ch int) bool {
 
 // InitColor is used to set 'color' to the specified RGB values. Values may
 // be between 0 and 1000.
-func InitColor(col int, r, g, b int) os.Error {
+func InitColor(col int, r, g, b int) error {
 	if C.init_color(C.short(col), C.short(r), C.short(g),
 		C.short(b)) == C.ERR {
-		return os.NewError("Failed to set new color definition")
+		return errors.New("Failed to set new color definition")
 	}
 	return nil
 }
 
 // InitPair sets a colour pair designated by 'pair' to fg and bg colors
-func InitPair(pair byte, fg, bg int) os.Error {
+func InitPair(pair byte, fg, bg int) error {
 	if pair == 0 || C.int(pair) > (C.COLOR_PAIRS-1) {
-		return os.NewError("Invalid color pair selected")
+		return errors.New("Invalid color pair selected")
 	}
 	if C.init_pair(C.short(pair), C.short(fg), C.short(bg)) == C.ERR {
-		return os.NewError("Failed to init color pair")
+		return errors.New("Failed to init color pair")
 	}
 	return nil
 }
 
 // Initialize the ncurses library. You must run this function prior to any 
 // other goncurses function in order for the library to work
-func Init() (stdscr *Window, err os.Error) {
+func Init() (stdscr *Window, err error) {
 	stdscr = (*Window)(C.initscr())
 	err = nil
 	if unsafe.Pointer(stdscr) == nil {
-		err = os.NewError("An error occurred initializing ncurses")
+		err = errors.New("An error occurred initializing ncurses")
 	}
 	return
 }
@@ -501,10 +501,10 @@ func MouseMask(mask int, old *int) (m int) {
 }
 
 // NewWindow creates a window of size h(eight) and w(idth) at y, x
-func NewWindow(h, w, y, x int) (win *Window, err os.Error) {
+func NewWindow(h, w, y, x int) (win *Window, err error) {
 	win = (*Window)(C.newwin(C.int(h), C.int(w), C.int(y), C.int(x)))
 	if unsafe.Pointer(win) == unsafe.Pointer(nil) {
-		err = os.NewError("Failed to create a new window")
+		err = errors.New("Failed to create a new window")
 	}
 	return
 }
@@ -531,29 +531,29 @@ func Raw(on bool) {
 
 // ResizeTerm will attempt to resize the terminal. This only has an effect if
 // the terminal is in an XWindows (GUI) environment.
-func ResizeTerm(nlines, ncols int) os.Error {
+func ResizeTerm(nlines, ncols int) error {
 	if C.resizeterm(C.int(nlines), C.int(ncols)) == C.ERR {
-		return os.NewError("Failed to resize terminal")
+		return errors.New("Failed to resize terminal")
 	}
 	return nil
 }
 
 // Enables colors to be displayed. Will return an error if terminal is not
 // capable of displaying colors
-func StartColor() os.Error {
+func StartColor() error {
 	if C.has_colors() == C.bool(false) {
-		return os.NewError("Terminal does not support colors")
+		return errors.New("Terminal does not support colors")
 	}
 	if C.start_color() == C.ERR {
-		return os.NewError("Failed to enable color mode")
+		return errors.New("Failed to enable color mode")
 	}
 	return nil
 }
 
 // Update the screen, refreshing all windows
-func Update() os.Error {
+func Update() error {
 	if C.doupdate() == C.ERR {
-		return os.NewError("Failed to update")
+		return errors.New("Failed to update")
 	}
 	return nil
 }
@@ -624,18 +624,18 @@ func (w *Window) AddChar(args ...int) {
 }
 
 // Turn off character attribute.
-func (w *Window) AttrOff(attr int) (err os.Error) {
+func (w *Window) AttrOff(attr int) (err error) {
 	if C.wattroff((*C.WINDOW)(w), C.int(attr)) == C.ERR {
-		err = os.NewError(fmt.Sprintf("Failed to unset attribute: %s",
+		err = errors.New(fmt.Sprintf("Failed to unset attribute: %s",
 			attrList[C.int(attr)]))
 	}
 	return
 }
 
 // Turn on character attribute
-func (w *Window) AttrOn(attr int) (err os.Error) {
+func (w *Window) AttrOn(attr int) (err error) {
 	if C.wattron((*C.WINDOW)(w), C.int(attr)) == C.ERR {
-		err = os.NewError(fmt.Sprintf("Failed to set attribute: %s",
+		err = errors.New(fmt.Sprintf("Failed to set attribute: %s",
 			attrList[C.int(attr)]))
 	}
 	return
@@ -647,29 +647,29 @@ func (w *Window) Background(attr int) {
 
 // Border uses the characters supplied to draw a border around the window.
 // t, b, r, l, s correspond to top, bottom, right, left and side respectively.
-func (w *Window) Border(ls, rs, ts, bs, tl, tr, bl, br int) os.Error {
+func (w *Window) Border(ls, rs, ts, bs, tl, tr, bl, br int) error {
 	res := C.wborder((*C.WINDOW)(w), C.chtype(ls), C.chtype(rs), C.chtype(ts),
 		C.chtype(bs), C.chtype(tl), C.chtype(tr), C.chtype(bl),
 		C.chtype(br))
 	if res == C.ERR {
-		return os.NewError("Failed to draw box around window")
+		return errors.New("Failed to draw box around window")
 	}
 	return nil
 }
 
 // Box draws a border around the given window. For complete control over the
 // characters used to draw the border use Border()
-func (w *Window) Box(vch, hch int) os.Error {
+func (w *Window) Box(vch, hch int) error {
 	if C.box((*C.WINDOW)(w), C.chtype(vch), C.chtype(hch)) == C.ERR {
-		return os.NewError("Failed to draw box around window")
+		return errors.New("Failed to draw box around window")
 	}
 	return nil
 }
 
 // Clear the screen
-func (w *Window) Clear() os.Error {
+func (w *Window) Clear() error {
 	if C.wclear((*C.WINDOW)(w)) == C.ERR {
-		return os.NewError("Failed to clear screen")
+		return errors.New("Failed to clear screen")
 	}
 	return nil
 }
@@ -683,18 +683,18 @@ func (w *Window) ClearOk(ok bool) {
 
 // Clear starting at the current cursor position, moving to the right, to the 
 // bottom of window
-func (w *Window) ClearToBottom() os.Error {
+func (w *Window) ClearToBottom() error {
 	if C.wclrtobot((*C.WINDOW)(w)) == C.ERR {
-		return os.NewError("Failed to clear bottom of window")
+		return errors.New("Failed to clear bottom of window")
 	}
 	return nil
 }
 
 // Clear from the current cursor position, moving to the right, to the end 
 // of the line
-func (w *Window) ClearToEOL() os.Error {
+func (w *Window) ClearToEOL() error {
 	if C.wclrtoeol((*C.WINDOW)(w)) == C.ERR {
-		return os.NewError("Failed to clear to end of line")
+		return errors.New("Failed to clear to end of line")
 	}
 	return nil
 }
@@ -705,18 +705,18 @@ func (w *Window) Color(pair byte) {
 }
 
 // ColorOff turns the specified color pair off
-func (w *Window) ColorOff(pair byte) os.Error {
+func (w *Window) ColorOff(pair byte) error {
 	if C.wattroff((*C.WINDOW)(w), C.COLOR_PAIR(C.int(pair))) == C.ERR {
-		return os.NewError("Failed to enable color pair")
+		return errors.New("Failed to enable color pair")
 	}
 	return nil
 }
 
 // Normally color pairs are turned on via attron() in ncurses but this
 // implementation chose to make it seperate
-func (w *Window) ColorOn(pair byte) os.Error {
+func (w *Window) ColorOn(pair byte) error {
 	if C.wattron((*C.WINDOW)(w), C.COLOR_PAIR(C.int(pair))) == C.ERR {
-		return os.NewError("Failed to enable color pair")
+		return errors.New("Failed to enable color pair")
 	}
 	return nil
 }
@@ -724,7 +724,7 @@ func (w *Window) ColorOn(pair byte) os.Error {
 // Copy is similar to Overlay and Overwrite but provides a finer grain of
 // control. 
 func (w *Window) Copy(src *Window, sy, sx, dtr, dtc, dbr, dbc int,
-overlay bool) os.Error {
+	overlay bool) error {
 	var ol int
 	if overlay {
 		ol = 1
@@ -732,15 +732,15 @@ overlay bool) os.Error {
 	if C.copywin((*C.WINDOW)(src), (*C.WINDOW)(w), C.int(sy), C.int(sx),
 		C.int(dtr), C.int(dtc), C.int(dbr), C.int(dbc), C.int(ol)) ==
 		C.ERR {
-		return os.NewError("Failed to copy window")
+		return errors.New("Failed to copy window")
 	}
 	return nil
 }
 
 // DelChar
-func (w *Window) DelChar(coord ...int) os.Error {
+func (w *Window) DelChar(coord ...int) error {
 	if len(coord) > 2 {
-		return os.NewError(fmt.Sprintf("Invalid number of arguments, "+
+		return errors.New(fmt.Sprintf("Invalid number of arguments, "+
 			"expected 2, got %d", len(coord)))
 	}
 	var err C.int
@@ -755,16 +755,16 @@ func (w *Window) DelChar(coord ...int) os.Error {
 		err = C.wdelch((*C.WINDOW)(w))
 	}
 	if err != C.OK {
-		return os.NewError("An error occurred when trying to delete " +
+		return errors.New("An error occurred when trying to delete " +
 			"character")
 	}
 	return nil
 }
 
 // Delete the window
-func (w *Window) Delete() os.Error {
+func (w *Window) Delete() error {
 	if C.delwin((*C.WINDOW)(w)) == C.ERR {
-		return os.NewError("Failed to delete window")
+		return errors.New("Failed to delete window")
 	}
 	w = nil
 	return nil
@@ -814,11 +814,11 @@ func (w *Window) GetChar(coords ...int) int {
 
 // Reads at most 'n' characters entered by the user from the Window. Attempts
 // to enter greater than 'n' characters will elicit a 'beep'
-func (w *Window) GetString(n int) (string, os.Error) {
+func (w *Window) GetString(n int) (string, error) {
 	// TODO: add move portion of code...
 	cstr := make([]C.char, n)
 	if C.wgetnstr((*C.WINDOW)(w), (*C.char)(&cstr[0]), C.int(n)) == C.ERR {
-		return "", os.NewError("Failed to retrieve string from input stream")
+		return "", errors.New("Failed to retrieve string from input stream")
 	}
 	return C.GoString(&cstr[0]), nil
 }
@@ -852,10 +852,10 @@ func (w *Window) IsKeypad() bool {
 
 // Keypad turns on/off the keypad characters, including those like the F1-F12 
 // keys and the arrow keys
-func (w *Window) Keypad(keypad bool) os.Error {
+func (w *Window) Keypad(keypad bool) error {
 	var err C.int
 	if err = C.keypad((*C.WINDOW)(w), C.bool(keypad)); err == C.ERR {
-		return os.NewError("Unable to set keypad mode")
+		return errors.New("Unable to set keypad mode")
 	}
 	return nil
 }
@@ -883,9 +883,9 @@ func (w *Window) NoutRefresh() {
 
 // Overlay copies overlapping sections of src window onto the destination
 // window. Non-blank elements are not overwritten.
-func (w *Window) Overlay(src *Window) os.Error {
+func (w *Window) Overlay(src *Window) error {
 	if C.overlay((*C.WINDOW)(src), (*C.WINDOW)(w)) == C.ERR {
-		return os.NewError("Failed to overlay window")
+		return errors.New("Failed to overlay window")
 	}
 	return nil
 }
@@ -893,9 +893,9 @@ func (w *Window) Overlay(src *Window) os.Error {
 // Overwrite copies overlapping sections of src window onto the destination
 // window. This function is considered "destructive" by copying all
 // elements of src onto the destination window.
-func (w *Window) Overwrite(src *Window) os.Error {
+func (w *Window) Overwrite(src *Window) error {
 	if C.overwrite((*C.WINDOW)(src), (*C.WINDOW)(w)) == C.ERR {
-		return os.NewError("Failed to overwrite window")
+		return errors.New("Failed to overwrite window")
 	}
 	return nil
 }

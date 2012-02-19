@@ -32,6 +32,7 @@
 
 /* ncurses menu extension */
 package goncurses
+
 /*
 #cgo LDFLAGS: -lmenu
 #include <menu.h>
@@ -43,7 +44,8 @@ ITEM* menu_item_at(ITEM** ilist, int i) {
 import "C"
 
 import (
-	"os"
+//	"os"
+	"syscall"
 	"unsafe"
 )
 
@@ -97,38 +99,30 @@ var DriverActions = map[int]int{
 type Menu C.MENU
 
 // NewMenu returns a pointer to a new menu.
-func NewMenu(items []*MenuItem) (*Menu, os.Error) {
+func NewMenu(items []*MenuItem) (*Menu, error) {
 	citems := make([]*C.ITEM, len(items)+1)
 	for index, item := range items {
 		citems[index] = (*C.ITEM)(item)
 	}
 	citems[len(items)] = nil
-	menu, errno := C.new_menu((**C.ITEM)(&citems[0]))
-	if menu == nil {
-		return nil, errno
-	}
-	return (*Menu)(menu), nil
+	menu, err := C.new_menu((**C.ITEM)(&citems[0]))
+	return (*Menu)(menu), ncursesError(err)
 }
 
 // RequestName of menu request code
-func RequestName(request int) (string, os.Error) {
+func RequestName(request int) (string, error) {
 	cstr, err := C.menu_request_name(C.int(request))
-	if cstr == nil {
-		return "", error(err.(os.Errno))
-	}
-	return C.GoString(cstr), nil
+	return C.GoString(cstr), ncursesError(err)
 }
 
 // RequestByName returns the request ID of the provide request
-func RequestByName(request string) (res int, err os.Error) {
+func RequestByName(request string) (res int, err error) {
 	cstr := C.CString(request)
 	defer C.free(unsafe.Pointer(cstr))
-	
+
 	res = int(C.menu_request_by_name(cstr))
-	if res == int(C.E_NO_MATCH) {
-		err = error(os.Errno(res))
-	}
-	return res, nil
+	err = ncursesError(syscall.Errno(res))
+	return
 }
 
 // Background returns the menu's background character setting
@@ -152,11 +146,9 @@ func (m *Menu) Current(mi *MenuItem) *MenuItem {
 
 // Driver controls how the menu is activated. Action usually corresponds
 // to the string return by the Key() function in goncurses.
-func (m *Menu) Driver(daction int) os.Error {
-	if err := C.menu_driver((*C.MENU)(m), C.int(daction)); err != C.E_OK {
-		return error(os.Errno(err))
-	}
-	return nil
+func (m *Menu) Driver(daction int) error {
+	err := C.menu_driver((*C.MENU)(m), C.int(daction))
+	return ncursesError(syscall.Errno(err))
 }
 
 // Foreground gets the attributes of highlighted items in the menu
@@ -165,20 +157,17 @@ func (m *Menu) Foreground() int {
 }
 
 // Format sets the menu format. See the O_* menu options.
-func (m *Menu) Format(r, c int) os.Error {
-	if res := C.set_menu_format((*C.MENU)(m), C.int(r), C.int(c)); res != C.E_OK {
-		return error(os.Errno(res))
-	}
-	return nil
+func (m *Menu) Format(r, c int) error {
+	err := C.set_menu_format((*C.MENU)(m), C.int(r), C.int(c))
+	return ncursesError(syscall.Errno(err))
 }
 
 // Free deallocates memory set aside for the menu. This must be called
 // before exiting.
-func (m *Menu) Free() os.Error {
-	if res := C.free_menu((*C.MENU)(m)); res != C.E_OK {
-		return error(os.Errno(res))
-	}
-	return nil
+func (m *Menu) Free() error {
+	err := C.free_menu((*C.MENU)(m))
+	m = nil
+	return ncursesError(syscall.Errno(err))
 }
 
 // Grey sets the attributes of non-selectable items in the menu
@@ -198,29 +187,24 @@ func (m *Menu) Items() []*MenuItem {
 }
 
 // Mark sets the indicator for the currently selected menu item
-func (m *Menu) Mark(mark string) os.Error {
+func (m *Menu) Mark(mark string) error {
 	cmark := C.CString(mark)
 	defer C.free(unsafe.Pointer(cmark))
 
-	if res := C.set_menu_mark((*C.MENU)(m), cmark); res != C.E_OK {
-		return error(os.Errno(res))
-	}
-	return nil
+	err := C.set_menu_mark((*C.MENU)(m), cmark)
+	return ncursesError(syscall.Errno(err))
 }
 
 // Option sets the options for the menu. See the O_* definitions for
 // a list of values which can be OR'd together
-func (m *Menu) Option(opts int, on bool) os.Error {
-	var res C.int
+func (m *Menu) Option(opts int, on bool) error {
+	var err C.int
 	if on {
-		res = C.menu_opts_on((*C.MENU)(m), C.Menu_Options(opts))
+		err = C.menu_opts_on((*C.MENU)(m), C.Menu_Options(opts))
 	} else {
-		res = C.menu_opts_off((*C.MENU)(m), C.Menu_Options(opts))
+		err = C.menu_opts_off((*C.MENU)(m), C.Menu_Options(opts))
 	}
-	if res != 0 {
-		return error(os.Errno(res))
-	}
-	return nil
+	return ncursesError(syscall.Errno(err))
 }
 
 // Pad sets the padding character for menu items.
@@ -239,74 +223,58 @@ func (m *Menu) PositionCursor() {
 }
 
 // Post the menu, making it visible
-func (m *Menu) Post() os.Error {
-	if res := C.post_menu((*C.MENU)(m)); res != C.E_OK {
-		return error(os.Errno(res))
-	}
-	return nil
+func (m *Menu) Post() error {
+	err := C.post_menu((*C.MENU)(m))
+	return ncursesError(syscall.Errno(err))
 }
 
 // Scale
-func (m *Menu) Scale() (int, int, os.Error) {
+func (m *Menu) Scale() (int, int, error) {
 	var y, x C.int
 	err := C.scale_menu((*C.MENU)(m), (*C.int)(&y), (*C.int)(&x))
-	if err != C.E_OK {
-		return  0, 0, error(os.Errno(err))
-	}
-	return int(y), int(x), nil
+/*	if err != C.E_OK {
+		return 0, 0, error_(os.Errno(err))
+	}*/
+	return int(y), int(x), ncursesError(syscall.Errno(err))
 }
 
 // SetBackground set the attributes of the un-highlighted items in the 
 // menu
-func (m *Menu) SetBackground(ch int) os.Error {
+func (m *Menu) SetBackground(ch int) error {
 	err := C.set_menu_back((*C.MENU)(m), C.chtype(ch))
-	if err != C.E_OK {
-		return error(os.Errno(err))
-	}
-	return nil
+	return ncursesError(syscall.Errno(err))
 }
 
 // SetForeground sets the attributes of the highlighted items in the menu
-func (m *Menu) SetForeground(ch int) os.Error {
+func (m *Menu) SetForeground(ch int) error {
 	err := C.set_menu_fore((*C.MENU)(m), C.chtype(ch))
-	if err != C.E_OK {
-		return error(os.Errno(err))
-	}
-	return nil
+	return ncursesError(syscall.Errno(err))
 }
 
 // SetItems will either set the items in the menu. When setting
 // items you must make sure the prior menu items will be freed.
-func (m *Menu) SetItems(items []*MenuItem) os.Error {
+func (m *Menu) SetItems(items []*MenuItem) error {
 	citems := make([]*C.ITEM, len(items)+1)
 	for index, item := range items {
 		citems[index] = (*C.ITEM)(item)
 	}
 	citems[len(items)] = nil
 	err := C.set_menu_items((*C.MENU)(m), (**C.ITEM)(&citems[0]))
-	if err != C.E_OK {
-		return error(os.Errno(err))
-	}
-	return nil
+	return ncursesError(syscall.Errno(err))
 }
 
 // SetPad sets the padding character for menu items.
-func (m *Menu) SetPad(ch int) os.Error {
-	if res := C.set_menu_pad((*C.MENU)(m), C.int(ch)); res != C.E_OK {
-		return error(os.Errno(res))
-	}
-	return nil
+func (m *Menu) SetPad(ch int) error {
+	err := C.set_menu_pad((*C.MENU)(m), C.int(ch))
+	return ncursesError(syscall.Errno(err))
 }
 
 // SetPattern sets the padding character for menu items.
-func (m *Menu) SetPattern(pattern string) os.Error {
+func (m *Menu) SetPattern(pattern string) error {
 	cpattern := C.CString(pattern)
 	defer C.free(unsafe.Pointer(cpattern))
-	res := C.set_menu_pattern((*C.MENU)(m), (*C.char)(cpattern))
-	if res != C.E_OK {
-		return error(os.Errno(res))
-	}
-	return nil
+	err := C.set_menu_pattern((*C.MENU)(m), (*C.char)(cpattern))
+	return ncursesError(syscall.Errno(err))
 }
 
 // SetSpacing of the the menu's items. 'desc' is the space between the
@@ -315,21 +283,16 @@ func (m *Menu) SetPattern(pattern string) os.Error {
 // three. 'col' is the spacing between each column of items in 
 // multi-column mode. Use values of 0 or 1 to reset spacing to default, 
 // which is one
-func (m *Menu) SetSpacing(desc, row, col int) os.Error {
+func (m *Menu) SetSpacing(desc, row, col int) error {
 	err := C.set_menu_spacing((*C.MENU)(m), C.int(desc), C.int(row),
 		C.int(col))
-	if err != C.E_OK {
-		return error(os.Errno(err))
-	}
-	return nil
+	return ncursesError(syscall.Errno(err))
 }
 
 // SetWindow container for the menu
-func (m *Menu) SetWindow(win *Window) os.Error {
-	if res := C.set_menu_win((*C.MENU)(m), (*C.WINDOW)(win)); res != C.E_OK {
-		return error(os.Errno(res))
-	}
-	return nil
+func (m *Menu) SetWindow(win *Window) error {
+	err := C.set_menu_win((*C.MENU)(m), (*C.WINDOW)(win))
+	return ncursesError(syscall.Errno(err))
 }
 
 // Spacing returns the menu item spacing. See SetSpacing for a description
@@ -344,19 +307,15 @@ func (m *Menu) Spacing() (int, int, int) {
 }
 
 // SubWindow for the menu
-func (m *Menu) SubWindow(sub *Window) os.Error {
-	if res := C.set_menu_sub((*C.MENU)(m), (*C.WINDOW)(sub)); res != C.E_OK {
-		return error(os.Errno(res))
-	}
-	return nil
+func (m *Menu) SubWindow(sub *Window) error {
+	err := C.set_menu_sub((*C.MENU)(m), (*C.WINDOW)(sub))
+	return ncursesError(syscall.Errno(err))
 }
 
 // UnPost the menu, effectively hiding it.
-func (m *Menu) UnPost() os.Error {
-	if res := C.unpost_menu((*C.MENU)(m)); res != C.E_OK {
-		return error(os.Errno(res))
-	}
-	return nil
+func (m *Menu) UnPost() error {
+	err := C.unpost_menu((*C.MENU)(m))
+	return ncursesError(syscall.Errno(err))
 }
 
 // Window container for the menu. Returns nil on failure
@@ -367,15 +326,12 @@ func (m *Menu) Window() *Window {
 type MenuItem C.ITEM
 
 // NewItem creates a new menu item with name and description.
-func NewItem(name, desc string) (*MenuItem, os.Error) {
+func NewItem(name, desc string) (*MenuItem, error) {
 	cname := C.CString(name)
 	cdesc := C.CString(desc)
 
 	item, err := C.new_item(cname, cdesc)
-	if item == nil {
-		return nil, err
-	}
-	return (*MenuItem)(item), nil
+	return (*MenuItem)(item), ncursesError(err)
 }
 
 // Description returns the second value passed to NewItem 
@@ -409,12 +365,9 @@ func (mi *MenuItem) Selectable(on bool) {
 }
 
 // SetValue sets whether an item is active or not
-func (mi *MenuItem) SetValue(val bool) os.Error {
+func (mi *MenuItem) SetValue(val bool) error {
 	err := int(C.set_item_value((*C.ITEM)(mi), C.bool(val)))
-	if err != C.E_OK {
-		return error(os.Errno(err))
-	}
-	return nil
+	return ncursesError(syscall.Errno(err))
 }
 
 // Value returns true if menu item is toggled/active, otherwise false
@@ -426,4 +379,3 @@ func (mi *MenuItem) Value() bool {
 func (mi *MenuItem) Visible() bool {
 	return bool(C.item_visible((*C.ITEM)(mi)))
 }
-
