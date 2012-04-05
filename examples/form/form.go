@@ -20,16 +20,16 @@ func main() {
     fields := make([]*Field, 2)
     fields[0], _ = NewField(1, 10, 4, 18, 0, 0)
     defer fields[0].Free()
-    fields[0].Foreground(ColorPair(1))
-    fields[0].Background(ColorPair(2)|A_UNDERLINE|A_BOLD)
-    fields[0].Options(FO_AUTOSKIP, false)
+    fields[0].SetForeground(ColorPair(1))
+    fields[0].SetBackground(ColorPair(2)|A_UNDERLINE|A_BOLD)
+    fields[0].SetOptionsOff(FO_AUTOSKIP)
     
     fields[1], _ = NewField(1, 10, 6, 18, 0, 0)
     defer fields[1].Free()
-    fields[1].Foreground(ColorPair(1))
-    fields[1].Background(A_UNDERLINE)
-    fields[1].Options(FO_AUTOSKIP, false)
-    fields[1].Pad('*')
+    fields[1].SetForeground(ColorPair(1))
+    fields[1].SetBackground(A_UNDERLINE)
+    fields[1].SetOptionsOff(FO_AUTOSKIP)
+    fields[1].SetPad('*')
     
     form, _ := NewForm(fields)
     form.Post()
@@ -37,13 +37,12 @@ func main() {
     defer form.Free()
     stdscr.Refresh()
     
-    //stdscr.ColorOn(ColorPair(2))
     stdscr.AttrOn(ColorPair(2)|A_BOLD)
     stdscr.Print(4, 10, "Value 1:")
     stdscr.AttrOff(ColorPair(2)|A_BOLD)
     stdscr.Print(6, 10, "Value 2:")
     stdscr.Refresh()
-    
+
     ch := stdscr.GetChar()
     for ch != 'q' {
         switch (ch) {
