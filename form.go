@@ -39,7 +39,6 @@ import "C"
 
 import (
 	"errors"
-//	"fmt"
 	"syscall"
 	"unsafe"
 )
@@ -135,6 +134,14 @@ const (
 	REQ_PREV_CHOICE  = C.REQ_PREV_CHOICE  // display previous field choice
 )
 
+type Field struct {
+	field *C.FIELD
+}
+
+type Form struct {
+	form *C.FORM
+}
+
 func ncursesError(e error) error {
 	errno, ok := e.(syscall.Errno)
 	if int(errno) == C.OK {
@@ -149,35 +156,37 @@ func ncursesError(e error) error {
 	return e
 }
 
-type Field C.FIELD
-
 func NewField(h, w, tr, lc, oscr, nbuf int) (*Field, error) {
-	field, err := C.new_field(C.int(h), C.int(w), C.int(tr), C.int(lc),
+	var new_field Field
+	var err error
+	new_field.field, err = C.new_field(C.int(h), C.int(w), C.int(tr), C.int(lc),
 		C.int(oscr), C.int(nbuf))
-	return (*Field)(field), ncursesError(err)
+	return &new_field, ncursesError(err)
 }
 
 // Background returns the field's background character attributes
 func (f *Field) Background() int {
-	return int(C.field_back((*C.FIELD)(f)))
+	return int(C.field_back(f.field))
 }
 
 // Duplicate the field at the specified coordinates, returning a pointer 
 // to the newly allocated object.
 func (f *Field) Duplicate(y, x int) (*Field, error) {
-	newfield, err := C.dup_field((*C.FIELD)(f), C.int(y), C.int(x))
-	return (*Field)(newfield), ncursesError(err)
+	var new_field Field
+	var err error
+	new_field.field, err = C.dup_field(f.field, C.int(y), C.int(x))
+	return &new_field, ncursesError(err)
 }
 
 // Foreground returns the field's foreground character attributes
 func (f *Field) Foreground() int {
-	return int(C.field_fore((*C.FIELD)(f)))
+	return int(C.field_fore(f.field))
 }
 
 // Free field's allocated memory. This must be called to prevent memory
 // leaks
 func (f *Field) Free() error {
-	err := C.free_field((*C.FIELD)(f));
+	err := C.free_field(f.field);
 	f = nil
 	return ncursesError(syscall.Errno(err))
 }
@@ -186,7 +195,7 @@ func (f *Field) Free() error {
 // given field. Pass the memory addess of the variable to store the data
 // in or nil.
 func (f *Field) Info(h, w, y, x, off, nbuf *int) error {
-	err := C.field_info((*C.FIELD)(f), (*C.int)(unsafe.Pointer(h)),
+	err := C.field_info(f.field, (*C.int)(unsafe.Pointer(h)),
 		(*C.int)(unsafe.Pointer(w)), (*C.int)(unsafe.Pointer(y)),
 		(*C.int)(unsafe.Pointer(x)), (*C.int)(unsafe.Pointer(off)),
 		(*C.int)(unsafe.Pointer(nbuf)))
@@ -195,38 +204,47 @@ func (f *Field) Info(h, w, y, x, off, nbuf *int) error {
 
 // Just returns the justification type of the field
 func (f *Field) Justification() int {
-	return int(C.field_just((*C.FIELD)(f)))
+	return int(C.field_just(f.field))
 }
 
 // Move the field to the location of the specified coordinates
 func (f *Field) Move(y, x int) error {
-	err := C.move_field((*C.FIELD)(f), C.int(y), C.int(x));
+	err := C.move_field(f.field, C.int(y), C.int(x));
 	return ncursesError(syscall.Errno(err))
 }
 
 // Options turns features on and off
 func (f *Field) Options(opts int, on bool) {
 	if on {
-		C.field_opts_on((*C.FIELD)(f), C.Field_Options(opts))
+		C.field_opts_on(f.field, C.Field_Options(opts))
 		return
 	}
-	C.field_opts_off((*C.FIELD)(f), C.Field_Options(opts))
+	C.field_opts_off(f.field, C.Field_Options(opts))
 }
 
 // Pad returns the padding character of the field
 func (f *Field) Pad() int {
-	return int(C.field_pad((*C.FIELD)(f)))
+	return int(C.field_pad(f.field))
 }
 
 // SetJustification of the field
 func (f *Field) SetJustification(just int) error {
-	err := C.set_field_just((*C.FIELD)(f), C.int(just))
+	err := C.set_field_just(f.field, C.int(just))
 	return ncursesError(syscall.Errno(err))
 }
 
-// Options turns features on and off
-func (f *Field) SetOptions(opts int) error {
-	err := int(C.set_field_opts((*C.FIELD)(f), C.Field_Options(opts)))
+// OptionsOff turns feature(s) off
+func (f *Field) OptionsOff(opts int) error {
+	err := int(C.field_opts_off(f.field, C.Field_Options(opts)))
+	if err != C.E_OK {
+		return ncursesError(syscall.Errno(err))
+	}
+	return nil
+}
+
+// OptionsOn turns feature(s) on
+func (f *Field) OptionsOn(opts int) error {
+	err := int(C.field_opts_on(f.field, C.Field_Options(opts)))
 	if err != C.E_OK {
 		return ncursesError(syscall.Errno(err))
 	}
@@ -235,45 +253,47 @@ func (f *Field) SetOptions(opts int) error {
 
 // SetPad sets the padding character of the field
 func (f *Field) SetPad(padch int) error {
-	err := C.set_field_pad((*C.FIELD)(f), C.int(padch))
+	err := C.set_field_pad(f.field, C.int(padch))
 	return ncursesError(syscall.Errno(err))
 }
 
 // SetBackground character and attributes (colours, etc)
 func (f *Field) SetBackground(ch int) error {
-	err := C.set_field_back((*C.FIELD)(f), C.chtype(ch))
+	err := C.set_field_back(f.field, C.chtype(ch))
 	return ncursesError(syscall.Errno(err))
 }
 
 // SetForeground character and attributes (colours, etc)
 func (f *Field) SetForeground(ch int) error {
-	err := C.set_field_fore((*C.FIELD)(f), C.chtype(ch))
+	err := C.set_field_fore(f.field, C.chtype(ch))
 	return ncursesError(syscall.Errno(err))
 }
 
-type Form C.FORM
-
 // NewForm returns a new form object using the fields array supplied as
 // an argument
-func NewForm(fields []*Field) (*Form, error) {
+func NewForm(fields []*Field) (Form, error) {
 	cfields := make([]*C.FIELD, len(fields)+1)
 	for index, field := range fields {
-		cfields[index] = (*C.FIELD)(field)
+		cfields[index] = field.field
 	}
 	cfields[len(fields)] = nil
-	f, err := C.new_form((**C.FIELD)(&cfields[0]))
-	return (*Form)(f), ncursesError(err)
+	
+	var form *C.FORM
+	var err error
+	form, err = C.new_form((**C.FIELD)(&cfields[0]))
+	
+	return Form{form}, ncursesError(err)
 }
 
 // FieldCount returns the number of fields attached to the Form
 func (f *Form) FieldCount() int {
-	return int(C.field_count((*C.FORM)(f)))
+	return int(C.field_count(f.form))
 }
 
 // Driver issues the actions requested to the form itself. See the
 // corresponding REQ_* constants
 func (f *Form) Driver(drvract int) error {
-	err := C.form_driver((*C.FORM)(f), C.int(drvract))
+	err := C.form_driver(f.form, C.int(drvract))
 	return ncursesError(syscall.Errno(err))
 }
 
@@ -281,14 +301,14 @@ func (f *Form) Driver(drvract int) error {
 // free'd by Go's garbage collection system so the memory allocated to
 // it must be explicitely free'd
 func (f *Form) Free() error {
-	err := C.free_form((*C.FORM)(f))
+	err := C.free_form(f.form)
 	f = nil
 	return ncursesError(syscall.Errno(err))
 }
 
 // Post the form, making it visible and interactive
 func (f *Form) Post() error {
-	err := C.post_form((*C.FORM)(f))
+	err := C.post_form(f.form)
 	return ncursesError(syscall.Errno(err))
 }
 
@@ -298,38 +318,38 @@ func (f *Form) Post() error {
 func (f *Form) SetFields(fields []*Field) error {
 	cfields := make([]*C.FIELD, len(fields)+1)
 	for index, field := range fields {
-		cfields[index] = (*C.FIELD)(field)
+		cfields[index] = field.field
 	}
 	cfields[len(fields)] = nil
-	err := C.set_form_fields((*C.FORM)(f), (**C.FIELD)(&cfields[0]))
+	err := C.set_form_fields(f.form, (**C.FIELD)(&cfields[0]))
 	return ncursesError(syscall.Errno(err))
 }
 
 // SetOptions for the form
 func (f *Form) SetOptions(opts int) error {
-	_, err := C.set_form_opts((*C.FORM)(f), (C.Form_Options)(opts))
+	_, err := C.set_form_opts(f.form, (C.Form_Options)(opts))
 	return ncursesError(err)
 }
 
 // SetSub sets the subwindow associated with the form
 func (f *Form) SetSub(w *Window) error {
-	err := int(C.set_form_sub((*C.FORM)(f), (*C.WINDOW)(w)))
+	err := int(C.set_form_sub(f.form, w.win))
 	return ncursesError(syscall.Errno(err))
 }
 
 // SetWindow sets the window associated with the form
 func (f *Form) SetWindow(w *Window) error {
-	err := int(C.set_form_win((*C.FORM)(f), (*C.WINDOW)(w)))
+	err := int(C.set_form_win(f.form, w.win))
 	return ncursesError(syscall.Errno(err))
 }
 
 // Sub returns the subwindow assocaiated with the form
-func (f *Form) Sub() *Window {
-	return (*Window)(C.form_sub((*C.FORM)(f)))
+func (f *Form) Sub() Window {
+	return Window{C.form_sub(f.form)}
 }
 
 // UnPost the form, removing it from the interface
 func (f *Form) UnPost() error {
-	err := C.unpost_form((*C.FORM)(f))
+	err := C.unpost_form(f.form)
 	return ncursesError(syscall.Errno(err))
 }
