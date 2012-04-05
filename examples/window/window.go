@@ -40,14 +40,14 @@ func main() {
     }
 }
 
-func createWin(h, w, y, x int) *Window {
+func createWin(h, w, y, x int) Window {
     new, _ := NewWindow(h, w, y, x)
     new.Box(0, 0)
     new.Refresh()
     return new
 }
 
-func destroy(w *Window) {
+func destroy(w Window) {
     w.Border(' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ')
     w.Refresh()
     w.Delete()
