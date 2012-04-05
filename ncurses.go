@@ -310,6 +310,12 @@ const (
 	M_POSITION       = C.REPORT_MOUSE_POSITION // mouse moved
 )
 
+type Window struct {
+	win *C.WINDOW
+}
+
+type Pad Window
+
 // BaudRate returns the speed of the terminal in bits per second
 func BaudRate() int {
 	return int(C.baudrate())
@@ -452,10 +458,9 @@ func InitPair(pair byte, fg, bg int) error {
 
 // Initialize the ncurses library. You must run this function prior to any 
 // other goncurses function in order for the library to work
-func Init() (stdscr *Window, err error) {
-	stdscr = (*Window)(C.initscr())
-	err = nil
-	if unsafe.Pointer(stdscr) == nil {
+func Init() (stdscr Window, err error) {
+	stdscr = Window{C.initscr()}
+	if unsafe.Pointer(stdscr.win) == nil {
 		err = errors.New("An error occurred initializing ncurses")
 	}
 	return
@@ -473,19 +478,15 @@ func IsTermResized(nlines, ncols int) bool {
 }
 
 // Returns a string representing the value of input returned by Getch
-func Key(k int) (key string) {
-	var ok bool
-	key, ok = keyList[C.int(k)]
+func Key(k int) (string) {
+	key, ok := keyList[C.int(k)]
 	if !ok {
 		key = fmt.Sprintf("%c", k)
 	}
-	return
+	return key
 }
 
 func MouseInterval() {
-	//	if bool(C.has_mouse()) != true {
-	//		return nil, os.NewError("Mouse support not enabled")
-	//	}
 }
 
 // MouseMask accepts a single int of OR'd mouse events. If a mouse event
@@ -501,9 +502,9 @@ func MouseMask(mask int, old *int) (m int) {
 }
 
 // NewWindow creates a window of size h(eight) and w(idth) at y, x
-func NewWindow(h, w, y, x int) (win *Window, err error) {
-	win = (*Window)(C.newwin(C.int(h), C.int(w), C.int(y), C.int(x)))
-	if unsafe.Pointer(win) == unsafe.Pointer(nil) {
+func NewWindow(h, w, y, x int) (window Window, err error) {
+	window = Window{C.newwin(C.int(h), C.int(w), C.int(y), C.int(x))}
+	if window.win == nil {
 		err = errors.New("Failed to create a new window")
 	}
 	return
@@ -558,37 +559,35 @@ func Update() error {
 	return nil
 }
 
-type Pad C.WINDOW
-
 // NewPad creates a window which is not restricted by the terminal's 
 // dimentions (unlike a Window)
-func NewPad(lines, cols int) *Pad {
-	return (*Pad)(C.newpad(C.int(lines), C.int(cols)))
+func NewPad(lines, cols int) Pad {
+	return Pad{C.newpad(C.int(lines), C.int(cols))}
 }
 
 // Echo prints a single character to the pad immediately. This has the
 // same effect of calling AddChar() + Refresh() but has a significant
 // speed advantage
 func (p *Pad) Echo(ch int) {
-	C.pechochar((*C.WINDOW)(p), C.chtype(ch))
+	C.pechochar(p.win, C.chtype(ch))
 }
 
 func (p *Pad) NoutRefresh(py, px, ty, tx, by, bx int) {
-	C.pnoutrefresh((*C.WINDOW)(p), C.int(py), C.int(px), C.int(ty),
+	C.pnoutrefresh(p.win, C.int(py), C.int(px), C.int(ty),
 		C.int(tx), C.int(by), C.int(bx))
 }
 
 // Refresh the pad at location py, px using the rectangle specified by
 // ty, tx, by, bx (bottom/top y/x)
 func (p *Pad) Refresh(py, px, ty, tx, by, bx int) {
-	C.prefresh((*C.WINDOW)(p), C.int(py), C.int(px), C.int(ty), C.int(tx),
+	C.prefresh(p.win, C.int(py), C.int(px), C.int(ty), C.int(tx),
 		C.int(by), C.int(bx))
 }
 
 // Sub creates a sub-pad lines by columns in size
-func (p *Pad) Sub(y, x, h, w int) *Pad {
-	return (*Pad)(C.subpad((*C.WINDOW)(p), C.int(h), C.int(w), C.int(y),
-		C.int(x)))
+func (p *Pad) Sub(y, x, h, w int) Pad {
+	return Pad{C.subpad(p.win, C.int(h), C.int(w), C.int(y),
+		C.int(x))}
 }
 
 // Window is a helper function for calling Window functions on a pad like
@@ -596,8 +595,6 @@ func (p *Pad) Sub(y, x, h, w int) *Pad {
 func (p *Pad) Window() *Window {
 	return (*Window)(p)
 }
-
-type Window C.WINDOW
 
 // AddChar prints a single character to the window. The character can be
 // OR'd together with attributes and colors. If optional first or second
@@ -617,15 +614,15 @@ func (w *Window) AddChar(args ...int) {
 	}
 	cattr |= C.int(args[count])
 	if count > 0 {
-		C.mvwaddch((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(cattr))
+		C.mvwaddch(w.win, C.int(y), C.int(x), C.chtype(cattr))
 		return
 	}
-	C.waddch((*C.WINDOW)(w), C.chtype(cattr))
+	C.waddch(w.win, C.chtype(cattr))
 }
 
 // Turn off character attribute.
 func (w *Window) AttrOff(attr int) (err error) {
-	if C.wattroff((*C.WINDOW)(w), C.int(attr)) == C.ERR {
+	if C.wattroff(w.win, C.int(attr)) == C.ERR {
 		err = errors.New(fmt.Sprintf("Failed to unset attribute: %s",
 			attrList[C.int(attr)]))
 	}
@@ -634,7 +631,7 @@ func (w *Window) AttrOff(attr int) (err error) {
 
 // Turn on character attribute
 func (w *Window) AttrOn(attr int) (err error) {
-	if C.wattron((*C.WINDOW)(w), C.int(attr)) == C.ERR {
+	if C.wattron(w.win, C.int(attr)) == C.ERR {
 		err = errors.New(fmt.Sprintf("Failed to set attribute: %s",
 			attrList[C.int(attr)]))
 	}
@@ -642,13 +639,13 @@ func (w *Window) AttrOn(attr int) (err error) {
 }
 
 func (w *Window) Background(attr int) {
-	C.wbkgd((*C.WINDOW)(w), C.chtype(attr))
+	C.wbkgd(w.win, C.chtype(attr))
 }
 
 // Border uses the characters supplied to draw a border around the window.
 // t, b, r, l, s correspond to top, bottom, right, left and side respectively.
 func (w *Window) Border(ls, rs, ts, bs, tl, tr, bl, br int) error {
-	res := C.wborder((*C.WINDOW)(w), C.chtype(ls), C.chtype(rs), C.chtype(ts),
+	res := C.wborder(w.win, C.chtype(ls), C.chtype(rs), C.chtype(ts),
 		C.chtype(bs), C.chtype(tl), C.chtype(tr), C.chtype(bl),
 		C.chtype(br))
 	if res == C.ERR {
@@ -660,7 +657,7 @@ func (w *Window) Border(ls, rs, ts, bs, tl, tr, bl, br int) error {
 // Box draws a border around the given window. For complete control over the
 // characters used to draw the border use Border()
 func (w *Window) Box(vch, hch int) error {
-	if C.box((*C.WINDOW)(w), C.chtype(vch), C.chtype(hch)) == C.ERR {
+	if C.box(w.win, C.chtype(vch), C.chtype(hch)) == C.ERR {
 		return errors.New("Failed to draw box around window")
 	}
 	return nil
@@ -668,7 +665,7 @@ func (w *Window) Box(vch, hch int) error {
 
 // Clear the screen
 func (w *Window) Clear() error {
-	if C.wclear((*C.WINDOW)(w)) == C.ERR {
+	if C.wclear(w.win) == C.ERR {
 		return errors.New("Failed to clear screen")
 	}
 	return nil
@@ -678,13 +675,13 @@ func (w *Window) Clear() error {
 // on stdscr then the whole screen is redrawn no matter which window has
 // Refresh() called on it. Defaults to False.
 func (w *Window) ClearOk(ok bool) {
-	C.clearok((*C.WINDOW)(w), C.bool(ok))
+	C.clearok(w.win, C.bool(ok))
 }
 
 // Clear starting at the current cursor position, moving to the right, to the 
 // bottom of window
 func (w *Window) ClearToBottom() error {
-	if C.wclrtobot((*C.WINDOW)(w)) == C.ERR {
+	if C.wclrtobot(w.win) == C.ERR {
 		return errors.New("Failed to clear bottom of window")
 	}
 	return nil
@@ -693,7 +690,7 @@ func (w *Window) ClearToBottom() error {
 // Clear from the current cursor position, moving to the right, to the end 
 // of the line
 func (w *Window) ClearToEOL() error {
-	if C.wclrtoeol((*C.WINDOW)(w)) == C.ERR {
+	if C.wclrtoeol(w.win) == C.ERR {
 		return errors.New("Failed to clear to end of line")
 	}
 	return nil
@@ -701,12 +698,12 @@ func (w *Window) ClearToEOL() error {
 
 // Color sets the forground/background color pair for the entire window
 func (w *Window) Color(pair byte) {
-	C.wcolor_set((*C.WINDOW)(w), C.short(C.COLOR_PAIR(C.int(pair))), nil)
+	C.wcolor_set(w.win, C.short(C.COLOR_PAIR(C.int(pair))), nil)
 }
 
 // ColorOff turns the specified color pair off
 func (w *Window) ColorOff(pair byte) error {
-	if C.wattroff((*C.WINDOW)(w), C.COLOR_PAIR(C.int(pair))) == C.ERR {
+	if C.wattroff(w.win, C.COLOR_PAIR(C.int(pair))) == C.ERR {
 		return errors.New("Failed to enable color pair")
 	}
 	return nil
@@ -715,7 +712,7 @@ func (w *Window) ColorOff(pair byte) error {
 // Normally color pairs are turned on via attron() in ncurses but this
 // implementation chose to make it seperate
 func (w *Window) ColorOn(pair byte) error {
-	if C.wattron((*C.WINDOW)(w), C.COLOR_PAIR(C.int(pair))) == C.ERR {
+	if C.wattron(w.win, C.COLOR_PAIR(C.int(pair))) == C.ERR {
 		return errors.New("Failed to enable color pair")
 	}
 	return nil
@@ -729,7 +726,7 @@ func (w *Window) Copy(src *Window, sy, sx, dtr, dtc, dbr, dbc int,
 	if overlay {
 		ol = 1
 	}
-	if C.copywin((*C.WINDOW)(src), (*C.WINDOW)(w), C.int(sy), C.int(sx),
+	if C.copywin(src.win, w.win, C.int(sy), C.int(sx),
 		C.int(dtr), C.int(dtc), C.int(dbr), C.int(dbc), C.int(ol)) ==
 		C.ERR {
 		return errors.New("Failed to copy window")
@@ -750,9 +747,9 @@ func (w *Window) DelChar(coord ...int) error {
 		if len(coord) > 2 {
 			x = coord[1]
 		}
-		err = C.mvwdelch((*C.WINDOW)(w), C.int(y), C.int(x))
+		err = C.mvwdelch(w.win, C.int(y), C.int(x))
 	} else {
-		err = C.wdelch((*C.WINDOW)(w))
+		err = C.wdelch(w.win)
 	}
 	if err != C.OK {
 		return errors.New("An error occurred when trying to delete " +
@@ -763,7 +760,7 @@ func (w *Window) DelChar(coord ...int) error {
 
 // Delete the window
 func (w *Window) Delete() error {
-	if C.delwin((*C.WINDOW)(w)) == C.ERR {
+	if C.delwin(w.win) == C.ERR {
 		return errors.New("Failed to delete window")
 	}
 	w = nil
@@ -774,25 +771,24 @@ func (w *Window) Delete() error {
 // y, x.  These coordinates are relative to the original window thereby 
 // confining the derived window to the area of original window. See the
 // SubWindow function for additional notes.
-func (w *Window) Derived(height, width, y, x int) *Window {
-	res := C.derwin((*C.WINDOW)(w), C.int(height), C.int(width), C.int(y),
-		C.int(x))
-	return (*Window)(res)
+func (w *Window) Derived(height, width, y, x int) Window {
+	return Window{C.derwin(w.win, C.int(height), C.int(width), C.int(y),
+		C.int(x))}
 }
 
 // Duplicate the window, creating an exact copy.
-func (w *Window) Duplicate() *Window {
-	return (*Window)(C.dupwin((*C.WINDOW)(w)))
+func (w *Window) Duplicate() Window {
+	return Window{C.dupwin(w.win)}
 }
 
 // Test whether the given mouse coordinates are within the window or not
 func (w *Window) Enclose(y, x int) bool {
-	return bool(C.wenclose((*C.WINDOW)(w), C.int(y), C.int(x)))
+	return bool(C.wenclose(w.win, C.int(y), C.int(x)))
 }
 
 // Erase the contents of the window, effectively clearing it
 func (w *Window) Erase() {
-	C.werase((*C.WINDOW)(w))
+	C.werase(w.win)
 }
 
 // Get a character from standard input
@@ -807,9 +803,9 @@ func (w *Window) GetChar(coords ...int) int {
 		count++
 	}
 	if count > 0 {
-		return int(C.mvwgetch((*C.WINDOW)(w), C.int(y), C.int(x)))
+		return int(C.mvwgetch(w.win, C.int(y), C.int(x)))
 	}
-	return int(C.wgetch((*C.WINDOW)(w)))
+	return int(C.wgetch(w.win))
 }
 
 // Reads at most 'n' characters entered by the user from the Window. Attempts
@@ -817,7 +813,7 @@ func (w *Window) GetChar(coords ...int) int {
 func (w *Window) GetString(n int) (string, error) {
 	// TODO: add move portion of code...
 	cstr := make([]C.char, n)
-	if C.wgetnstr((*C.WINDOW)(w), (*C.char)(&cstr[0]), C.int(n)) == C.ERR {
+	if C.wgetnstr(w.win, (*C.char)(&cstr[0]), C.int(n)) == C.ERR {
 		return "", errors.New("Failed to retrieve string from input stream")
 	}
 	return C.GoString(&cstr[0]), nil
@@ -828,33 +824,32 @@ func (w *Window) GetString(n int) (string, error) {
 func (w *Window) Getyx() (int, int) {
 	// In some cases, getxy() and family are macros which don't play well with
 	// cgo
-	return int(w._cury), int(w._curx)
+	return int(w.win._cury), int(w.win._curx)
 }
 
 // HLine draws a horizontal line starting at y, x and ending at width using 
 // the specified character
 func (w *Window) HLine(y, x, ch, wid int) {
 	// TODO: move portion	
-	C.mvwhline((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(ch),
-		C.int(wid))
+	C.mvwhline(w.win, C.int(y), C.int(x), C.chtype(ch), C.int(wid))
 	return
 }
 
 // IsCleared returns the value set in ClearOk
 func (w *Window) IsCleared() bool {
-	return bool(C.is_cleared((*C.WINDOW)(w)))
+	return bool(w.win._clear)
 }
 
 // IsKeypad returns the value set in Keypad
 func (w *Window) IsKeypad() bool {
-	return bool(C.is_keypad((*C.WINDOW)(w)))
+	return bool(w.win._use_keypad)
 }
 
 // Keypad turns on/off the keypad characters, including those like the F1-F12 
 // keys and the arrow keys
 func (w *Window) Keypad(keypad bool) error {
 	var err C.int
-	if err = C.keypad((*C.WINDOW)(w), C.bool(keypad)); err == C.ERR {
+	if err = C.keypad(w.win, C.bool(keypad)); err == C.ERR {
 		return errors.New("Unable to set keypad mode")
 	}
 	return nil
@@ -864,12 +859,12 @@ func (w *Window) Keypad(keypad bool) error {
 // of returning y then x.
 func (w *Window) Maxyx() (int, int) {
 	// This hack is necessary to make cgo happy
-	return int(w._maxy + 1), int(w._maxx + 1)
+	return int(w.win._maxy + 1), int(w.win._maxx + 1)
 }
 
 // Move the cursor to the specified coordinates within the window
 func (w *Window) Move(y, x int) {
-	C.wmove((*C.WINDOW)(w), C.int(y), C.int(x))
+	C.wmove(w.win, C.int(y), C.int(x))
 	return
 }
 
@@ -877,14 +872,14 @@ func (w *Window) Move(y, x int) {
 // the changes, Update() must be called. This function when coupled with
 // Update() provides a speed increase over using Refresh() on each window.
 func (w *Window) NoutRefresh() {
-	C.wnoutrefresh((*C.WINDOW)(w))
+	C.wnoutrefresh(w.win)
 	return
 }
 
 // Overlay copies overlapping sections of src window onto the destination
 // window. Non-blank elements are not overwritten.
 func (w *Window) Overlay(src *Window) error {
-	if C.overlay((*C.WINDOW)(src), (*C.WINDOW)(w)) == C.ERR {
+	if C.overlay(src.win, w.win) == C.ERR {
 		return errors.New("Failed to overlay window")
 	}
 	return nil
@@ -894,14 +889,14 @@ func (w *Window) Overlay(src *Window) error {
 // window. This function is considered "destructive" by copying all
 // elements of src onto the destination window.
 func (w *Window) Overwrite(src *Window) error {
-	if C.overwrite((*C.WINDOW)(src), (*C.WINDOW)(w)) == C.ERR {
+	if C.overwrite(src.win, w.win) == C.ERR {
 		return errors.New("Failed to overwrite window")
 	}
 	return nil
 }
 
 func (w *Window) Parent() *Window {
-	return (*Window)(C.wgetparent((*C.WINDOW)(w)))
+	return &Window{w.win._parent}
 }
 
 // Print a string to the given window. The first two arguments may be
@@ -934,31 +929,31 @@ func (w *Window) Print(args ...interface{}) {
 	defer C.free(unsafe.Pointer(cstr))
 
 	if count > 0 {
-		C.mvwaddstr((*C.WINDOW)(w), C.int(y), C.int(x), cstr)
+		C.mvwaddstr(w.win, C.int(y), C.int(x), cstr)
 		return
 	}
-	C.waddstr((*C.WINDOW)(w), cstr)
+	C.waddstr(w.win, cstr)
 }
 
 // Refresh the window so it's contents will be displayed
 func (w *Window) Refresh() {
-	C.wrefresh((*C.WINDOW)(w))
+	C.wrefresh(w.win)
 }
 
 // Resize the window to new height, width
 func (w *Window) Resize(height, width int) {
-	C.wresize((*C.WINDOW)(w), C.int(height), C.int(width))
+	C.wresize(w.win, C.int(height), C.int(width))
 }
 
 // Scroll the contents of the window. Use a negative number to scroll up,
 // a positive number to scroll down. ScrollOk Must have been called prior.
 func (w *Window) Scroll(n int) {
-	C.wscrl((*C.WINDOW)(w), C.int(n))
+	C.wscrl(w.win, C.int(n))
 }
 
 // ScrollOk sets whether scrolling will work
 func (w *Window) ScrollOk(ok bool) {
-	C.scrollok((*C.WINDOW)(w), C.bool(ok))
+	C.scrollok(w.win, C.bool(ok))
 }
 
 // SubWindow creates a new window of height and width at the coordinates
@@ -966,10 +961,9 @@ func (w *Window) ScrollOk(ok bool) {
 // made to one window are reflected in the other. It is necessary to call
 // Touch() on this window prior to calling Refresh in order for it to be
 // displayed.
-func (w *Window) Sub(height, width, y, x int) *Window {
-	res := C.subwin((*C.WINDOW)(w), C.int(height), C.int(width), C.int(y),
-		C.int(x))
-	return (*Window)(res)
+func (w *Window) Sub(height, width, y, x int) Window {
+	return Window{C.subwin(w.win, C.int(height), C.int(width), C.int(y),
+		C.int(x))}
 }
 
 // Sync updates all parent or child windows which were created via
@@ -981,25 +975,26 @@ func (w *Window) Sub(height, width, y, x int) *Window {
 func (w *Window) Sync(sync int) {
 	switch sync {
 	case SYNC_DOWN:
-		C.wsyncdown((*C.WINDOW)(w))
+		C.wsyncdown(w.win)
 	case SYNC_CURSOR:
-		C.wcursyncup((*C.WINDOW)(w))
+		C.wcursyncup(w.win)
 	case SYNC_UP:
-		C.wsyncup((*C.WINDOW)(w))
+		C.wsyncup(w.win)
 	}
 }
 
 // Touch indicates that the window contains changes which should be updated
 // on the next call to Refresh
 func (w *Window) Touch() {
-	C.touchwin((*C.WINDOW)(w))
+	// may not use touchwin() directly. cgo does not handle macros well.
+	y, _ := w.Maxyx()
+	C.wtouchln(w.win, 0, C.int(y), 1)
 }
 
 // VLine draws a verticle line starting at y, x and ending at height using 
 // the specified character
 func (w *Window) VLine(y, x, ch, h int) {
 	// TODO: move portion
-	C.mvwvline((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(ch),
-		C.int(h))
+	C.mvwvline(w.win, C.int(y), C.int(x), C.chtype(ch), C.int(h))
 	return
 }
