@@ -41,9 +41,15 @@
    implemented. Instead, only the mvwgetnstr() and wgetnstr() can be used. */
 package goncurses
 
-// #cgo LDFLAGS: -lncurses
-// #include <ncurses.h>
-// #include <stdlib.h>
+/* 
+#cgo LDFLAGS: -lncurses
+#include <ncurses.h>
+#include <stdlib.h>
+
+bool ncurses_has_mouse(void) {
+	return has_mouse();
+}
+*/
 import "C"
 
 import (
@@ -397,7 +403,7 @@ func Flash() {
 // x, y and z coordinates, id of the device, and a bit masked state of
 // the devices buttons
 func GetMouse() ([]int, error) {
-	if bool(C.has_mouse()) != true {
+	if bool(C.ncurses_has_mouse()) != true {
 		return nil, errors.New("Mouse support not enabled")
 	}
 	var event C.MEVENT
@@ -478,12 +484,16 @@ func IsTermResized(nlines, ncols int) bool {
 }
 
 // Returns a string representing the value of input returned by Getch
-func Key(k int) (string) {
+func Key(k int) string {
 	key, ok := keyList[C.int(k)]
 	if !ok {
 		key = fmt.Sprintf("%c", k)
 	}
 	return key
+}
+
+func Mouse() bool {
+	return bool(C.ncurses_has_mouse())
 }
 
 func MouseInterval() {
@@ -494,7 +504,7 @@ func MouseInterval() {
 // event use GetMouse() to pop it off the queue. Pass a pointer as the 
 // second argument to store the prior events being monitored or nil.
 func MouseMask(mask int, old *int) (m int) {
-	if bool(C.has_mouse()) {
+	if bool(C.ncurses_has_mouse()) {
 		m = int(C.mousemask((C.mmask_t)(mask),
 			(*C.mmask_t)(unsafe.Pointer(old))))
 	}
