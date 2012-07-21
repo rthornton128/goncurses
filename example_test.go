@@ -3,7 +3,7 @@ package goncurses
 
 import "code.google.com/p/goncurses"
 
-func InitExample() {
-	stdscr, _ := goncurses.Init()
+func ExampleInit() {
+	goncurses.Init()
 	defer goncurses.End()
 }
