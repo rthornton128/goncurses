@@ -1,34 +1,6 @@
-// goncurses - ncurses library for Go.
-//
-// Copyright (c) 2011, Rob Thornton 
-//
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met:
-//
-//   * Redistributions of source code must retain the above copyright notice, 
-//     this list of conditions and the following disclaimer.
-//
-//   * Redistributions in binary form must reproduce the above copyright notice, 
-//     this list of conditions and the following disclaimer in the documentation 
-//     and/or other materials provided with the distribution.
-//  
-//   * Neither the name of the copyright holder nor the names of its 
-//     contributors may be used to endorse or promote products derived from this 
-//     software without specific prior written permission.
-//      
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
-// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
-// POSSIBILITY OF SUCH DAMAGE.
+// Copyright 2011 Rob Thornton. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 /* ncurses menu extension */
 package goncurses
@@ -44,7 +16,7 @@ ITEM* menu_item_at(ITEM** ilist, int i) {
 import "C"
 
 import (
-//	"os"
+	//	"os"
 	"syscall"
 	"unsafe"
 )
@@ -112,7 +84,7 @@ func NewMenu(items []*MenuItem) (*Menu, error) {
 	}
 	citems[len(items)] = nil
 	var menu *C.MENU
-	var err error 
+	var err error
 	menu, err = C.new_menu((**C.ITEM)(&citems[0]))
 	return &Menu{menu}, ncursesError(err)
 }
@@ -330,7 +302,7 @@ func (m *Menu) Window() *Window {
 func NewItem(name, desc string) (*MenuItem, error) {
 	cname := C.CString(name)
 	cdesc := C.CString(desc)
-	
+
 	var item *C.ITEM
 	var err error
 	item, err = C.new_item(cname, cdesc)
