@@ -215,7 +215,7 @@ func (w *Window) Erase() {
 }
 
 // Get a character from standard input
-func (w *Window) GetChar(coords ...int) int {
+func (w *Window) GetChar(coords ...int) Key {
 	var y, x, count int
 	if len(coords) > 1 {
 		y = coords[0]
@@ -226,9 +226,9 @@ func (w *Window) GetChar(coords ...int) int {
 		count++
 	}
 	if count > 0 {
-		return int(C.mvwgetch(w.win, C.int(y), C.int(x)))
+		return Key(C.mvwgetch(w.win, C.int(y), C.int(x)))
 	}
-	return int(C.wgetch(w.win))
+	return Key(C.wgetch(w.win))
 }
 
 // Reads at most 'n' characters entered by the user from the Window. Attempts

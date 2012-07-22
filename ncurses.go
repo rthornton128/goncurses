@@ -144,7 +144,7 @@ func HasColors() bool {
 }
 
 // HasKey returns true if terminal recognized the given character
-func HasKey(ch int) bool {
+func HasKey(ch Key) bool {
 	if C.has_key(C.int(ch)) == 1 {
 		return true
 	}
@@ -194,10 +194,10 @@ func IsTermResized(nlines, ncols int) bool {
 }
 
 // Returns a string representing the value of input returned by Getch
-func Key(k int) string {
-	key, ok := keyList[C.int(k)]
+func KeyString(k Key) string {
+	key, ok := keyList[k]
 	if !ok {
-		key = fmt.Sprintf("%c", k)
+		key = fmt.Sprintf("%c", int(k))
 	}
 	return key
 }
