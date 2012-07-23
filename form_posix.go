@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// +build linux bsd unix
 
 /* ncurses form extension */
 package goncurses
@@ -11,100 +12,8 @@ package goncurses
 import "C"
 
 import (
-	"errors"
 	"syscall"
 	"unsafe"
-)
-
-const (
-	FO_VISIBLE  = C.O_VISIBLE  // Field visibility
-	FO_ACTIVE   = C.O_ACTIVE   // Field is sensitive/accessable
-	FO_PUBLIC   = C.O_PUBLIC   // Typed characters are echoed
-	FO_EDIT     = C.O_EDIT     // Editable
-	FO_WRAP     = C.O_WRAP     // Line wrapping
-	FO_BLANK    = C.O_BLANK    // Clear on entry
-	FO_AUTOSKIP = C.O_AUTOSKIP // Skip to next field when current filled
-	FO_NULLOK   = C.O_NULLOK   // Blank ok 
-	FO_STATIC   = C.O_STATIC   // Fixed size
-	FO_PASSOK   = C.O_PASSOK   // Field validation
-)
-
-var errList = map[C.int]string{
-	C.E_SYSTEM_ERROR:    "System error occurred",
-	C.E_BAD_ARGUMENT:    "Incorrect or out-of-range argument",
-	C.E_POSTED:          "Form has already been posted",
-	C.E_CONNECTED:       "Field is already connected to a form",
-	C.E_BAD_STATE:       "Bad state",
-	C.E_NO_ROOM:         "No room",
-	C.E_NOT_POSTED:      "Form has not been posted",
-	C.E_UNKNOWN_COMMAND: "Unknown command",
-	C.E_NO_MATCH:        "No match",
-	C.E_NOT_SELECTABLE:  "Not selectable",
-	C.E_NOT_CONNECTED:   "Field is not connected to a form",
-	C.E_REQUEST_DENIED:  "Request denied",
-	C.E_INVALID_FIELD:   "Invalid field",
-	C.E_CURRENT:         "Current",
-}
-
-// Form Driver Requests
-const (
-	REQ_NEXT_PAGE    = C.REQ_NEXT_PAGE    // next page
-	REQ_PREV_PAGE    = C.REQ_PREV_PAGE    // previous page
-	REQ_FIRST_PAGE   = C.REQ_FIRST_PAGE   // first page
-	REQ_LAST_PAGE    = C.REQ_LAST_PAGE    // last page
-	REQ_NEXT_FIELD   = C.REQ_NEXT_FIELD   // next field
-	REQ_PREV_FIELD   = C.REQ_PREV_FIELD   // previous field
-	REQ_FIRST_FIELD  = C.REQ_FIRST_FIELD  // first field
-	REQ_LAST_FIELD   = C.REQ_LAST_FIELD   // last field
-	REQ_SNEXT_FIELD  = C.REQ_SNEXT_FIELD  // sorted next field
-	REQ_SPREV_FIELD  = C.REQ_SPREV_FIELD  // sorted previous field
-	REQ_SFIRST_FIELD = C.REQ_SFIRST_FIELD // sorted first field
-	REQ_SLAST_FIELD  = C.REQ_SLAST_FIELD  // sorted last field
-	REQ_LEFT_FIELD   = C.REQ_LEFT_FIELD   // left field
-	REQ_RIGHT_FIELD  = C.REQ_RIGHT_FIELD  // right field
-	REQ_UP_FIELD     = C.REQ_UP_FIELD     // up to a field
-	REQ_DOWN_FIELD   = C.REQ_DOWN_FIELD   // down to a field
-	REQ_NEXT_CHAR    = C.REQ_NEXT_CHAR    // next character in field
-	REQ_PREV_CHAR    = C.REQ_PREV_CHAR    // previous character in field
-	REQ_NEXT_LINE    = C.REQ_NEXT_LINE    // next line
-	REQ_PREV_LINE    = C.REQ_PREV_LINE    // previous line
-	REQ_NEXT_WORD    = C.REQ_NEXT_WORD    // next word
-	REQ_PREV_WORD    = C.REQ_PREV_WORD    // previous word
-	REQ_BEG_FIELD    = C.REQ_BEG_FIELD    // beginning of field
-	REQ_END_FIELD    = C.REQ_END_FIELD    // end of field
-	REQ_BEG_LINE     = C.REQ_BEG_LINE     // beginning of line
-	REQ_END_LINE     = C.REQ_END_LINE     // end of line
-	REQ_LEFT_CHAR    = C.REQ_LEFT_CHAR    // character to the left
-	REQ_RIGHT_CHAR   = C.REQ_RIGHT_CHAR   // character to the right
-	REQ_UP_CHAR      = C.REQ_UP_CHAR      // up a character
-	REQ_DOWN_CHAR    = C.REQ_DOWN_CHAR    // down a character
-	REQ_NEW_LINE     = C.REQ_NEW_LINE     // insert of overlay a new line
-	REQ_INS_CHAR     = C.REQ_INS_CHAR     // insert a blank character at cursor
-	REQ_INS_LINE     = C.REQ_INS_LINE     // insert a blank line at cursor
-	REQ_DEL_CHAR     = C.REQ_DEL_CHAR     // delete character at cursor
-	REQ_DEL_PREV     = C.REQ_DEL_PREV     // delete character before cursor
-	REQ_DEL_LINE     = C.REQ_DEL_LINE     // delete line
-	REQ_DEL_WORD     = C.REQ_DEL_WORD     // delete word
-	REQ_CLR_EOL      = C.REQ_CLR_EOL      // clear from cursor to end of line
-	REQ_CLR_EOF      = C.REQ_CLR_EOF      // clear from cursor to end of field
-	REQ_CLR_FIELD    = C.REQ_CLR_FIELD    // clear field
-	REQ_OVL_MODE     = C.REQ_OVL_MODE     // overlay mode
-	REQ_INS_MODE     = C.REQ_INS_MODE     // insert mode
-	REQ_SCR_FLINE    = C.REQ_SCR_FLINE    // scroll field forward a line
-	REQ_SCR_BLINE    = C.REQ_SCR_BLINE    // scroll field back a line
-	REQ_SCR_FPAGE    = C.REQ_SCR_FPAGE    // scroll field forward a page
-	REQ_SCR_BPAGE    = C.REQ_SCR_BPAGE    // scroll field back a page
-	REQ_SCR_FHPAGE   = C.REQ_SCR_FHPAGE   // scroll field forward half a page
-	REQ_SCR_BHPAGE   = C.REQ_SCR_BHPAGE   // scroll field back half a page
-	REQ_SCR_FCHAR    = C.REQ_SCR_FCHAR    // scroll field forward a character
-	REQ_SCR_BCHAR    = C.REQ_SCR_BCHAR    // scroll field back a character
-	REQ_SCR_HFLINE   = C.REQ_SCR_HFLINE   // horisontal scroll field forward a line
-	REQ_SCR_HBLINE   = C.REQ_SCR_HBLINE   // horisontal scroll field back a line
-	REQ_SCR_HFHALF   = C.REQ_SCR_HFHALF   // horisontal scroll field forward half a line
-	REQ_SCR_HBHALF   = C.REQ_SCR_HBHALF   // horisontal scroll field back half a line
-	REQ_VALIDATION   = C.REQ_VALIDATION   // validate field
-	REQ_NEXT_CHOICE  = C.REQ_NEXT_CHOICE  // display next field choice
-	REQ_PREV_CHOICE  = C.REQ_PREV_CHOICE  // display previous field choice
 )
 
 type Field struct {
@@ -113,20 +22,6 @@ type Field struct {
 
 type Form struct {
 	form *C.FORM
-}
-
-func ncursesError(e error) error {
-	errno, ok := e.(syscall.Errno)
-	if int(errno) == C.OK {
-		e = nil
-	}
-	if ok {
-		errstr, ok := errList[C.int(errno)]
-		if ok {
-			return errors.New(errstr)
-		}
-	}
-	return e
 }
 
 func NewField(h, w, tr, lc, oscr, nbuf int) (*Field, error) {
@@ -159,7 +54,7 @@ func (f *Field) Foreground() int {
 // Free field's allocated memory. This must be called to prevent memory
 // leaks
 func (f *Field) Free() error {
-	err := C.free_field(f.field);
+	err := C.free_field(f.field)
 	f = nil
 	return ncursesError(syscall.Errno(err))
 }
@@ -182,7 +77,7 @@ func (f *Field) Justification() int {
 
 // Move the field to the location of the specified coordinates
 func (f *Field) Move(y, x int) error {
-	err := C.move_field(f.field, C.int(y), C.int(x));
+	err := C.move_field(f.field, C.int(y), C.int(x))
 	return ncursesError(syscall.Errno(err))
 }
 
@@ -250,11 +145,11 @@ func NewForm(fields []*Field) (Form, error) {
 		cfields[index] = field.field
 	}
 	cfields[len(fields)] = nil
-	
+
 	var form *C.FORM
 	var err error
 	form, err = C.new_form((**C.FIELD)(&cfields[0]))
-	
+
 	return Form{form}, ncursesError(err)
 }
 

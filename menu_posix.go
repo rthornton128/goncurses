@@ -18,88 +18,9 @@ ITEM* menu_item_at(ITEM** ilist, int i) {
 import "C"
 
 import (
-	"errors"
 	"syscall"
 	"unsafe"
 )
-
-// Menu Driver Requests
-const (
-	REQ_LEFT          = C.REQ_LEFT_ITEM
-	REQ_RIGHT         = C.REQ_RIGHT_ITEM
-	REQ_UP            = C.REQ_UP_ITEM
-	REQ_DOWN          = C.REQ_DOWN_ITEM
-	REQ_ULINE         = C.REQ_SCR_ULINE
-	REQ_DLINE         = C.REQ_SCR_DLINE
-	REQ_PAGE_DOWN     = C.REQ_SCR_DPAGE
-	REQ_PAGE_UP       = C.REQ_SCR_UPAGE
-	REQ_FIRST         = C.REQ_FIRST_ITEM
-	REQ_LAST          = C.REQ_LAST_ITEM
-	REQ_NEXT          = C.REQ_NEXT_ITEM
-	REQ_PREV          = C.REQ_PREV_ITEM
-	REQ_TOGGLE        = C.REQ_TOGGLE_ITEM
-	REQ_CLEAR_PATTERN = C.REQ_CLEAR_PATTERN
-	REQ_BACK_PATTERN  = C.REQ_BACK_PATTERN
-	REQ_NEXT_MATCH    = C.REQ_NEXT_MATCH
-	REQ_PREV_MATCH    = C.REQ_PREV_MATCH
-)
-
-// Menu Options
-const (
-	O_ONEVALUE   = C.O_ONEVALUE   // Only one item can be selected
-	O_SHOWDESC   = C.O_SHOWDESC   // Display item descriptions
-	O_ROWMAJOR   = C.O_ROWMAJOR   // Display in row-major order
-	O_IGNORECASE = C.O_IGNORECASE // Ingore case when pattern-matching
-	O_SHOWMATCH  = C.O_SHOWMATCH  // Move cursor to item when pattern-matching
-	O_NONCYCLIC  = C.O_NONCYCLIC  // Don't wrap next/prev item
-)
-
-// Menu Item Options
-const O_SELECTABLE = C.O_SELECTABLE
-
-// DriverActions is a convenience mapping for common responses
-// to keyboard input
-var DriverActions = map[Key]int{
-	KEY_DOWN:     C.REQ_DOWN_ITEM,
-	KEY_HOME:     C.REQ_FIRST_ITEM,
-	KEY_END:      C.REQ_LAST_ITEM,
-	KEY_LEFT:     C.REQ_LEFT_ITEM,
-	KEY_PAGEDOWN: C.REQ_SCR_DPAGE,
-	KEY_PAGEUP:   C.REQ_SCR_UPAGE,
-	KEY_RIGHT:    C.REQ_RIGHT_ITEM,
-	KEY_UP:       C.REQ_UP_ITEM,
-}
-
-var errList = map[C.int]string{
-	C.E_SYSTEM_ERROR:    "System error occurred",
-	C.E_BAD_ARGUMENT:    "Incorrect or out-of-range argument",
-	C.E_POSTED:          "Form has already been posted",
-	C.E_CONNECTED:       "Field is already connected to a form",
-	C.E_BAD_STATE:       "Bad state",
-	C.E_NO_ROOM:         "No room",
-	C.E_NOT_POSTED:      "Form has not been posted",
-	C.E_UNKNOWN_COMMAND: "Unknown command",
-	C.E_NO_MATCH:        "No match",
-	C.E_NOT_SELECTABLE:  "Not selectable",
-	C.E_NOT_CONNECTED:   "Field is not connected to a form",
-	C.E_REQUEST_DENIED:  "Request denied",
-	C.E_INVALID_FIELD:   "Invalid field",
-	C.E_CURRENT:         "Current",
-}
-
-func ncursesError(e error) error {
-	errno, ok := e.(syscall.Errno)
-	if int(errno) == C.OK {
-		e = nil
-	}
-	if ok {
-		errstr, ok := errList[C.int(errno)]
-		if ok {
-			return errors.New(errstr)
-		}
-	}
-	return e
-}
 
 type Menu struct {
 	menu *C.MENU
@@ -301,7 +222,7 @@ func (m *Menu) SetSpacing(desc, row, col int) error {
 
 // SetWindow container for the menu
 func (m *Menu) SetWindow(w *Window) error {
-	err := C.set_menu_win(m.menu, (*C.WINDOW)(w))
+	err := C.set_menu_win(m.menu, w.win)
 	return ncursesError(syscall.Errno(err))
 }
 
