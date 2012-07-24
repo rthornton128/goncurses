@@ -17,10 +17,7 @@ package goncurses
 /* 
 #cgo LDFLAGS: -lncurses
 #include <ncurses.h>
-
-bool ncurses_has_mouse(void) {
-	return has_mouse();
-}
+#include "goncurses.h"
 */
 import "C"
 
