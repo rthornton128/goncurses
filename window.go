@@ -6,6 +6,7 @@ package goncurses
 
 // #include <stdlib.h>
 // #include <ncurses.h>
+// #include "goncurses.h"
 import "C"
 
 import (
@@ -247,7 +248,9 @@ func (w *Window) GetString(n int) (string, error) {
 func (w *Window) Getyx() (int, int) {
 	// In some cases, getxy() and family are macros which don't play well with
 	// cgo
-	return int(w.win._cury), int(w.win._curx)
+	var cy, cx C.int
+	C.ncurses_getyx(w.win, &cy, &cx)
+	return int(cy), int(cx)
 }
 
 // HLine draws a horizontal line starting at y, x and ending at width using 
@@ -260,12 +263,12 @@ func (w *Window) HLine(y, x, ch, wid int) {
 
 // IsCleared returns the value set in ClearOk
 func (w *Window) IsCleared() bool {
-	return bool(w.win._clear)
+	return bool(C.ncurses_is_cleared(w.win))
 }
 
 // IsKeypad returns the value set in Keypad
 func (w *Window) IsKeypad() bool {
-	return bool(w.win._use_keypad)
+	return bool(C.ncurses_is_keypad(w.win))
 }
 
 // Keypad turns on/off the keypad characters, including those like the F1-F12 
@@ -281,8 +284,9 @@ func (w *Window) Keypad(keypad bool) error {
 // Returns the maximum size of the Window. Note that it uses ncurses idiom
 // of returning y then x.
 func (w *Window) Maxyx() (int, int) {
-	// This hack is necessary to make cgo happy
-	return int(w.win._maxy + 1), int(w.win._maxx + 1)
+	var cy, cx C.int
+	C.ncurses_getmaxyx(w.win, &cy, &cx)
+	return int(cy) + 1, int(cx) + 1
 }
 
 // Move the cursor to the specified coordinates within the window
