@@ -3,53 +3,52 @@
 
 package main
 
-import . "goncurses.googlecode.com/hg/goncurses"
+import "code.google.com/p/goncurses"
 
-func main() {    
-    stdscr, _ := Init()
-    defer End()
-    
-    Echo(false)
-    CBreak(true)
-    Cursor(0)
-    stdscr.Keypad(true)
-    stdscr.Print("Press 'q' to exit")
-    stdscr.Refresh()
-    
-    rows, cols := stdscr.Maxyx()
-    height, width := 3, 10
-    y, x := (rows-height)/2, (cols-width)/2
-    win, _ := NewWindow(height, width, y, x)
-    win.Refresh()
-    
-    for {
-        switch stdscr.GetChar() {
-        case 'q':
-            return
-        case KEY_LEFT:
-            x -= 1
-        case KEY_RIGHT:
-            x += 1
-        case KEY_UP:
-            y -= 1
-        case KEY_DOWN:
-            y += 1
-        }
-        destroy(win)
-        win = createWin(height, width, y, x)
-    }
+func main() {
+	stdscr, _ := goncurses.Init()
+	defer goncurses.End()
+
+	goncurses.Echo(false)
+	goncurses.CBreak(true)
+	goncurses.Cursor(0)
+	stdscr.Keypad(true)
+	stdscr.Print("Use arrow keys to move window. Press 'q' to exit")
+	stdscr.Refresh()
+
+	rows, cols := stdscr.Maxyx()
+	height, width := 3, 10
+	y, x := (rows-height)/2, (cols-width)/2
+	win := createWin(height, width, y, x)
+
+	for {
+		switch stdscr.GetChar() {
+		case 'q':
+			return
+		case goncurses.KEY_LEFT:
+			x -= 1
+		case goncurses.KEY_RIGHT:
+			x += 1
+		case goncurses.KEY_UP:
+			y -= 1
+		case goncurses.KEY_DOWN:
+			y += 1
+		}
+		destroy(win)
+		win = createWin(height, width, y, x)
+	}
 }
 
-func createWin(h, w, y, x int) Window {
-    new, _ := NewWindow(h, w, y, x)
-    new.Box(0, 0)
-    new.Refresh()
-    return new
+func createWin(h, w, y, x int) goncurses.Window {
+	new, _ := goncurses.NewWindow(h, w, y, x)
+	new.Box(0, 0)
+	new.Refresh()
+	return new
 }
 
-func destroy(w Window) {
-    w.Border(' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ')
-    w.Refresh()
-    w.Delete()
-    return
+func destroy(w goncurses.Window) {
+	w.Border(' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ')
+	w.Refresh()
+	w.Delete()
+	return
 }
