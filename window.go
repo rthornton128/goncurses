@@ -323,7 +323,7 @@ func (w *Window) Overwrite(src *Window) error {
 }
 
 func (w *Window) Parent() *Window {
-	return &Window{w.win._parent}
+	return &Window{C.ncurses_wgetparent(w.win)}
 }
 
 // Print a string to the given window. The first two arguments may be

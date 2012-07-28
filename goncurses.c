@@ -11,6 +11,11 @@ void ncurses_getmaxyx(WINDOW *win, int *y, int *x)
 	getmaxyx(win, *y, *x);
 }
 
+WINDOW * ncurses_wgetparent(const WINDOW *win)
+{
+	return wgetparent(win);
+}
+
 bool ncurses_is_cleared(const WINDOW *win)
 {
 	return is_cleared(win);
