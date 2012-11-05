@@ -2,7 +2,7 @@
 
 package main
 
-import . "goncurses.googlecode.com/hg/goncurses"
+import . "code.google.com/p/goncurses"
 
 func main() {
     stdscr, _ := Init()
