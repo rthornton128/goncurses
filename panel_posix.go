@@ -4,8 +4,7 @@
 
 // +build linux bsd unix
 
-/* ncurses panel extension
-
+/*
 The following functions have not been implemented because there are far more
 effective manners by which they can be done in Go: set_panel_userptr() and
 panel_userptr() */
