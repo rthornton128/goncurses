@@ -3,7 +3,7 @@
 package main
 
 /* Note that is not considered idiomatic Go to import curses this way */
-import . "goncurses.googlecode.com/hg/goncurses"
+import . "code.google.com/p/goncurses"
 
 func main() {
     stdscr, _ := Init()
@@ -17,7 +17,7 @@ func main() {
     
     // An example of trying to set an invalid color pair
     err := InitPair(255, C_BLACK, C_CYAN)
-    stdscr.Print("An intentional error: %s", err.String())
+    stdscr.Print("An intentional error: %s", err.Error())
     
     stdscr.Keypad(true)
     stdscr.Print(12, 30, "Hello, World!!!")

@@ -3,7 +3,7 @@
 
 package main
 
-import . "goncurses.googlecode.com/hg/goncurses"
+import . "code.google.com/p/goncurses"
 
 const (
     HEIGHT = 10
@@ -32,11 +32,11 @@ func main() {
     stdscr.Print(0, 0, "Use arrow keys to go up and down, Press enter to select")
     stdscr.Refresh()
     
-    printmenu(win, menu, active)
+    printmenu(&win, menu, active)
     
     for {
         ch:= stdscr.GetChar()
-        switch(Key(ch)) {
+        switch(KeyString(ch)) {
         case "q":
             return
         case "up":
@@ -62,7 +62,7 @@ func main() {
             stdscr.Refresh()
         }
 
-        printmenu(win, menu, active)
+        printmenu(&win, menu, active)
     }
 }
 
