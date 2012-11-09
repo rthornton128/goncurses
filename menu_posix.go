@@ -4,7 +4,9 @@
 
 // +build linux bsd unix
 
-/* ncurses menu extension */
+/*
+The NCurses menu extension allows you to create GUI-like user menus similar to
+application menu bars in GNOME or KDE */
 package goncurses
 
 /*
