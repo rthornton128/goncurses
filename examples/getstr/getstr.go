@@ -4,19 +4,19 @@
 
 package main
 
-import . "goncurses.googlecode.com/hg/goncurses"
+import gc "code.google.com/p/goncurses"
 
 func main() {
-    stdscr, _ := Init();
-    defer End()
-    
-    row, col := stdscr.Maxyx()
-    msg := "Enter a string: "
-    stdscr.Print(row/2, (col-len(msg))/2, msg)
-    
-    str, _ := stdscr.GetString(10)
-    stdscr.Print(row-2, 0, "You entered: %s", str)
+	stdscr, _ := gc.Init()
+	defer gc.End()
 
-    stdscr.Refresh()
-    stdscr.GetChar()
+	row, col := stdscr.Maxyx()
+	msg := "Enter a string: "
+	stdscr.Print(row/2, (col-len(msg)-8)/2, msg)
+
+	str, _ := stdscr.GetString(10)
+	stdscr.Print(row-2, 0, "You entered: %s", str)
+
+	stdscr.Refresh()
+	stdscr.GetChar()
 }
