@@ -3,7 +3,7 @@
 
 package main
 
-import . "goncurses.googlecode.com/hg/goncurses"
+import gc "code.google.com/p/goncurses"
 
 const (
 	HEIGHT = 10
@@ -14,46 +14,46 @@ func main() {
 	var active int
 	menu := []string{"Choice 1", "Choice 2", "Choice 3", "Choice 4", "Exit"}
 
-	stdscr, _ := Init()
-	defer End()
+	stdscr, _ := gc.Init()
+	defer gc.End()
 
-	Raw(true)
-	Echo(false)
-	Cursor(0)
+	gc.Raw(true)
+	gc.Echo(false)
+	gc.Cursor(0)
 	stdscr.Clear()
 	stdscr.Keypad(true)
 
 	rows, cols := stdscr.Maxyx()
 	y, x := (rows-HEIGHT)/2, (cols-WIDTH)/2
 
-	win, _ := NewWindow(HEIGHT, WIDTH, y, x)
+	win, _ := gc.NewWindow(HEIGHT, WIDTH, y, x)
 	win.Keypad(true)
 	stdscr.Print(0, 0,
 		"Use arrow keys to go up and down, Press enter to select")
 	stdscr.Refresh()
 
 	printmenu(win, menu, active)
-	MouseMask(M_B1_CLICKED, nil)
+	gc.MouseMask(gc.M_B1_CLICKED, nil)
 
 	for {
 		ch := stdscr.GetChar()
 		switch ch {
 		case 'q':
 			return
-		case KEY_UP:
+		case gc.KEY_UP:
 			if active == 0 {
 				active = len(menu) - 1
 			} else {
 				active -= 1
 			}
-		case KEY_DOWN:
+		case gc.KEY_DOWN:
 			if active == len(menu)-1 {
 				active = 0
 			} else {
 				active += 1
 			}
-		case KEY_MOUSE:
-			md, _ := GetMouse()
+		case gc.KEY_MOUSE:
+			md, _ := gc.GetMouse()
 			new := getactive(x, y, md[0], md[1], menu)
 			if new != -1 {
 				active = new
@@ -62,7 +62,7 @@ func main() {
 				menu[active])
 			stdscr.ClearToEOL()
 			stdscr.Refresh()
-		case KEY_RETURN:
+		case gc.KEY_RETURN:
 			stdscr.Print(23, 0, "Choice #%d: %s selected", active+1,
 				menu[active])
 			stdscr.ClearToEOL()
@@ -93,14 +93,14 @@ func getactive(x, y, mx, my int, menu []string) int {
 	return -1
 }
 
-func printmenu(w Window, menu []string, active int) {
+func printmenu(w gc.Window, menu []string, active int) {
 	y, x := 2, 2
 	w.Box(0, 0)
 	for i, s := range menu {
 		if i == active {
-			w.AttrOn(A_REVERSE)
+			w.AttrOn(gc.A_REVERSE)
 			w.Print(y+i, x, s)
-			w.AttrOff(A_REVERSE)
+			w.AttrOff(gc.A_REVERSE)
 		} else {
 			w.Print(y+i, x, s)
 		}
