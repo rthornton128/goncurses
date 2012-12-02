@@ -2,23 +2,23 @@
 
 package main
 
-import . "goncurses.googlecode.com/hg/goncurses"
+import gc "code.google.com/p/goncurses"
 
 func main() {
-    stdscr, _ := Init()
-    defer End()
+	stdscr, _ := gc.Init()
+	defer gc.End()
 
-    var panels [3]*Panel
-    y, x := 2, 4
-    
-    for i := 0; i < 3; i++ {
-        window, _ := NewWindow(10, 40 , y+i, x+(i*5))
-        window.Box(0, 0)
-        panels[i] = NewPanel(window)
-    }
-    
-    UpdatePanels()
-    Update()
+	var panels [3]*gc.Panel
+	y, x := 2, 4
 
-    stdscr.GetChar()
+	for i := 0; i < 3; i++ {
+		window, _ := gc.NewWindow(10, 40, y+i, x+(i*5))
+		window.Box(0, 0)
+		panels[i] = gc.NewPanel(&window)
+	}
+
+	gc.UpdatePanels()
+	gc.Update()
+
+	stdscr.GetChar()
 }
