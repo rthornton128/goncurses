@@ -21,27 +21,15 @@ type Window struct {
 }
 
 // AddChar prints a single character to the window. The character can be
-// OR'd together with attributes and colors. If optional first or second
-// arguments are given they are the y and x coordinates on the screen
-// respectively. If only y is given, x is assumed to be zero.
-func (w *Window) AddChar(args ...int) {
-	var cattr C.int
-	var count, y, x int
+// OR'd together with attributes and colors.
+func (w *Window) AddChar(ach AsciiCharacter) {
+	C.waddch(w.win, C.chtype(ach))
+}
 
-	if len(args) > 1 {
-		y = args[0]
-		count += 1
-	}
-	if len(args) > 2 {
-		x = args[1]
-		count += 1
-	}
-	cattr |= C.int(args[count])
-	if count > 0 {
-		C.mvwaddch(w.win, C.int(y), C.int(x), C.chtype(cattr))
-		return
-	}
-	C.waddch(w.win, C.chtype(cattr))
+// MoveAddChar prints a single character to the window at the specified 
+// y x coordinates. See AddChar for more info.
+func (w *Window) MoveAddChar(y, x int, ach AsciiCharacter) {
+	C.mvwaddch(w.win, C.int(y), C.int(x), C.chtype(ach))
 }
 
 // Turn off character attribute.
@@ -255,8 +243,7 @@ func (w *Window) Getyx() (int, int) {
 
 // HLine draws a horizontal line starting at y, x and ending at width using 
 // the specified character
-func (w *Window) HLine(y, x, ch, wid int) {
-	// TODO: move portion	
+func (w *Window) HLine(y, x int, ch AsciiCharacter, wid int) {
 	C.mvwhline(w.win, C.int(y), C.int(x), C.chtype(ch), C.int(wid))
 	return
 }
