@@ -102,7 +102,7 @@ func (f *Field) SetJustification(just int) error {
 }
 
 // OptionsOff turns feature(s) off
-func (f *Field) OptionsOff(opts int) error {
+func (f *Field) SetOptionsOff(opts int) error {
 	err := int(C.field_opts_off(f.field, C.Field_Options(opts)))
 	if err != C.E_OK {
 		return ncursesError(syscall.Errno(err))
@@ -111,7 +111,7 @@ func (f *Field) OptionsOff(opts int) error {
 }
 
 // OptionsOn turns feature(s) on
-func (f *Field) OptionsOn(opts int) error {
+func (f *Field) SetOptionsOn(opts int) error {
 	err := int(C.field_opts_on(f.field, C.Field_Options(opts)))
 	if err != C.E_OK {
 		return ncursesError(syscall.Errno(err))
@@ -160,7 +160,7 @@ func (f *Form) FieldCount() int {
 
 // Driver issues the actions requested to the form itself. See the
 // corresponding REQ_* constants
-func (f *Form) Driver(drvract int) error {
+func (f *Form) Driver(drvract Key) error {
 	err := C.form_driver(f.form, C.int(drvract))
 	return ncursesError(syscall.Errno(err))
 }
