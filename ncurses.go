@@ -106,6 +106,14 @@ func Flash() {
 	C.flash()
 }
 
+// FlushInput flushes all input
+func FlushInput() error {
+	if C.flushinp() == C.ERR {
+		return errors.New("Flush input failed")
+	}
+	return nil
+}
+
 // Returns an array of integers representing the following, in order:
 // x, y and z coordinates, id of the device, and a bit masked state of
 // the devices buttons
@@ -138,6 +146,18 @@ func HalfDelay(delay int) error {
 // HasColors returns true if terminal can display colors
 func HasColors() bool {
 	return bool(C.has_colors())
+}
+
+// HasInsertCharacter return true if the terminal has insert and delete
+// character capabilities
+func HasInsertCharacter() bool {
+	return bool(C.has_ic())
+}
+
+// HasInsertLine returns true if the terminal has insert and delete line
+// capabilities. See ncurses documentation for more details
+func HasInsertLine() bool {
+	return bool(C.has_il())
 }
 
 // HasKey returns true if terminal recognized the given character
@@ -218,6 +238,11 @@ func MouseMask(mask int, old *int) (m int) {
 	return
 }
 
+// NapMilliseconds is used to sleep for ms milliseconds
+func NapMilliseconds(ms int) {
+	C.napms(C.int(ms))
+}
+
 // NewWindow creates a window of size h(eight) and w(idth) at y, x
 func NewWindow(h, w, y, x int) (window Window, err error) {
 	window = Window{C.newwin(C.int(h), C.int(w), C.int(y), C.int(x))}
@@ -274,6 +299,12 @@ func Update() error {
 		return errors.New("Failed to update")
 	}
 	return nil
+}
+
+// UseEnvironment specifies whether the LINES and COLUMNS environmental
+// variables should be used or not
+func UseEnvironment(use bool) {
+	C.use_env(C.bool(use))
 }
 
 // NewPad creates a window which is not restricted by the terminal's 
