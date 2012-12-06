@@ -399,10 +399,32 @@ func (w *Window) Sync(sync int) {
 
 // Touch indicates that the window contains changes which should be updated
 // on the next call to Refresh
-func (w *Window) Touch() {
+func (w *Window) Touch() error {
 	// may not use touchwin() directly. cgo does not handle macros well.
-	y, _ := w.Maxyx()
-	C.wtouchln(w.win, 0, C.int(y), 1)
+	//y, _ := w.Maxyx()
+	//C.wtouchln(w.win, 0, C.int(y), 1)
+	if C.ncurses_touchwin(w.win) == C.ERR {
+		return errors.New("Failed to Touch window")
+	}
+	return nil
+}
+
+// Touched returns true if window will be updated on the next Refresh
+func (w *Window) Touched() bool {
+	return bool(C.is_wintouched(w.win))
+}
+
+func (w *Window) TouchLine(start, count int) error {
+	if C.touchline(w.win, C.int(start), C.int(count)) == C.ERR {
+		return errors.New("Error in call to TouchLine")
+	}
+	return nil
+}
+
+// UnTouch indicates the window should not be updated on the next call to
+// Refresh
+func (w *Window) UnTouch() {
+	C.ncurses_untouchwin(w.win)
 }
 
 // VLine draws a verticle line starting at y, x and ending at height using 

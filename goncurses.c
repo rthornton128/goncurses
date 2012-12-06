@@ -45,3 +45,11 @@ bool ncurses_has_mouse(void)
 	return has_mouse();
 #endif
 }
+
+int ncurses_touchwin(WINDOW *win) {
+	return touchwin(win);
+}
+
+int ncurses_untouchwin(WINDOW *win) {
+	return untouchwin(win);
+}
