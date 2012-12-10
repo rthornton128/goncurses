@@ -1,22 +1,22 @@
 Installation
 ------------
-Goinstall is probably the best method of installing goncurses.
+The go tool is probably the best method of installing goncurses.
 
-goinstall "goncurses.googlecode.com/hg/goncurses"
+go get "code.google.com/p/goncurses"
 
 Alternatively you could use mercurial to install goncurses.
 
 Usage
 -----
 
-import "goncurses.googlecode.com/hg/goncurses"
+import "code.google.com/p/goncurses"
 
 TODO
 ----
 
  * complete core library implementation
- * comlete form library implementation
- * comlete menu library implementation
+ * complete form library implementation
+ * complete menu library implementation
  * better handling of variable input
  
 See the following matrix for a basic overview of each module's completion
@@ -24,7 +24,7 @@ status:
 
     Module | Complete
     -----------------
-     Core  |   20%
-     Form  |    5%
-     Menu  |   30%
+     Core  |   24%
+     Form  |   41%
+     Menu  |   78%
      Panel |  100%
