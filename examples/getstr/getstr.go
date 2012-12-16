@@ -12,10 +12,10 @@ func main() {
 
 	row, col := stdscr.Maxyx()
 	msg := "Enter a string: "
-	stdscr.Print(row/2, (col-len(msg)-8)/2, msg)
+	stdscr.MovePrint(row/2, (col-len(msg)-8)/2, msg)
 
 	str, _ := stdscr.GetString(10)
-	stdscr.Print(row-2, 0, "You entered: %s", str)
+	stdscr.MovePrint(row-2, 0, "You entered: %s", str)
 
 	stdscr.Refresh()
 	stdscr.GetChar()
