@@ -282,6 +282,12 @@ func (w *Window) Move(y, x int) {
 	return
 }
 
+// MoveWindow moves the location of the window to the specified coordinates
+func (w *Window) MoveWindow(y, x int) {
+	C.mvwin(w.win, C.int(y), C.int(x))
+	return
+}
+
 // NoutRefresh flags the window for redrawing. In order to actually perform
 // the changes, Update() must be called. This function when coupled with
 // Update() provides a speed increase over using Refresh() on each window.
