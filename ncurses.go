@@ -27,8 +27,6 @@ import (
 	"unsafe"
 )
 
-type Pad Window
-
 // BaudRate returns the speed of the terminal in bits per second
 func BaudRate() int {
 	return int(C.baudrate())
@@ -305,41 +303,4 @@ func Update() error {
 // variables should be used or not
 func UseEnvironment(use bool) {
 	C.use_env(C.bool(use))
-}
-
-// NewPad creates a window which is not restricted by the terminal's 
-// dimentions (unlike a Window)
-func NewPad(lines, cols int) Pad {
-	return Pad{C.newpad(C.int(lines), C.int(cols))}
-}
-
-// Echo prints a single character to the pad immediately. This has the
-// same effect of calling AddChar() + Refresh() but has a significant
-// speed advantage
-func (p *Pad) Echo(ch int) {
-	C.pechochar(p.win, C.chtype(ch))
-}
-
-func (p *Pad) NoutRefresh(py, px, ty, tx, by, bx int) {
-	C.pnoutrefresh(p.win, C.int(py), C.int(px), C.int(ty),
-		C.int(tx), C.int(by), C.int(bx))
-}
-
-// Refresh the pad at location py, px using the rectangle specified by
-// ty, tx, by, bx (bottom/top y/x)
-func (p *Pad) Refresh(py, px, ty, tx, by, bx int) {
-	C.prefresh(p.win, C.int(py), C.int(px), C.int(ty), C.int(tx),
-		C.int(by), C.int(bx))
-}
-
-// Sub creates a sub-pad lines by columns in size
-func (p *Pad) Sub(y, x, h, w int) Pad {
-	return Pad{C.subpad(p.win, C.int(h), C.int(w), C.int(y),
-		C.int(x))}
-}
-
-// Window is a helper function for calling Window functions on a pad like
-// Print(). Convention would be to use Pad.Window().Print().
-func (p *Pad) Window() *Window {
-	return (*Window)(p)
 }
