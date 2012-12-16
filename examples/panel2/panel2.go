@@ -32,7 +32,7 @@ func main() {
 		window.HLine(2, 1, gc.ACS_HLINE, w-2)
 		window.MoveAddChar(2, w-1, gc.ACS_RTEE)
 		window.ColorOn(byte(i + 1))
-		window.Print(1, (w/2)-(len(title)/2), title, i+1)
+		window.MovePrint(1, (w/2)-(len(title)/2), title, i+1)
 		window.ColorOff(byte(i + 1))
 		panels[i] = gc.NewPanel(&window)
 
