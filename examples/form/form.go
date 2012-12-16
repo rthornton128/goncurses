@@ -37,9 +37,9 @@ func main() {
 	stdscr.Refresh()
 
 	stdscr.AttrOn(gc.ColorPair(2) | gc.A_BOLD)
-	stdscr.Print(4, 10, "Value 1:")
+	stdscr.MovePrint(4, 10, "Value 1:")
 	stdscr.AttrOff(gc.ColorPair(2) | gc.A_BOLD)
-	stdscr.Print(6, 10, "Value 2:")
+	stdscr.MovePrint(6, 10, "Value 2:")
 	stdscr.Refresh()
 
 	ch := stdscr.GetChar()
