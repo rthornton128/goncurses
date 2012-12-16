@@ -42,14 +42,14 @@ func main() {
 	title := "My Menu"
 	menuwin.Box(0, 0)
 	menuwin.ColorOn(1)
-	menuwin.Print(1, (x/2)-(len(title)/2), title)
+	menuwin.MovePrint(1, (x/2)-(len(title)/2), title)
 	menuwin.ColorOff(1)
 	menuwin.MoveAddChar(2, 0, gc.ACS_LTEE)
 	menuwin.HLine(2, 1, gc.ACS_HLINE, x-3)
 	menuwin.MoveAddChar(2, x-2, gc.ACS_RTEE)
 
 	y, x = stdscr.Maxyx()
-	stdscr.Print(y-2, 1, "'q' to exit")
+	stdscr.MovePrint(y-2, 1, "'q' to exit")
 	stdscr.Refresh()
 
 	menu.Post()
