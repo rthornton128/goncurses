@@ -28,7 +28,7 @@ func main() {
 
 	win, _ := gc.NewWindow(HEIGHT, WIDTH, y, x)
 	win.Keypad(true)
-	stdscr.Print(0, 0,
+	stdscr.MovePrint(0, 0,
 		"Use arrow keys to go up and down, Press enter to select")
 	stdscr.Refresh()
 
@@ -58,17 +58,17 @@ func main() {
 			if new != -1 {
 				active = new
 			}
-			stdscr.Print(23, 0, "Choice #%d: %s selected", active+1,
+			stdscr.MovePrint(23, 0, "Choice #%d: %s selected", active+1,
 				menu[active])
 			stdscr.ClearToEOL()
 			stdscr.Refresh()
 		case gc.KEY_RETURN:
-			stdscr.Print(23, 0, "Choice #%d: %s selected", active+1,
+			stdscr.MovePrint(23, 0, "Choice #%d: %s selected", active+1,
 				menu[active])
 			stdscr.ClearToEOL()
 			stdscr.Refresh()
 		default:
-			stdscr.Print(23, 0, "Character pressed = %3d/%c", ch, ch)
+			stdscr.MovePrint(23, 0, "Character pressed = %3d/%c", ch, ch)
 			stdscr.ClearToEOL()
 			stdscr.Refresh()
 		}
@@ -99,10 +99,10 @@ func printmenu(w gc.Window, menu []string, active int) {
 	for i, s := range menu {
 		if i == active {
 			w.AttrOn(gc.A_REVERSE)
-			w.Print(y+i, x, s)
+			w.MovePrint(y+i, x, s)
 			w.AttrOff(gc.A_REVERSE)
 		} else {
-			w.Print(y+i, x, s)
+			w.MovePrint(y+i, x, s)
 		}
 	}
 	w.Refresh()
