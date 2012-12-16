@@ -41,7 +41,7 @@ func main() {
 	defer menu.Free()
 
 	y, _ := stdscr.Maxyx()
-	stdscr.Print(y-3, "Use up/down arrows to move; 'q' to exit")
+	stdscr.MovePrint(y-3, 0, "Use up/down arrows to move; 'q' to exit")
 	stdscr.Refresh()
 
 	menu.SetForeground(gc.ColorPair(1) | gc.A_REVERSE)
@@ -62,7 +62,7 @@ func main() {
 		case gc.KEY_RETURN:
 			stdscr.Move(20, 0)
 			stdscr.ClearToEOL()
-			stdscr.Print(20, 0, "Item selected is: %s",
+			stdscr.MovePrint(20, 0, "Item selected is: %s",
 				menu.Current(nil).Name())
 			menu.PositionCursor()
 		default:
