@@ -37,7 +37,7 @@ func main() {
 
 	menu.Post()
 
-	stdscr.Print(20, 0, "'q' to exit")
+	stdscr.MovePrint(20, 0, "'q' to exit")
 	stdscr.Refresh()
 
 	for {
