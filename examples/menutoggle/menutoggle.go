@@ -38,8 +38,8 @@ func main() {
 	menu.Option(gc.O_ONEVALUE, false)
 
 	y, _ := stdscr.Maxyx()
-	stdscr.Print(y-3, "Use up/down arrows to move, spacebar to toggle and "+
-		"enter to print. 'q' to exit")
+	stdscr.MovePrint(y-3, 0, "Use up/down arrows to move, spacebar to "+
+		"toggle and enter to print. 'q' to exit")
 	stdscr.Refresh()
 
 	menu.Post()
@@ -63,7 +63,7 @@ func main() {
 			}
 			stdscr.Move(20, 0)
 			stdscr.ClearToEOL()
-			stdscr.Print(20, list)
+			stdscr.MovePrint(20, 0, list)
 			stdscr.Refresh()
 		default:
 			menu.Driver(gc.DriverActions[ch])
