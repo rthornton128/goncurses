@@ -12,7 +12,6 @@ import "C"
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"unsafe"
 )
 
@@ -329,30 +328,20 @@ func (w *Window) Parent() *Window {
 // goncurses.Print(23, "hello!") // moves to 23, 0 and prints "hello!"
 // goncurses.Print(5, 10, "hello %s!", "world") // move to 5, 10 and print
 //                                              // "hello world!"
-func (w *Window) Print(args ...interface{}) {
-	var count, y, x int
-
-	if len(args) > 1 {
-		if reflect.TypeOf(args[0]).String() == "int" {
-			y = args[0].(int)
-			count += 1
-		}
-	}
-	if len(args) > 2 {
-		if reflect.TypeOf(args[1]).String() == "int" {
-			x = args[1].(int)
-			count += 1
-		}
-	}
-
-	cstr := C.CString(fmt.Sprintf(args[count].(string), args[count+1:]...))
+func (w *Window) Print(format string, args ...interface{}) {
+	cstr := C.CString(fmt.Sprintf(format, args...))
 	defer C.free(unsafe.Pointer(cstr))
 
-	if count > 0 {
-		C.mvwaddstr(w.win, C.int(y), C.int(x), cstr)
-		return
-	}
 	C.waddstr(w.win, cstr)
+}
+
+// MovePrint moves the cursor to the specified coordinates and prints the supplied message.
+// See Print for more details
+func (w *Window) MovePrint(y, x int, format string, args ...interface{}) {
+	cstr := C.CString(fmt.Sprintf(format, args...))
+	defer C.free(unsafe.Pointer(cstr))
+
+	C.mvwaddstr(w.win, C.int(y), C.int(x), cstr)
 }
 
 // Refresh the window so it's contents will be displayed
