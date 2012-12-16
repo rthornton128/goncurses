@@ -65,11 +65,11 @@ func main() {
 	menu.Format(5, 3)
 	menu.Mark(" * ")
 
-	// Print centered menu title
+	// MovePrint centered menu title
 	title := "My Menu"
 	menuwin.Box(0, 0)
 	menuwin.ColorOn(1)
-	menuwin.Print(1, (WIDTH/2)-(len(title)/2), title)
+	menuwin.MovePrint(1, (WIDTH/2)-(len(title)/2), title)
 	menuwin.ColorOff(1)
 	menuwin.MoveAddChar(2, 0, gc.ACS_LTEE)
 	menuwin.HLine(2, 1, gc.ACS_HLINE, WIDTH-2)
@@ -77,7 +77,7 @@ func main() {
 
 	y, _ := stdscr.Maxyx()
 	stdscr.ColorOn(2)
-	stdscr.Print(y-3, 1,
+	stdscr.MovePrint(y-3, 1,
 		"Use up/down arrows or page up/down to navigate. 'q' to exit")
 	stdscr.ColorOff(2)
 	stdscr.Refresh()
