@@ -234,8 +234,8 @@ var keyList = map[Key]string{
 	KEY_F11:       "F11",
 	KEY_F12:       "F12",
 	KEY_MOUSE:     "mouse",
-	KEY_PAGEUP:    "page down",
-	KEY_PAGEDOWN:  "page up",
+	KEY_PAGEUP:    "page up",
+	KEY_PAGEDOWN:  "page down",
 }
 
 type MouseButton int
