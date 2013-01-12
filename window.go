@@ -272,7 +272,7 @@ func (w *Window) Keypad(keypad bool) error {
 func (w *Window) Maxyx() (int, int) {
 	var cy, cx C.int
 	C.ncurses_getmaxyx(w.win, &cy, &cx)
-	return int(cy) + 1, int(cx) + 1
+	return int(cy), int(cx)
 }
 
 // Move the cursor to the specified coordinates within the window
