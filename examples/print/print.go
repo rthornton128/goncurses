@@ -14,9 +14,8 @@ func main() {
 
 	stdscr.MovePrint(row-3, 0, "This screen has %d rows and %d columns. ",
 		row, col)
-	stdscr.MovePrint(row-2, 0, "Try resizing your window and then run this "+
-		"program again.")
-
+	stdscr.MovePrint(row-2, 0, "Try resizing your terminal window and then "+
+		"run this program again.")
 	stdscr.Refresh()
 	stdscr.GetChar()
 }
