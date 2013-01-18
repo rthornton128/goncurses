@@ -30,7 +30,7 @@ func main() {
 
 	menu, err := goncurses.NewMenu(items)
 	if err != nil {
-		stdscr.Print(err)
+		stdscr.Print(err.Error())
 		return
 	}
 	defer menu.Free()
