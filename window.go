@@ -247,6 +247,17 @@ func (w *Window) HLine(y, x int, ch AsciiCharacter, wid int) {
 	return
 }
 
+// InChar returns the character at the current position in the curses window
+func (w *Window) InChar() AsciiCharacter {
+	return AsciiCharacter(C.winch(w.win))
+}
+
+// MoveInChar returns the character at the designated coordates in the curses
+// window
+func (w *Window) MoveInChar(y, x int) AsciiCharacter {
+	return AsciiCharacter(C.mvwinch(w.win, C.int(y), C.int(x)))
+}
+
 // IsCleared returns the value set in ClearOk
 func (w *Window) IsCleared() bool {
 	return bool(C.ncurses_is_cleared(w.win))
