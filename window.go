@@ -21,13 +21,13 @@ type Window struct {
 
 // AddChar prints a single character to the window. The character can be
 // OR'd together with attributes and colors.
-func (w *Window) AddChar(ach AsciiCharacter) {
+func (w *Window) AddChar(ach Character) {
 	C.waddch(w.win, C.chtype(ach))
 }
 
 // MoveAddChar prints a single character to the window at the specified 
 // y x coordinates. See AddChar for more info.
-func (w *Window) MoveAddChar(y, x int, ach AsciiCharacter) {
+func (w *Window) MoveAddChar(y, x int, ach Character) {
 	C.mvwaddch(w.win, C.int(y), C.int(x), C.chtype(ach))
 }
 
@@ -242,20 +242,20 @@ func (w *Window) Getyx() (int, int) {
 
 // HLine draws a horizontal line starting at y, x and ending at width using 
 // the specified character
-func (w *Window) HLine(y, x int, ch AsciiCharacter, wid int) {
+func (w *Window) HLine(y, x int, ch Character, wid int) {
 	C.mvwhline(w.win, C.int(y), C.int(x), C.chtype(ch), C.int(wid))
 	return
 }
 
 // InChar returns the character at the current position in the curses window
-func (w *Window) InChar() AsciiCharacter {
-	return AsciiCharacter(C.winch(w.win))
+func (w *Window) InChar() Character {
+	return Character(C.winch(w.win))
 }
 
 // MoveInChar returns the character at the designated coordates in the curses
 // window
-func (w *Window) MoveInChar(y, x int) AsciiCharacter {
-	return AsciiCharacter(C.mvwinch(w.win, C.int(y), C.int(x)))
+func (w *Window) MoveInChar(y, x int) Character {
+	return Character(C.mvwinch(w.win, C.int(y), C.int(x)))
 }
 
 // IsCleared returns the value set in ClearOk
