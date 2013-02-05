@@ -219,10 +219,9 @@ func (w *Window) GetChar(coords ...int) Key {
 	return Key(C.wgetch(w.win))
 }
 
-// Reads at most 'n' characters entered by the user from the Window. Attempts
-// to enter greater than 'n' characters will elicit a 'beep'
+// GetString reads at most 'n' characters entered by the user from the Window. 
+// Attempts to enter greater than 'n' characters will elicit a 'beep'
 func (w *Window) GetString(n int) (string, error) {
-	// TODO: add move portion of code...
 	cstr := make([]C.char, n)
 	if C.wgetnstr(w.win, (*C.char)(&cstr[0]), C.int(n)) == C.ERR {
 		return "", errors.New("Failed to retrieve string from input stream")
