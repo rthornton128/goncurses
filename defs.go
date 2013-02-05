@@ -23,10 +23,10 @@ const (
 // to use them until either a) the Go team works out a way to overcome this
 // limitation in godefs/cgo or b) an alternative method is found. Work is
 // being done to find a solution from the ncurses source code.
-type AsciiCharacter int
+type Character int
 
 const (
-	ACS_DEGREE AsciiCharacter = iota + 4194406
+	ACS_DEGREE Character = iota + 4194406
 	ACS_PLMINUS
 	ACS_BOARD
 	ACS_LANTERN
