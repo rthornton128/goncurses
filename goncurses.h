@@ -1,3 +1,4 @@
+chtype ncurses_getbkgd(WINDOW *win);
 void ncurses_getmaxyx(WINDOW *win, int *y, int *x);
 void ncurses_getyx(WINDOW *win, int *y, int *x);
 bool ncurses_has_mouse(void);

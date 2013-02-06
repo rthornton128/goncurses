@@ -1,6 +1,11 @@
 #include <stdbool.h>
 #include <ncurses.h>
 
+chtype ncurses_getbkgd(WINDOW *win) 
+{
+	return getbkgd(win);
+}
+
 void ncurses_getyx(WINDOW *win, int *y, int *x)
 {
 	getyx(win, *y, *x);
