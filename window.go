@@ -49,8 +49,15 @@ func (w *Window) AttrOn(attr int) (err error) {
 	return
 }
 
-func (w *Window) Background(attr int) {
+// SetBackground fills the background with the supplied attributes and/or
+// characters.
+func (w *Window) SetBackground(attr Character) {
 	C.wbkgd(w.win, C.chtype(attr))
+}
+
+// Background returns the current background attributes
+func (w *Window) Background() Character {
+	return Character(C.ncurses_getbkgd(w.win))
 }
 
 // Border uses the characters supplied to draw a border around the window.
