@@ -23,7 +23,7 @@ func main() {
 	stdscr.MovePrint(12, 30, "Hello, World!!!")
 	stdscr.Refresh()
 	stdscr.GetChar()
-	stdscr.Background(ColorPair(2))
+	stdscr.SetBackground(ColorPair(2))
 	stdscr.ColorOn(1)
 	stdscr.MovePrint(13, 30, "Hello, World in Color!!!")
 	stdscr.ColorOff(1)
