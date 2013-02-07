@@ -209,21 +209,15 @@ func (w *Window) Erase() {
 	C.werase(w.win)
 }
 
-// Get a character from standard input
-func (w *Window) GetChar(coords ...int) Key {
-	var y, x, count int
-	if len(coords) > 1 {
-		y = coords[0]
-		count++
-	}
-	if len(coords) > 2 {
-		x = coords[1]
-		count++
-	}
-	if count > 0 {
-		return Key(C.mvwgetch(w.win, C.int(y), C.int(x)))
-	}
+// GetChar retrieves a character from standard input stream and returns it
+func (w *Window) GetChar() Key {
 	return Key(C.wgetch(w.win))
+}
+
+// MoveGetChar moves the cursor to the given position and gets a character
+// from the input stream
+func (w *Window) MoveGetChar(y, x int) Key {
+	return Key(C.mvwgetch(C.int(y), C.int(x)))
 }
 
 // GetString reads at most 'n' characters entered by the user from the Window. 
