@@ -217,7 +217,7 @@ func (w *Window) GetChar() Key {
 // MoveGetChar moves the cursor to the given position and gets a character
 // from the input stream
 func (w *Window) MoveGetChar(y, x int) Key {
-	return Key(C.mvwgetch(C.int(y), C.int(x)))
+	return Key(C.mvwgetch(w.win, C.int(y), C.int(x)))
 }
 
 // GetString reads at most 'n' characters entered by the user from the Window. 
