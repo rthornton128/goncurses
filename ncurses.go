@@ -291,6 +291,11 @@ func StartColor() error {
 	return nil
 }
 
+// UnGetChar places the character back into the input queue
+func UnGetChar(ch Character) {
+	C.ungetch(C.int(ch))
+}
+
 // Update the screen, refreshing all windows
 func Update() error {
 	if C.doupdate() == C.ERR {
