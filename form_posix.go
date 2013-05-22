@@ -7,8 +7,8 @@
 /* ncurses form extension */
 package goncurses
 
-//#cgo LDFLAGS: -lform
-//#include <form.h>
+// #cgo pkg-config: form
+// #include <form.h>
 import "C"
 
 import (

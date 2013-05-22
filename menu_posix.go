@@ -4,13 +4,10 @@
 
 // +build linux bsd unix
 
-/*
-The NCurses menu extension allows you to create GUI-like user menus similar to
-application menu bars in GNOME or KDE */
 package goncurses
 
 /*
-#cgo LDFLAGS: -lmenu
+#cgo pkg-config: menu
 #include <menu.h>
 #include <stdlib.h>
 
