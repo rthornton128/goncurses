@@ -15,7 +15,7 @@
 package goncurses
 
 /* 
-#cgo LDFLAGS: -lncurses
+#cgo pkg-config: ncurses
 #include <ncurses.h>
 #include "goncurses.h"
 */

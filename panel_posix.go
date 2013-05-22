@@ -10,7 +10,7 @@ effective manners by which they can be done in Go: set_panel_userptr() and
 panel_userptr() */
 package goncurses
 
-// #cgo LDFLAGS: -lpanel
+// #cgo pkg-config: panel
 // #include <panel.h>
 // #include <ncurses.h>
 import "C"
