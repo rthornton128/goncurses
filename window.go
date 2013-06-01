@@ -435,8 +435,6 @@ func (w *Window) UnTouch() {
 
 // VLine draws a verticle line starting at y, x and ending at height using 
 // the specified character
-func (w *Window) VLine(y, x, ch, h int) {
-	// TODO: move portion
-	C.mvwvline(w.win, C.int(y), C.int(x), C.chtype(ch), C.int(h))
-	return
+func (w *Window) VLine(y, x, ch Character, wid int) {
+	C.mvwvline(w.win, C.int(y), C.int(x), C.chtype(ch), C.int(wid))
 }
