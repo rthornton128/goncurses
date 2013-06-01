@@ -406,9 +406,6 @@ func (w *Window) Sync(sync int) {
 // Touch indicates that the window contains changes which should be updated
 // on the next call to Refresh
 func (w *Window) Touch() error {
-	// may not use touchwin() directly. cgo does not handle macros well.
-	//y, _ := w.Maxyx()
-	//C.wtouchln(w.win, 0, C.int(y), 1)
 	if C.ncurses_touchwin(w.win) == C.ERR {
 		return errors.New("Failed to Touch window")
 	}
@@ -420,6 +417,8 @@ func (w *Window) Touched() bool {
 	return bool(C.is_wintouched(w.win))
 }
 
+// Touchline behaves like Touch but only effects count number of lines,
+// beginning at start 
 func (w *Window) TouchLine(start, count int) error {
 	if C.touchline(w.win, C.int(start), C.int(count)) == C.ERR {
 		return errors.New("Error in call to TouchLine")
