@@ -3,22 +3,14 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/* ncurses library
-
-   1. No functions which operate only on stdscr have been implemented because 
-   it makes little sense to do so in a Go implementation. Stdscr is treated the
-   same as any other window.
-
-   2. Whenever possible, versions of ncurses functions which could potentially
-   have a buffer overflow, like the getstr() family of functions, have not been
-   implemented. Instead, only the mvwgetnstr() and wgetnstr() can be used. */
+// Package goncurses is a new curses (ncurses) library for the Go programming
+// language. It implements all the ncurses extension libraries: form, menu and
+// panel.
 package goncurses
 
-/* 
-#cgo pkg-config: ncurses
-#include <ncurses.h>
-#include "goncurses.h"
-*/
+// #cgo pkg-config: ncurses
+// #include <ncurses.h>
+// #include "goncurses.h"
 import "C"
 
 import (

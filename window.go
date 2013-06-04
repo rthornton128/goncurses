@@ -278,6 +278,10 @@ func (w *Window) Keypad(keypad bool) error {
 	return nil
 }
 
+func (w *Window) LineTouched(line int) bool {
+	return bool(C.is_linetouched(w.win, C.int(line)))
+}
+
 // Returns the maximum size of the Window. Note that it uses ncurses idiom
 // of returning y then x.
 func (w *Window) Maxyx() (int, int) {
