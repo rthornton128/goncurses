@@ -2,13 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build linux bsd unix
-
-/*
-The following functions have not been implemented because there are far more
-effective manners by which they can be done in Go: set_panel_userptr() and
-panel_userptr() */
 package goncurses
+
+// +build linux bsd unix
 
 // #cgo pkg-config: panel
 // #include <panel.h>

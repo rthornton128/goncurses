@@ -2,10 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build linux bsd unix
-
-/* ncurses form extension */
 package goncurses
+
+// +build linux bsd unix
 
 // #cgo pkg-config: form
 // #include <form.h>

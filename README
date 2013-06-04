@@ -6,10 +6,24 @@ go get "code.google.com/p/goncurses"
 
 Alternatively you could use mercurial to install goncurses.
 
+
 Usage
 -----
 
 import "code.google.com/p/goncurses"
+
+
+NOTES
+-----
+
+No functions which operate only on stdscr have been implemented because 
+it makes little sense to do so in a Go implementation. Stdscr is treated the
+same as any other window.
+
+Whenever possible, versions of ncurses functions which could potentially
+have a buffer overflow, like the getstr() family of functions, have not been
+implemented. Instead, only the mvwgetnstr() and wgetnstr() are used.
+
 
 TODO
 ----
@@ -19,6 +33,7 @@ TODO
  * complete menu library implementation
  * better handling of variable input
  
+
 See the following matrix for a basic overview of each module's completion
 status:
 
