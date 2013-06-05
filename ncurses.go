@@ -6,6 +6,21 @@
 // Package goncurses is a new curses (ncurses) library for the Go programming
 // language. It implements all the ncurses extension libraries: form, menu and
 // panel.
+//
+// Minimal operation would consist of initializing the display:
+//
+// src, err := goncurses.Init()
+// if err != nil {
+// 	log.Fatal("init:", err)
+// }
+// defer goncurses.End()
+//
+// It is important to always call End() before your program exits. If you
+// fail to do so, the terminal will not perform properly and will either
+// need to be reset or restarted completely.
+//
+// The examples directory contains demontrations of many of the capabilities
+// goncurses can provide.
 package goncurses
 
 // #cgo pkg-config: ncurses
