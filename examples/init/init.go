@@ -4,15 +4,21 @@
 
 package main
 
-import "code.google.com/p/goncurses"
+import (
+	"code.google.com/p/goncurses"
+	"log"
+)
 
 func main() {
-	stdscr, _ := goncurses.Init()
+	stdscr, err := goncurses.Init()
+	if err != nil {
+		log.Fatal("init", err)
+	}
 	defer goncurses.End()
 
-	goncurses.Raw(true)
-	goncurses.Echo(false)
-	stdscr.Keypad(true)
+	goncurses.Raw(true)   // turn on raw "uncooked" input
+	goncurses.Echo(false) // turn echoing of typed characters off
+	stdscr.Keypad(true)   // allow keypad input
 
 	stdscr.Print("Press a key...")
 	stdscr.Refresh()
