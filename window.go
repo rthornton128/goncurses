@@ -350,8 +350,8 @@ func (w *Window) Print(format string, args ...interface{}) {
 	C.waddstr(w.win, cstr)
 }
 
-// MovePrint moves the cursor to the specified coordinates and prints the supplied message.
-// See Print for more details
+// MovePrint moves the cursor to the specified coordinates and prints the 
+// supplied message. See Print for more details.
 func (w *Window) MovePrint(y, x int, format string, args ...interface{}) {
 	cstr := C.CString(fmt.Sprintf(format, args...))
 	defer C.free(unsafe.Pointer(cstr))
