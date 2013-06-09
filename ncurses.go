@@ -235,12 +235,9 @@ func MouseInterval() {
 // is triggered, GetChar() will return KEY_MOUSE. To retrieve the actual
 // event use GetMouse() to pop it off the queue. Pass a pointer as the 
 // second argument to store the prior events being monitored or nil.
-func MouseMask(mask int, old *int) (m int) {
-	if bool(C.ncurses_has_mouse()) {
-		m = int(C.mousemask((C.mmask_t)(mask),
-			(*C.mmask_t)(unsafe.Pointer(old))))
-	}
-	return
+func MouseMask(mask MouseButton, old *MouseButton) int {
+	return int(C.mousemask((C.mmask_t)(mask),
+		(*C.mmask_t)(unsafe.Pointer(old))))
 }
 
 // NapMilliseconds is used to sleep for ms milliseconds
