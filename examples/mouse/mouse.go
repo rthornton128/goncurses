@@ -33,7 +33,17 @@ func main() {
 	stdscr.Refresh()
 
 	printmenu(win, menu, active)
-	gc.MouseMask(gc.M_B1_CLICKED, nil)
+	if gc.Mouse() {
+		stdscr.MovePrint(3, 0, "WARN: Mouse support not detected.")
+	}
+	// If, for example, you are temporarily disabling the mouse or are
+	// otherwise altering mouse button detection temporarily, you could
+	// pass a pointer to a MouseButton object as the 2nd argument to
+	// record that information. Invocation may look something like:
+	// var old gc.MouseButton
+	// gc.MouseMask(gc.M_ALL, &old) /* temporarily enable all mouse clicks */
+	// gc.MouseMask(old, nil)		/* change it back */
+	gc.MouseMask(gc.M_B1_PRESSED, nil)
 
 	for {
 		ch := stdscr.GetChar()
@@ -53,7 +63,10 @@ func main() {
 				active += 1
 			}
 		case gc.KEY_MOUSE:
-			md, _ := gc.GetMouse()
+			md, err := gc.GetMouse()
+			if err != nil {
+				stdscr.MovePrint(20, 0, "%s", err)
+			}
 			new := getactive(x, y, md[0], md[1], menu)
 			if new != -1 {
 				active = new
