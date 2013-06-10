@@ -3,21 +3,29 @@
 package main
 
 /* Note that is not considered idiomatic Go to import curses this way */
-import . "code.google.com/p/goncurses"
+import (
+	. "code.google.com/p/goncurses"
+	"log"
+)
 
 func main() {
-	stdscr, _ := Init()
+	stdscr, err := Init()
+	if err != nil {
+		log.Fatal("init:", err)
+	}
 	defer End()
 	StartColor()
 
 	Raw(true)
-	Echo(true)
+	Echo(false)
 	InitPair(1, C_BLUE, C_WHITE)
 	InitPair(2, C_BLACK, C_CYAN)
 
+	stdscr.Println("Type 'q' to proceed and again to exit")
+
 	// An example of trying to set an invalid color pair
-	err := InitPair(255, C_BLACK, C_CYAN)
-	stdscr.Print("An intentional error: %s", err.Error())
+	err = InitPair(255, C_BLACK, C_CYAN)
+	stdscr.Println("An intentional error:", err)
 
 	stdscr.Keypad(true)
 	stdscr.MovePrint(12, 30, "Hello, World!!!")
