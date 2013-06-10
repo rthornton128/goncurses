@@ -351,10 +351,10 @@ func (w *Window) Printf(format string, args ...interface{}) {
 	C.waddstr(w.win, cstr)
 }
 
-// Println behaves the same as Println in the stanard library's fmt package.
+// Println behaves the s as Println in the stanard library's fmt package.
 // See Print for more information.
 func (w *Window) Println(args ...interface{}) {
-	w.Printf("%s\n", fmt.Sprint(args...))
+	w.Printf("%s", fmt.Sprintln(args...))
 }
 
 // MovePrint moves the cursor to the specified coordinates and prints the 
