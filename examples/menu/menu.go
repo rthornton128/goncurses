@@ -3,7 +3,10 @@
 
 package main
 
-import "code.google.com/p/goncurses"
+import (
+	"code.google.com/p/goncurses"
+	"log"
+)
 
 const (
 	HEIGHT = 10
@@ -11,7 +14,10 @@ const (
 )
 
 func main() {
-	stdscr, _ := goncurses.Init()
+	stdscr, err := goncurses.Init()
+	if err != nil {
+		log.Fatal("init:", err)
+	}
 	defer goncurses.End()
 
 	goncurses.Raw(true)
@@ -30,7 +36,7 @@ func main() {
 
 	menu, err := goncurses.NewMenu(items)
 	if err != nil {
-		stdscr.Print(err.Error())
+		stdscr.Print(err)
 		return
 	}
 	defer menu.Free()

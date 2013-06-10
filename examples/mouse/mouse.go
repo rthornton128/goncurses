@@ -3,7 +3,10 @@
 
 package main
 
-import gc "code.google.com/p/goncurses"
+import (
+	gc "code.google.com/p/goncurses"
+	"log"
+)
 
 const (
 	HEIGHT = 10
@@ -14,7 +17,10 @@ func main() {
 	var active int
 	menu := []string{"Choice 1", "Choice 2", "Choice 3", "Choice 4", "Exit"}
 
-	stdscr, _ := gc.Init()
+	stdscr, err := gc.Init()
+	if err != nil {
+		log.Fatal("init:", err)
+	}
 	defer gc.End()
 
 	gc.Raw(true)
@@ -26,7 +32,10 @@ func main() {
 	rows, cols := stdscr.Maxyx()
 	y, x := (rows-HEIGHT)/2, (cols-WIDTH)/2
 
-	win, _ := gc.NewWindow(HEIGHT, WIDTH, y, x)
+	win, err := gc.NewWindow(HEIGHT, WIDTH, y, x)
+	if err != nil {
+		log.Fatal("new_window:", err)
+	}
 	win.Keypad(true)
 	stdscr.MovePrint(0, 0,
 		"Use arrow keys to go up and down, Press enter to select")
@@ -71,17 +80,17 @@ func main() {
 			if new != -1 {
 				active = new
 			}
-			stdscr.MovePrint(23, 0, "Choice #%d: %s selected", active+1,
+			stdscr.MovePrintf(23, 0, "Choice #%d: %s selected", active+1,
 				menu[active])
 			stdscr.ClearToEOL()
 			stdscr.Refresh()
 		case gc.KEY_RETURN:
-			stdscr.MovePrint(23, 0, "Choice #%d: %s selected", active+1,
+			stdscr.MovePrintf(23, 0, "Choice #%d: %s selected", active+1,
 				menu[active])
 			stdscr.ClearToEOL()
 			stdscr.Refresh()
 		default:
-			stdscr.MovePrint(23, 0, "Character pressed = %3d/%c", ch, ch)
+			stdscr.MovePrintf(23, 0, "Character pressed = %3d/%c", ch, ch)
 			stdscr.ClearToEOL()
 			stdscr.Refresh()
 		}
