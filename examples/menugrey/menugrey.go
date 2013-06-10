@@ -3,10 +3,16 @@
 
 package main
 
-import gc "code.google.com/p/goncurses"
+import (
+	gc "code.google.com/p/goncurses"
+	"log"
+)
 
 func main() {
-	stdscr, _ := gc.Init()
+	stdscr, err := gc.Init()
+	if err != nil {
+		log.Fatal("init:", err)
+	}
 	defer gc.End()
 
 	gc.StartColor()
@@ -62,8 +68,7 @@ func main() {
 		case gc.KEY_RETURN:
 			stdscr.Move(20, 0)
 			stdscr.ClearToEOL()
-			stdscr.MovePrint(20, 0, "Item selected is: %s",
-				menu.Current(nil).Name())
+			stdscr.Printf("Item selected is: %s", menu.Current(nil).Name())
 			menu.PositionCursor()
 		default:
 			menu.Driver(gc.DriverActions[ch])

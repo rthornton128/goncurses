@@ -4,18 +4,30 @@
 
 package main
 
-import gc "code.google.com/p/goncurses"
+import (
+	gc "code.google.com/p/goncurses"
+	"log"
+)
 
 func main() {
-	stdscr, _ := gc.Init()
+	stdscr, err := gc.Init()
+	if err != nil {
+		log.Fatal("init:", err)
+	}
 	defer gc.End()
 
-	row, col := stdscr.Maxyx()
 	msg := "Enter a string: "
-	stdscr.MovePrint(row/2, (col-len(msg)-8)/2, msg)
+	row, col := stdscr.Maxyx()
+	row, col = (row/2)-1, (col-len(msg))/2
+	stdscr.MovePrint(row, col, msg)
 
-	str, _ := stdscr.GetString(10)
-	stdscr.MovePrint(row-2, 0, "You entered: %s", str)
+	var str string
+	str, err = stdscr.GetString(10)
+	if err != nil {
+		stdscr.MovePrint(row+1, col, "GetString Error:", err)
+	} else {
+		stdscr.MovePrintf(row+1, col, "You entered: %s", str)
+	}
 
 	stdscr.Refresh()
 	stdscr.GetChar()
