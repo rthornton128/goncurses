@@ -333,30 +333,50 @@ func (w *Window) Parent() *Window {
 	return &Window{C.ncurses_wgetparent(w.win)}
 }
 
-// Print a string to the given window. The first two arguments may be
-// coordinates to print to. If only one integer is supplied, it is assumed to
-// be the y coordinate, x therefore defaults to 0. In order to simulate the 'n' 
-// versions of functions like addnstr use a string slice.
-// Examples:
-// goncurses.Print("hello!")
-// goncurses.Print("hello %s!", "world")
-// goncurses.Print(23, "hello!") // moves to 23, 0 and prints "hello!"
-// goncurses.Print(5, 10, "hello %s!", "world") // move to 5, 10 and print
-//                                              // "hello world!"
-func (w *Window) Print(format string, args ...interface{}) {
+// Print a string to the given window. See the fmt package in the standard
+// library for more information. In order to simulate the 'n' version
+// of functions (like addnstr) just slice your string to the maximum 
+// length before passing it as an argument.
+// window.Print("My line which should be clamped to 20 characters"[:20])
+func (w *Window) Print(args ...interface{}) {
+	w.Printf("%s", fmt.Sprint(args...))
+}
+
+// Printf functions the same as the stardard library's fmt package. See Print
+// for more details.
+func (w *Window) Printf(format string, args ...interface{}) {
 	cstr := C.CString(fmt.Sprintf(format, args...))
 	defer C.free(unsafe.Pointer(cstr))
 
 	C.waddstr(w.win, cstr)
 }
 
+// Println behaves the same as Println in the stanard library's fmt package.
+// See Print for more information.
+func (w *Window) Println(args ...interface{}) {
+	w.Printf("%s\n", fmt.Sprint(args...))
+}
+
 // MovePrint moves the cursor to the specified coordinates and prints the 
-// supplied message. See Print for more details.
-func (w *Window) MovePrint(y, x int, format string, args ...interface{}) {
+// supplied message. See Print for more details.The first two arguments are the
+// coordinates to print to.
+func (w *Window) MovePrint(y, x int, args ...interface{}) {
+	w.MovePrintf(y, x, "%s", fmt.Sprint(args...))
+}
+
+// MovePrintf moves the cursor to coordinates and prints the message using
+// the specified format. See Printf and MovePrint for more information.
+func (w *Window) MovePrintf(y, x int, format string, args ...interface{}) {
 	cstr := C.CString(fmt.Sprintf(format, args...))
 	defer C.free(unsafe.Pointer(cstr))
 
 	C.mvwaddstr(w.win, C.int(y), C.int(x), cstr)
+}
+
+// MovePrintln moves the cursor to coordinates and prints the message. See
+// Println and MovePrint for more details.
+func (w *Window) MovePrintln(y, x int, args ...interface{}) {
+	w.MovePrintf(y, x, "%s", fmt.Sprintln(args...))
 }
 
 // Refresh the window so it's contents will be displayed
