@@ -21,18 +21,18 @@ type Window struct {
 
 // AddChar prints a single character to the window. The character can be
 // OR'd together with attributes and colors.
-func (w *Window) AddChar(ach Character) {
+func (w *Window) AddChar(ach Char) {
 	C.waddch(w.win, C.chtype(ach))
 }
 
 // MoveAddChar prints a single character to the window at the specified 
 // y x coordinates. See AddChar for more info.
-func (w *Window) MoveAddChar(y, x int, ach Character) {
+func (w *Window) MoveAddChar(y, x int, ach Char) {
 	C.mvwaddch(w.win, C.int(y), C.int(x), C.chtype(ach))
 }
 
 // Turn off character attribute.
-func (w *Window) AttrOff(attr Character) (err error) {
+func (w *Window) AttrOff(attr Char) (err error) {
 	if C.wattroff(w.win, C.int(attr)) == C.ERR {
 		err = errors.New(fmt.Sprintf("Failed to unset attribute: %s",
 			attrList[C.int(attr)]))
@@ -41,7 +41,7 @@ func (w *Window) AttrOff(attr Character) (err error) {
 }
 
 // Turn on character attribute
-func (w *Window) AttrOn(attr Character) (err error) {
+func (w *Window) AttrOn(attr Char) (err error) {
 	if C.wattron(w.win, C.int(attr)) == C.ERR {
 		err = errors.New(fmt.Sprintf("Failed to set attribute: %s",
 			attrList[C.int(attr)]))
@@ -51,13 +51,13 @@ func (w *Window) AttrOn(attr Character) (err error) {
 
 // SetBackground fills the background with the supplied attributes and/or
 // characters.
-func (w *Window) SetBackground(attr Character) {
+func (w *Window) SetBackground(attr Char) {
 	C.wbkgd(w.win, C.chtype(attr))
 }
 
 // Background returns the current background attributes
-func (w *Window) Background() Character {
-	return Character(C.ncurses_getbkgd(w.win))
+func (w *Window) Background() Char {
+	return Char(C.ncurses_getbkgd(w.win))
 }
 
 // Border uses the characters supplied to draw a border around the window.
@@ -242,20 +242,20 @@ func (w *Window) Getyx() (int, int) {
 
 // HLine draws a horizontal line starting at y, x and ending at width using 
 // the specified character
-func (w *Window) HLine(y, x int, ch Character, wid int) {
+func (w *Window) HLine(y, x int, ch Char, wid int) {
 	C.mvwhline(w.win, C.int(y), C.int(x), C.chtype(ch), C.int(wid))
 	return
 }
 
 // InChar returns the character at the current position in the curses window
-func (w *Window) InChar() Character {
-	return Character(C.winch(w.win))
+func (w *Window) InChar() Char {
+	return Char(C.winch(w.win))
 }
 
 // MoveInChar returns the character at the designated coordates in the curses
 // window
-func (w *Window) MoveInChar(y, x int) Character {
-	return Character(C.mvwinch(w.win, C.int(y), C.int(x)))
+func (w *Window) MoveInChar(y, x int) Char {
+	return Char(C.mvwinch(w.win, C.int(y), C.int(x)))
 }
 
 // IsCleared returns the value set in ClearOk
@@ -458,6 +458,6 @@ func (w *Window) UnTouch() {
 
 // VLine draws a verticle line starting at y, x and ending at height using 
 // the specified character
-func (w *Window) VLine(y, x, ch Character, wid int) {
+func (w *Window) VLine(y, x, ch Char, wid int) {
 	C.mvwvline(w.win, C.int(y), C.int(x), C.chtype(ch), C.int(wid))
 }

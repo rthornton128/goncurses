@@ -23,10 +23,10 @@ const (
 // to use them until either a) the Go team works out a way to overcome this
 // limitation in godefs/cgo or b) an alternative method is found. Work is
 // being done to find a solution from the ncurses source code.
-type Character int
+type Char int
 
 const (
-	ACS_DEGREE Character = iota + 4194406
+	ACS_DEGREE Char = iota + 4194406
 	ACS_PLMINUS
 	ACS_BOARD
 	ACS_LANTERN
@@ -62,7 +62,7 @@ const (
 
 // Text attributes
 const (
-	A_NORMAL     Character = C.A_NORMAL
+	A_NORMAL     Char = C.A_NORMAL
 	A_STANDOUT             = C.A_STANDOUT
 	A_UNDERLINE            = C.A_UNDERLINE
 	A_REVERSE              = C.A_REVERSE

@@ -71,8 +71,8 @@ func ColorContent(col int) (int, int, int) {
 
 // Return the value of a color pair which can be passed to functions which
 // accept attributes like AddChar, AttrOn/Off and Background.
-func ColorPair(pair int) Character {
-	return Character(C.COLOR_PAIR(C.int(pair)))
+func ColorPair(pair int) Char {
+	return Char(C.COLOR_PAIR(C.int(pair)))
 }
 
 // CursesVersion returns the version of the ncurses library currently linked to
@@ -153,9 +153,9 @@ func HasColors() bool {
 	return bool(C.has_colors())
 }
 
-// HasInsertCharacter return true if the terminal has insert and delete
+// HasInsertChar return true if the terminal has insert and delete
 // character capabilities
-func HasInsertCharacter() bool {
+func HasInsertChar() bool {
 	return bool(C.has_ic())
 }
 
@@ -296,7 +296,7 @@ func StartColor() error {
 }
 
 // UnGetChar places the character back into the input queue
-func UnGetChar(ch Character) {
+func UnGetChar(ch Char) {
 	C.ungetch(C.int(ch))
 }
 

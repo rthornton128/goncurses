@@ -28,7 +28,7 @@ func main() {
 	} else {
 		stdscr.Print("The key pressed is: ")
 		stdscr.AttrOn(goncurses.A_BOLD)
-		stdscr.AddChar(goncurses.Character(ch))
+		stdscr.AddChar(goncurses.Char(ch))
 		stdscr.AttrOff(goncurses.A_BOLD)
 	}
 	stdscr.Refresh()
