@@ -70,9 +70,9 @@ func ColorContent(col int) (int, int, int) {
 }
 
 // Return the value of a color pair which can be passed to functions which
-// accept attributes like AddChar or AttrOn/Off.
-func ColorPair(pair int) int {
-	return int(C.COLOR_PAIR(C.int(pair)))
+// accept attributes like AddChar, AttrOn/Off and Background.
+func ColorPair(pair int) Character {
+	return Character(C.COLOR_PAIR(C.int(pair)))
 }
 
 // CursesVersion returns the version of the ncurses library currently linked to
