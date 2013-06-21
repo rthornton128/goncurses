@@ -33,7 +33,7 @@ func main() {
 	stdscr.GetChar()
 	// Note that background doesn't just accept colours but will fill
 	// any blank positions with the supplied character too
-	stdscr.SetBackground(Character('-') | ColorPair(2))
+	stdscr.SetBackground(Char('-') | ColorPair(2))
 	stdscr.ColorOn(1)
 	stdscr.MovePrint(13, 30, "Hello, World in Color!!!")
 	stdscr.ColorOff(1)
