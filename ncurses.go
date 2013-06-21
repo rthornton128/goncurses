@@ -62,11 +62,11 @@ func CanChangeColor() bool {
 }
 
 // Get RGB values for specified colour
-func ColorContent(col int) (int, int, int) {
+func ColorContent(col int16) (int16, int16, int16) {
 	var r, g, b C.short
 	C.color_content(C.short(col), (*C.short)(&r), (*C.short)(&g),
 		(*C.short)(&b))
-	return int(r), int(g), int(b)
+	return int16(r), int16(g), int16(b)
 }
 
 // Return the value of a color pair which can be passed to functions which
@@ -175,7 +175,7 @@ func HasKey(ch Key) bool {
 
 // InitColor is used to set 'color' to the specified RGB values. Values may
 // be between 0 and 1000.
-func InitColor(col int, r, g, b int) error {
+func InitColor(col, r, g, b int16) error {
 	if C.init_color(C.short(col), C.short(r), C.short(g),
 		C.short(b)) == C.ERR {
 		return errors.New("Failed to set new color definition")
@@ -184,8 +184,8 @@ func InitColor(col int, r, g, b int) error {
 }
 
 // InitPair sets a colour pair designated by 'pair' to fg and bg colors
-func InitPair(pair byte, fg, bg int) error {
-	if pair == 0 || C.int(pair) > (C.COLOR_PAIRS-1) {
+func InitPair(pair, fg, bg int16) error {
+	if pair == 0 || C.short(pair) > C.short(C.COLOR_PAIRS-1) {
 		return errors.New("Invalid color pair selected")
 	}
 	if C.init_pair(C.short(pair), C.short(fg), C.short(bg)) == C.ERR {
@@ -222,6 +222,16 @@ func KeyString(k Key) string {
 		key = fmt.Sprintf("%c", int(k))
 	}
 	return key
+}
+
+// PairContent returns the current foreground and background colours
+// associated with the given pair
+func PairContent(pair int16) (fg int16, bg int16, err error) {
+	var f, b C.short
+	if C.pair_content(C.short(pair), &f, &b) == C.ERR {
+		return -1, -1, errors.New("Invalid color pair")
+	}
+	return int16(f), int16(b), nil
 }
 
 func Mouse() bool {
