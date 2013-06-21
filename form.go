@@ -32,8 +32,8 @@ func NewField(h, w, tr, lc, oscr, nbuf int) (*Field, error) {
 }
 
 // Background returns the field's background character attributes
-func (f *Field) Background() int {
-	return int(C.field_back(f.field))
+func (f *Field) Background() Character {
+	return Character(C.field_back(f.field))
 }
 
 // Duplicate the field at the specified coordinates, returning a pointer 
@@ -46,8 +46,8 @@ func (f *Field) Duplicate(y, x int) (*Field, error) {
 }
 
 // Foreground returns the field's foreground character attributes
-func (f *Field) Foreground() int {
-	return int(C.field_fore(f.field))
+func (f *Field) Foreground() Character {
+	return Character(C.field_fore(f.field))
 }
 
 // Free field's allocated memory. This must be called to prevent memory
@@ -101,7 +101,7 @@ func (f *Field) SetJustification(just int) error {
 }
 
 // OptionsOff turns feature(s) off
-func (f *Field) SetOptionsOff(opts int) error {
+func (f *Field) SetOptionsOff(opts Character) error {
 	err := int(C.field_opts_off(f.field, C.Field_Options(opts)))
 	if err != C.E_OK {
 		return ncursesError(syscall.Errno(err))
@@ -110,7 +110,7 @@ func (f *Field) SetOptionsOff(opts int) error {
 }
 
 // OptionsOn turns feature(s) on
-func (f *Field) SetOptionsOn(opts int) error {
+func (f *Field) SetOptionsOn(opts Character) error {
 	err := int(C.field_opts_on(f.field, C.Field_Options(opts)))
 	if err != C.E_OK {
 		return ncursesError(syscall.Errno(err))
@@ -125,13 +125,13 @@ func (f *Field) SetPad(padch int) error {
 }
 
 // SetBackground character and attributes (colours, etc)
-func (f *Field) SetBackground(ch int) error {
+func (f *Field) SetBackground(ch Character) error {
 	err := C.set_field_back(f.field, C.chtype(ch))
 	return ncursesError(syscall.Errno(err))
 }
 
 // SetForeground character and attributes (colours, etc)
-func (f *Field) SetForeground(ch int) error {
+func (f *Field) SetForeground(ch Character) error {
 	err := C.set_field_fore(f.field, C.chtype(ch))
 	return ncursesError(syscall.Errno(err))
 }

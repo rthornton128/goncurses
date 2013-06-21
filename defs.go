@@ -62,17 +62,17 @@ const (
 
 // Text attributes
 const (
-	A_NORMAL     = C.A_NORMAL
-	A_STANDOUT   = C.A_STANDOUT
-	A_UNDERLINE  = C.A_UNDERLINE
-	A_REVERSE    = C.A_REVERSE
-	A_BLINK      = C.A_BLINK
-	A_DIM        = C.A_DIM
-	A_BOLD       = C.A_BOLD
-	A_PROTECT    = C.A_PROTECT
-	A_INVIS      = C.A_INVIS
-	A_ALTCHARSET = C.A_ALTCHARSET
-	A_CHARTEXT   = C.A_CHARTEXT
+	A_NORMAL     Character = C.A_NORMAL
+	A_STANDOUT             = C.A_STANDOUT
+	A_UNDERLINE            = C.A_UNDERLINE
+	A_REVERSE              = C.A_REVERSE
+	A_BLINK                = C.A_BLINK
+	A_DIM                  = C.A_DIM
+	A_BOLD                 = C.A_BOLD
+	A_PROTECT              = C.A_PROTECT
+	A_INVIS                = C.A_INVIS
+	A_ALTCHARSET           = C.A_ALTCHARSET
+	A_CHARTEXT             = C.A_CHARTEXT
 )
 
 var attrList = map[C.int]string{

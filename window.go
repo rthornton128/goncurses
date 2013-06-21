@@ -32,7 +32,7 @@ func (w *Window) MoveAddChar(y, x int, ach Character) {
 }
 
 // Turn off character attribute.
-func (w *Window) AttrOff(attr int) (err error) {
+func (w *Window) AttrOff(attr Character) (err error) {
 	if C.wattroff(w.win, C.int(attr)) == C.ERR {
 		err = errors.New(fmt.Sprintf("Failed to unset attribute: %s",
 			attrList[C.int(attr)]))
@@ -41,7 +41,7 @@ func (w *Window) AttrOff(attr int) (err error) {
 }
 
 // Turn on character attribute
-func (w *Window) AttrOn(attr int) (err error) {
+func (w *Window) AttrOn(attr Character) (err error) {
 	if C.wattron(w.win, C.int(attr)) == C.ERR {
 		err = errors.New(fmt.Sprintf("Failed to set attribute: %s",
 			attrList[C.int(attr)]))
