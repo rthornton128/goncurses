@@ -234,11 +234,19 @@ func PairContent(pair int16) (fg int16, bg int16, err error) {
 	return int16(f), int16(b), nil
 }
 
+// Mouse returns true if ncurses has built-in mouse support. On ncurses 5.7
+// and earlier, this function is not present and so will always return false
 func Mouse() bool {
 	return bool(C.ncurses_has_mouse())
 }
 
-func MouseInterval() {
+// MouseInterval sets the maximum time in milliseconds that can elapse
+// between press and release mouse events and returns the previous setting.
+// Use a value of 0 (zero) to disable click resolution. Use a value of -1
+// to get the previous value without changing the current value. Default
+// value is 1/6 of a second.
+func MouseInterval(ms int) int {
+	return int(C.mouseinterval(C.int(ms)))
 }
 
 // MouseMask accepts a single int of OR'd mouse events. If a mouse event
