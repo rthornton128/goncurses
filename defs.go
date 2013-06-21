@@ -63,16 +63,16 @@ const (
 // Text attributes
 const (
 	A_NORMAL     Char = C.A_NORMAL
-	A_STANDOUT             = C.A_STANDOUT
-	A_UNDERLINE            = C.A_UNDERLINE
-	A_REVERSE              = C.A_REVERSE
-	A_BLINK                = C.A_BLINK
-	A_DIM                  = C.A_DIM
-	A_BOLD                 = C.A_BOLD
-	A_PROTECT              = C.A_PROTECT
-	A_INVIS                = C.A_INVIS
-	A_ALTCHARSET           = C.A_ALTCHARSET
-	A_CHARTEXT             = C.A_CHARTEXT
+	A_STANDOUT        = C.A_STANDOUT
+	A_UNDERLINE       = C.A_UNDERLINE
+	A_REVERSE         = C.A_REVERSE
+	A_BLINK           = C.A_BLINK
+	A_DIM             = C.A_DIM
+	A_BOLD            = C.A_BOLD
+	A_PROTECT         = C.A_PROTECT
+	A_INVIS           = C.A_INVIS
+	A_ALTCHARSET      = C.A_ALTCHARSET
+	A_CHARTEXT        = C.A_CHARTEXT
 )
 
 var attrList = map[C.int]string{
@@ -93,14 +93,14 @@ var attrList = map[C.int]string{
 // for bright/dark versions of each color. These colors can be used for
 // both background and foreground colors.
 const (
-	C_BLACK   = C.COLOR_BLACK
-	C_BLUE    = C.COLOR_BLUE
-	C_CYAN    = C.COLOR_CYAN
-	C_GREEN   = C.COLOR_GREEN
-	C_MAGENTA = C.COLOR_MAGENTA
-	C_RED     = C.COLOR_RED
-	C_WHITE   = C.COLOR_WHITE
-	C_YELLOW  = C.COLOR_YELLOW
+	C_BLACK   int16 = C.COLOR_BLACK
+	C_BLUE          = C.COLOR_BLUE
+	C_CYAN          = C.COLOR_CYAN
+	C_GREEN         = C.COLOR_GREEN
+	C_MAGENTA       = C.COLOR_MAGENTA
+	C_RED           = C.COLOR_RED
+	C_WHITE         = C.COLOR_WHITE
+	C_YELLOW        = C.COLOR_YELLOW
 )
 
 type Key int
