@@ -62,7 +62,7 @@ func (w *Window) Background() Char {
 
 // Border uses the characters supplied to draw a border around the window.
 // t, b, r, l, s correspond to top, bottom, right, left and side respectively.
-func (w *Window) Border(ls, rs, ts, bs, tl, tr, bl, br int) error {
+func (w *Window) Border(ls, rs, ts, bs, tl, tr, bl, br Char) error {
 	res := C.wborder(w.win, C.chtype(ls), C.chtype(rs), C.chtype(ts),
 		C.chtype(bs), C.chtype(tl), C.chtype(tr), C.chtype(bl),
 		C.chtype(br))
@@ -74,7 +74,7 @@ func (w *Window) Border(ls, rs, ts, bs, tl, tr, bl, br int) error {
 
 // Box draws a border around the given window. For complete control over the
 // characters used to draw the border use Border()
-func (w *Window) Box(vch, hch int) error {
+func (w *Window) Box(vch, hch Char) error {
 	if C.box(w.win, C.chtype(vch), C.chtype(hch)) == C.ERR {
 		return errors.New("Failed to draw box around window")
 	}
