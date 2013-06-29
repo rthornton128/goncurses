@@ -84,7 +84,7 @@ func ColorContent(col int16) (int16, int16, int16) {
 
 // Return the value of a color pair which can be passed to functions which
 // accept attributes like AddChar, AttrOn/Off and Background.
-func ColorPair(pair int) Char {
+func ColorPair(pair int16) Char {
 	return Char(C.COLOR_PAIR(C.int(pair)))
 }
 
