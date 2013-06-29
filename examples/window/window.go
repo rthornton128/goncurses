@@ -1,3 +1,8 @@
+// goncurses - ncurses library for Go.
+// Copyright 2011 Rob Thornton. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 /* This simnple example mirrors one in the TLDP ncurses howto. It demonstrates
  * how to move a window around the screen. It is advisable not to  */
 
