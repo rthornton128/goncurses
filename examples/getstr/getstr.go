@@ -1,3 +1,8 @@
+// goncurses - ncurses library for Go.
+// Copyright 2011 Rob Thornton. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 /* This example demonstrates reading a string from input, rather than a 
  * single character. Note that only the 'n' versions of getstr have been
  * implemented in goncurses to ensure buffer overflows won't exist */
