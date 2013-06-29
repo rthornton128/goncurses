@@ -115,12 +115,12 @@ func (w *Window) ClearToEOL() error {
 }
 
 // Color sets the forground/background color pair for the entire window
-func (w *Window) Color(pair byte) {
+func (w *Window) Color(pair int16) {
 	C.wcolor_set(w.win, C.short(C.COLOR_PAIR(C.int(pair))), nil)
 }
 
 // ColorOff turns the specified color pair off
-func (w *Window) ColorOff(pair byte) error {
+func (w *Window) ColorOff(pair int16) error {
 	if C.wattroff(w.win, C.COLOR_PAIR(C.int(pair))) == C.ERR {
 		return errors.New("Failed to enable color pair")
 	}
@@ -129,7 +129,7 @@ func (w *Window) ColorOff(pair byte) error {
 
 // Normally color pairs are turned on via attron() in ncurses but this
 // implementation chose to make it seperate
-func (w *Window) ColorOn(pair byte) error {
+func (w *Window) ColorOn(pair int16) error {
 	if C.wattron(w.win, C.COLOR_PAIR(C.int(pair))) == C.ERR {
 		return errors.New("Failed to enable color pair")
 	}
