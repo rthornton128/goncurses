@@ -17,22 +17,23 @@ import (
 type SlkFormat byte
 
 const (
-	SLK_323 SlkFormat = iota // 8 labels; 3-2-3 arrangement
-	SLK_44	// 8 labels; 4-4 arrangement
-	SLK_PC444	// 12 labels; 4-4-4
-	SLK_PC444INDEX // 12 labels; 4-4-4 arrangement with index line
+	SLK_323        SlkFormat = iota // 8 labels; 3-2-3 arrangement
+	SLK_44                          // 8 labels; 4-4 arrangement
+	SLK_PC444                       // 12 labels; 4-4-4
+	SLK_PC444INDEX                  // 12 labels; 4-4-4 arrangement with index line
 )
 
 type SlkJustify byte
+
 const (
 	SLK_LEFT SlkJustify = iota
 	SLK_CENTER
 	SLK_RIGHT
 )
 
-// Initializes the soft-key labels with the given format; keys like the  
+// Initializes the soft-key labels with the given format; keys like the
 // F1-F12 keys on most keyboards. After a call to SlkRefresh a bar at the
-// bottom of the standard screen returned by Init will be displayed. This 
+// bottom of the standard screen returned by Init will be displayed. This
 // function MUST be called prior to Init()
 func SlkInit(f SlkFormat) {
 	C.slk_init(C.int(f))
