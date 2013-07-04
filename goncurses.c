@@ -62,3 +62,7 @@ int ncurses_touchwin(WINDOW *win) {
 int ncurses_untouchwin(WINDOW *win) {
 	return untouchwin(win);
 }
+
+int ncurses_wattrset(WINDOW *win, int attr) {
+	return wattrset(win, attr);
+}
