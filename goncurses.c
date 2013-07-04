@@ -66,3 +66,10 @@ int ncurses_untouchwin(WINDOW *win) {
 int ncurses_wattrset(WINDOW *win, int attr) {
 	return wattrset(win, attr);
 }
+
+int ncurses_wstandend(WINDOW *win) {
+	return wstandend(win);
+}
+int ncurses_wstandout(WINDOW *win) {
+	return wstandout(win);
+}

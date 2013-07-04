@@ -14,4 +14,5 @@ int ncurses_touchwin(WINDOW *win);
 int ncurses_untouchwin(WINDOW *win);
 int ncurses_wattrset(WINDOW *win, int attr);
 WINDOW * ncurses_wgetparent(const WINDOW *win);
-
+int ncurses_wstandend(WINDOW *win);
+int ncurses_wstandout(WINDOW *win);
