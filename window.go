@@ -418,6 +418,22 @@ func (w *Window) Sub(height, width, y, x int) Window {
 		C.int(x))}
 }
 
+// Standend turns off Standout mode, which is equivalent AttrSet(A_NORMAL)
+func (w *Window) Standend() error {
+	if C.ncurses_wstandend(w.win) == C.ERR {
+		return errors.New("Failed to set standend")
+	}
+	return nil
+}
+
+// Standout is equivalent to AttrSet(A_STANDOUT)
+func (w *Window) Standout() error {
+	if C.ncurses_wstandout(w.win) == C.ERR {
+		return errors.New("Failed to set standout")
+	}
+	return nil
+}
+
 // Sync updates all parent or child windows which were created via
 // SubWindow() or DerivedWindow(). Argument can be one of: SYNC_DOWN, which
 // syncronizes all parent windows (done by Refresh() by default so should
