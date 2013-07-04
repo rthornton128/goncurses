@@ -49,6 +49,14 @@ func (w *Window) AttrOn(attr Char) (err error) {
 	return
 }
 
+// AttrSet sets the attributes to the given value
+func (w *Window) AttrSet(attr Char) error {
+	if C.ncurses_wattrset(w.win, C.int(attr)) == C.ERR {
+		return errors.New("Failed to set attributes")
+	}
+	return nil
+}
+
 // SetBackground fills the background with the supplied attributes and/or
 // characters.
 func (w *Window) SetBackground(attr Char) {

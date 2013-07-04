@@ -12,5 +12,6 @@ bool ncurses_is_pad(const WINDOW *win);
 bool ncurses_is_subwin(const WINDOW *win);
 int ncurses_touchwin(WINDOW *win);
 int ncurses_untouchwin(WINDOW *win);
+int ncurses_wattrset(WINDOW *win, int attr);
 WINDOW * ncurses_wgetparent(const WINDOW *win);
 
