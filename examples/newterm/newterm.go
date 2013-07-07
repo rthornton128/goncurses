@@ -32,23 +32,24 @@ func main() {
 	if err != nil {
 		log.Fatal("newterm:", err)
 	}
-	// Remember that defer is LIFO order and End must be called prior to Delete
-	// It also matters than End is called on term2 prior to term1
+	// It is important that End is called on term2 prior to term1
 	defer term2.Delete()
-	defer term2.End()
+	defer term2.End() // comment out for an alternative to End
+	//defer gc.End()    // uncomment for alternate way to end
+	//defer term2.Set() // uncomment
 
 	// Set the active terminal to term1
 	term1.Set()
 
 	// Get the Standard Screen Window and write to the active terminal
 	mw := gc.StdScr() // misleading...use a StdScr() method instead?
-	mw.MovePrint(0,0, "Term 1 works! Press any key to exit...")
+	mw.MovePrint(0, 0, "Term 1 works! Press any key to exit...")
 	mw.Refresh()
 	mw.GetChar()
 
 	// activate term2 and send data to it
 	term2.Set()
-	mw.MovePrint(0,0, "Term 2 works! Press any key to exit...")
+	mw.MovePrint(0, 0, "Term 2 works! Press any key to exit...")
 	mw.Refresh()
 	mw.GetChar()
 }
