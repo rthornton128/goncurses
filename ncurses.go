@@ -326,6 +326,13 @@ func StartColor() error {
 	return nil
 }
 
+// StdScr returns a Window for the underlying stdscr object which represents
+// the physical screen. This is the same Window returned by Init and therefore
+// not useful unless using NewTerm and other multi-screen related functions.
+func StdScr() *Window {
+	return &Window{C.stdscr}
+}
+
 // UnGetChar places the character back into the input queue
 func UnGetChar(ch Char) {
 	C.ungetch(C.int(ch))
