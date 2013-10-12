@@ -4,8 +4,6 @@
 
 package goncurses
 
-// +build linux bsd unix
-
 /*
 #cgo pkg-config: menu
 #include <menu.h>
