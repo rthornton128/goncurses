@@ -4,8 +4,6 @@
 
 package goncurses
 
-// +build linux bsd unix
-
 // #cgo pkg-config: form
 // #include <form.h>
 import "C"
