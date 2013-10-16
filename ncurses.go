@@ -346,6 +346,18 @@ func Update() error {
 	return nil
 }
 
+// UseDefaultColors tells the curses library to assign the terminal's default
+// foreground and background colors to color number -1. This will allow you to
+// call InitPair(x, -1, -1) to set both the foreground and backgroun colours
+// of pair x to the terminal's default. This function can fail if the terminal
+// does not support certain ncurses features like orig_pair or initialize_pair.
+func UseDefaultColors() error {
+	if C.use_default_colors() == C.ERR {
+		return errors.New("Failed to assume default colours.")
+	}
+	return nil
+}
+
 // UseEnvironment specifies whether the LINES and COLUMNS environmental
 // variables should be used or not
 func UseEnvironment(use bool) {
