@@ -25,7 +25,7 @@ func (w *Window) AddChar(ach Char) {
 	C.waddch(w.win, C.chtype(ach))
 }
 
-// MoveAddChar prints a single character to the window at the specified 
+// MoveAddChar prints a single character to the window at the specified
 // y x coordinates. See AddChar for more info.
 func (w *Window) MoveAddChar(y, x int, ach Char) {
 	C.mvwaddch(w.win, C.int(y), C.int(x), C.chtype(ach))
@@ -104,7 +104,7 @@ func (w *Window) ClearOk(ok bool) {
 	C.clearok(w.win, C.bool(ok))
 }
 
-// Clear starting at the current cursor position, moving to the right, to the 
+// Clear starting at the current cursor position, moving to the right, to the
 // bottom of window
 func (w *Window) ClearToBottom() error {
 	if C.wclrtobot(w.win) == C.ERR {
@@ -113,7 +113,7 @@ func (w *Window) ClearToBottom() error {
 	return nil
 }
 
-// Clear from the current cursor position, moving to the right, to the end 
+// Clear from the current cursor position, moving to the right, to the end
 // of the line
 func (w *Window) ClearToEOL() error {
 	if C.wclrtoeol(w.win) == C.ERR {
@@ -145,7 +145,7 @@ func (w *Window) ColorOn(pair int16) error {
 }
 
 // Copy is similar to Overlay and Overwrite but provides a finer grain of
-// control. 
+// control.
 func (w *Window) Copy(src *Window, sy, sx, dtr, dtc, dbr, dbc int,
 	overlay bool) error {
 	var ol int
@@ -194,7 +194,7 @@ func (w *Window) Delete() error {
 }
 
 // Derived creates a new window of height and width at the coordinates
-// y, x.  These coordinates are relative to the original window thereby 
+// y, x.  These coordinates are relative to the original window thereby
 // confining the derived window to the area of original window. See the
 // SubWindow function for additional notes.
 func (w *Window) Derived(height, width, y, x int) Window {
@@ -217,7 +217,10 @@ func (w *Window) Erase() {
 	C.werase(w.win)
 }
 
-// GetChar retrieves a character from standard input stream and returns it
+// GetChar retrieves a character from standard input stream and returns it.
+// In the event of an error or if the input timeout has expired (ie. if
+// Timeout() has been set to zero or a positive value and no characters have
+// been received) the value returned will be zero (0)
 func (w *Window) GetChar() Key {
 	return Key(C.wgetch(w.win))
 }
@@ -228,7 +231,7 @@ func (w *Window) MoveGetChar(y, x int) Key {
 	return Key(C.mvwgetch(w.win, C.int(y), C.int(x)))
 }
 
-// GetString reads at most 'n' characters entered by the user from the Window. 
+// GetString reads at most 'n' characters entered by the user from the Window.
 // Attempts to enter greater than 'n' characters will elicit a 'beep'
 func (w *Window) GetString(n int) (string, error) {
 	cstr := make([]C.char, n)
@@ -238,7 +241,7 @@ func (w *Window) GetString(n int) (string, error) {
 	return C.GoString(&cstr[0]), nil
 }
 
-// Getyx returns the current cursor location in the Window. Note that it uses 
+// Getyx returns the current cursor location in the Window. Note that it uses
 // ncurses idiom of returning y then x.
 func (w *Window) Getyx() (int, int) {
 	// In some cases, getxy() and family are macros which don't play well with
@@ -248,7 +251,7 @@ func (w *Window) Getyx() (int, int) {
 	return int(cy), int(cx)
 }
 
-// HLine draws a horizontal line starting at y, x and ending at width using 
+// HLine draws a horizontal line starting at y, x and ending at width using
 // the specified character
 func (w *Window) HLine(y, x int, ch Char, wid int) {
 	C.mvwhline(w.win, C.int(y), C.int(x), C.chtype(ch), C.int(wid))
@@ -276,7 +279,7 @@ func (w *Window) IsKeypad() bool {
 	return bool(C.ncurses_is_keypad(w.win))
 }
 
-// Keypad turns on/off the keypad characters, including those like the F1-F12 
+// Keypad turns on/off the keypad characters, including those like the F1-F12
 // keys and the arrow keys
 func (w *Window) Keypad(keypad bool) error {
 	var err C.int
@@ -343,7 +346,7 @@ func (w *Window) Parent() *Window {
 
 // Print a string to the given window. See the fmt package in the standard
 // library for more information. In order to simulate the 'n' version
-// of functions (like addnstr) just slice your string to the maximum 
+// of functions (like addnstr) just slice your string to the maximum
 // length before passing it as an argument.
 // window.Print("My line which should be clamped to 20 characters"[:20])
 func (w *Window) Print(args ...interface{}) {
@@ -365,7 +368,7 @@ func (w *Window) Println(args ...interface{}) {
 	w.Printf("%s", fmt.Sprintln(args...))
 }
 
-// MovePrint moves the cursor to the specified coordinates and prints the 
+// MovePrint moves the cursor to the specified coordinates and prints the
 // supplied message. See Print for more details.The first two arguments are the
 // coordinates to print to.
 func (w *Window) MovePrint(y, x int, args ...interface{}) {
@@ -451,6 +454,15 @@ func (w *Window) Sync(sync int) {
 	}
 }
 
+// Timeout sets the window to blocking or non-blocking read mode. Calls to
+// GetCh will behave in the following manor depending on the value of delay:
+// <= -1 - blocking mode is set (blocks indefinately)
+// ==  0 - non-blocking; returns zero (0)
+// >=  1 - blocks for delay in milliseconds; returns zero (0)
+func (w *Window) Timeout(delay int) {
+	C.wtimeout(w.win, C.int(delay))
+}
+
 // Touch indicates that the window contains changes which should be updated
 // on the next call to Refresh
 func (w *Window) Touch() error {
@@ -466,7 +478,7 @@ func (w *Window) Touched() bool {
 }
 
 // Touchline behaves like Touch but only effects count number of lines,
-// beginning at start 
+// beginning at start
 func (w *Window) TouchLine(start, count int) error {
 	if C.touchline(w.win, C.int(start), C.int(count)) == C.ERR {
 		return errors.New("Error in call to TouchLine")
@@ -480,7 +492,7 @@ func (w *Window) UnTouch() {
 	C.ncurses_untouchwin(w.win)
 }
 
-// VLine draws a verticle line starting at y, x and ending at height using 
+// VLine draws a verticle line starting at y, x and ending at height using
 // the specified character
 func (w *Window) VLine(y, x, ch Char, wid int) {
 	C.mvwvline(w.win, C.int(y), C.int(x), C.chtype(ch), C.int(wid))
