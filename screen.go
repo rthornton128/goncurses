@@ -1,8 +1,12 @@
+// Copyright 2011 Rob Thornton. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package goncurses
 
 // #include <stdio.h>
 // #include <stdlib.h>
-// #include <ncurses.h>
+// #include <curses.h>
 import "C"
 
 import (
@@ -11,7 +15,7 @@ import (
 	"unsafe"
 )
 
-type Screen struct { scrPtr *C.SCREEN }
+type Screen struct{ scrPtr *C.SCREEN }
 
 // NewTerm returns a new Screen, representing a physical terminal. If using
 // this function to generate a new Screen you should not call Init().
@@ -51,7 +55,7 @@ func (s *Screen) Set() (*Screen, error) {
 	return &Screen{screen}, nil
 }
 
-// Delete frees memory allocated to the screen. This function 
+// Delete frees memory allocated to the screen. This function
 func (s *Screen) Delete() {
 	C.delscreen(s.scrPtr)
 }

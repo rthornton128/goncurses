@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// +build !windows
+
 package goncurses
 
 /*
@@ -166,7 +168,7 @@ func (m *Menu) Scale() (int, int, error) {
 	return int(y), int(x), ncursesError(syscall.Errno(err))
 }
 
-// SetBackground set the attributes of the un-highlighted items in the 
+// SetBackground set the attributes of the un-highlighted items in the
 // menu
 func (m *Menu) SetBackground(ch int) error {
 	err := C.set_menu_back(m.menu, C.chtype(ch))
@@ -206,10 +208,10 @@ func (m *Menu) SetPattern(pattern string) error {
 }
 
 // SetSpacing of the the menu's items. 'desc' is the space between the
-// item and it's description andmay not be larger than TAB_SIZE. 'row' 
-// is the number of rows separating each item and may not be larger than 
-// three. 'col' is the spacing between each column of items in 
-// multi-column mode. Use values of 0 or 1 to reset spacing to default, 
+// item and it's description andmay not be larger than TAB_SIZE. 'row'
+// is the number of rows separating each item and may not be larger than
+// three. 'col' is the spacing between each column of items in
+// multi-column mode. Use values of 0 or 1 to reset spacing to default,
 // which is one
 func (m *Menu) SetSpacing(desc, row, col int) error {
 	err := C.set_menu_spacing(m.menu, C.int(desc), C.int(row),
@@ -260,7 +262,7 @@ func NewItem(name, desc string) (*MenuItem, error) {
 	return &MenuItem{item}, ncursesError(err)
 }
 
-// Description returns the second value passed to NewItem 
+// Description returns the second value passed to NewItem
 func (mi *MenuItem) Description() string {
 	return C.GoString(C.item_description(mi.item))
 }

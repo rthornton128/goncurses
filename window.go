@@ -5,7 +5,7 @@
 package goncurses
 
 // #include <stdlib.h>
-// #include <ncurses.h>
+// #include <curses.h>
 // #include "goncurses.h"
 import "C"
 
@@ -33,7 +33,7 @@ func (w *Window) MoveAddChar(y, x int, ach Char) {
 
 // Turn off character attribute.
 func (w *Window) AttrOff(attr Char) (err error) {
-	if C.wattroff(w.win, C.int(attr)) == C.ERR {
+	if C.wattroff(w.win, C.chtype(attr)) == C.ERR {
 		err = errors.New(fmt.Sprintf("Failed to unset attribute: %s",
 			attrList[C.int(attr)]))
 	}
@@ -42,7 +42,7 @@ func (w *Window) AttrOff(attr Char) (err error) {
 
 // Turn on character attribute
 func (w *Window) AttrOn(attr Char) (err error) {
-	if C.wattron(w.win, C.int(attr)) == C.ERR {
+	if C.wattron(w.win, C.chtype(attr)) == C.ERR {
 		err = errors.New(fmt.Sprintf("Failed to set attribute: %s",
 			attrList[C.int(attr)]))
 	}
@@ -124,12 +124,12 @@ func (w *Window) ClearToEOL() error {
 
 // Color sets the forground/background color pair for the entire window
 func (w *Window) Color(pair int16) {
-	C.wcolor_set(w.win, C.short(C.COLOR_PAIR(C.int(pair))), nil)
+	C.wcolor_set(w.win, C.short(ColorPair(pair)), nil)
 }
 
 // ColorOff turns the specified color pair off
 func (w *Window) ColorOff(pair int16) error {
-	if C.wattroff(w.win, C.COLOR_PAIR(C.int(pair))) == C.ERR {
+	if C.wattroff(w.win, C.chtype(ColorPair(pair))) == C.ERR {
 		return errors.New("Failed to enable color pair")
 	}
 	return nil
@@ -138,7 +138,7 @@ func (w *Window) ColorOff(pair int16) error {
 // Normally color pairs are turned on via attron() in ncurses but this
 // implementation chose to make it seperate
 func (w *Window) ColorOn(pair int16) error {
-	if C.wattron(w.win, C.COLOR_PAIR(C.int(pair))) == C.ERR {
+	if C.wattron(w.win, C.chtype(ColorPair(pair))) == C.ERR {
 		return errors.New("Failed to enable color pair")
 	}
 	return nil

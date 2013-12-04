@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// +build !windows
+
 package goncurses
 
 // #cgo pkg-config: form
@@ -34,7 +36,7 @@ func (f *Field) Background() Char {
 	return Char(C.field_back(f.field))
 }
 
-// Duplicate the field at the specified coordinates, returning a pointer 
+// Duplicate the field at the specified coordinates, returning a pointer
 // to the newly allocated object.
 func (f *Field) Duplicate(y, x int) (*Field, error) {
 	var new_field Field
@@ -56,7 +58,7 @@ func (f *Field) Free() error {
 	return ncursesError(syscall.Errno(err))
 }
 
-// Info retrieves the height, width, y, x, offset and buffer size of the 
+// Info retrieves the height, width, y, x, offset and buffer size of the
 // given field. Pass the memory addess of the variable to store the data
 // in or nil.
 func (f *Field) Info(h, w, y, x, off, nbuf *int) error {
