@@ -3,7 +3,23 @@
 // license that can be found in the LICENSE file.
 
 #include <stdbool.h>
-#include <ncurses.h>
+#include <stdlib.h>
+#include <curses.h>
+
+#ifdef PDCURSES
+int ncurses_COLOR_PAIR(int n) { 
+	return (((chtype)(n) << PDC_COLOR_SHIFT) & A_COLOR);
+}
+bool is_term_resized(int y, int x) { return is_termresized(); }
+int resizeterm(int y, int x) { return resize_term(y, x); }
+int ncurses_ungetch(int ch) { return PDC_ungetch(ch); }
+int ncurses_getmouse(MEVENT *me) { return nc_getmouse(me); }
+#else
+int ncurses_COLOR_PAIR(int p) { return COLOR_PAIR(p); }
+int ncurses_getmouse(MEVENT *me) { return getmouse(me); }
+int ncurses_ungetch(int ch) { return PDC_ungetch(ch); }
+#endif
+
 
 chtype ncurses_getbkgd(WINDOW *win) 
 {
@@ -20,29 +36,49 @@ void ncurses_getmaxyx(WINDOW *win, int *y, int *x)
 	getmaxyx(win, *y, *x);
 }
 
-WINDOW * ncurses_wgetparent(const WINDOW *win)
+WINDOW *ncurses_wgetparent(const WINDOW *win)
 {
+#ifdef PDCURSES
+	return win->_parent;
+#else
 	return wgetparent(win);
+#endif
 }
 
 bool ncurses_is_cleared(const WINDOW *win)
 {
+#ifdef PDCURSES
+	return win->_clear;
+#else
 	return is_cleared(win);
+#endif
 }
 
 bool ncurses_is_keypad(const WINDOW *win)
 {
+#ifdef PDCURSES
+	return win->_use_keypad;
+#else
 	return is_keypad(win);
+#endif
 }
 
 bool ncurses_is_pad(const WINDOW *win)
 {
+#ifdef PDCURSES
+	return false; /* no known built-in way to test for this */
+#else
 	return is_pad(win);
+#endif
 }
 
 bool ncurses_is_subwin(const WINDOW *win)
 {
+#ifdef PDCURSES
+	return win->_parent != NULL;
+#else
 	return is_subwin(win);
+#endif
 }
 
 

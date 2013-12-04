@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// +build !windows
+
 package goncurses
 
-/*
-#include <ncurses.h>
-#include <form.h>
-#include <menu.h>
-*/
+// #include <curses.h>
+// #include <form.h>
+// #include <menu.h>
 import "C"
 
 import (

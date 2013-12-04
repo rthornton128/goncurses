@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// +build !windows
+
 package goncurses
 
 // #include <form.h>
@@ -79,7 +81,7 @@ const (
 	FO_WRAP     = C.O_WRAP     // Line wrapping
 	FO_BLANK    = C.O_BLANK    // Clear on entry
 	FO_AUTOSKIP = C.O_AUTOSKIP // Skip to next field when current filled
-	FO_NULLOK   = C.O_NULLOK   // Blank ok 
+	FO_NULLOK   = C.O_NULLOK   // Blank ok
 	FO_STATIC   = C.O_STATIC   // Fixed size
 	FO_PASSOK   = C.O_PASSOK   // Field validation
 )

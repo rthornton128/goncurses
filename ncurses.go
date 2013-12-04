@@ -36,8 +36,10 @@
 // goncurses can provide.
 package goncurses
 
-// #cgo pkg-config: ncurses
-// #include <ncurses.h>
+// #cgo !windows pkg-config: ncurses
+// #cgo windows CFLAGS: -DNCURSES_MOUSE_VERSION
+// #cgo windows LDFLAGS: -lpdcurses
+// #include <curses.h>
 // #include "goncurses.h"
 import "C"
 
@@ -85,7 +87,7 @@ func ColorContent(col int16) (int16, int16, int16) {
 // Return the value of a color pair which can be passed to functions which
 // accept attributes like AddChar, AttrOn/Off and Background.
 func ColorPair(pair int16) Char {
-	return Char(C.COLOR_PAIR(C.int(pair)))
+	return Char(C.ncurses_COLOR_PAIR(C.int(pair)))
 }
 
 // CursesVersion returns the version of the ncurses library currently linked to
@@ -140,7 +142,7 @@ func GetMouse() ([]int, error) {
 		return nil, errors.New("Mouse support not enabled")
 	}
 	var event C.MEVENT
-	if C.getmouse(&event) != C.OK {
+	if C.ncurses_getmouse(&event) != C.OK {
 		return nil, errors.New("Failed to get mouse event")
 	}
 	return []int{int(event.x), int(event.y), int(event.z), int(event.id),
@@ -180,7 +182,7 @@ func HasInsertLine() bool {
 
 // HasKey returns true if terminal recognized the given character
 func HasKey(ch Key) bool {
-	if C.has_key(C.int(ch)) == 1 {
+	if C.has_key(C.int(ch)) == C._Bool(true) {
 		return true
 	}
 	return false
@@ -207,7 +209,7 @@ func InitPair(pair, fg, bg int16) error {
 	return nil
 }
 
-// Initialize the ncurses library. You must run this function prior to any 
+// Initialize the ncurses library. You must run this function prior to any
 // other goncurses function in order for the library to work
 func Init() (stdscr Window, err error) {
 	stdscr = Window{C.initscr()}
@@ -222,7 +224,7 @@ func IsEnd() bool {
 	return bool(C.isendwin())
 }
 
-// IsTermResized returns true if ResizeTerm would modify any current Windows 
+// IsTermResized returns true if ResizeTerm would modify any current Windows
 // if called with the given parameters
 func IsTermResized(nlines, ncols int) bool {
 	return bool(C.is_term_resized(C.int(nlines), C.int(ncols)))
@@ -264,7 +266,7 @@ func MouseInterval(ms int) int {
 
 // MouseMask accepts a single int of OR'd mouse events. If a mouse event
 // is triggered, GetChar() will return KEY_MOUSE. To retrieve the actual
-// event use GetMouse() to pop it off the queue. Pass a pointer as the 
+// event use GetMouse() to pop it off the queue. Pass a pointer as the
 // second argument to store the prior events being monitored or nil.
 func MouseMask(mask MouseButton, old *MouseButton) int {
 	return int(C.mousemask((C.mmask_t)(mask),
@@ -294,7 +296,7 @@ func NL(on bool) {
 	C.nonl()
 }
 
-// Raw turns on input buffering; user signals are disabled and the key strokes 
+// Raw turns on input buffering; user signals are disabled and the key strokes
 // are passed directly to input. Set to false if you wish to turn this mode
 // off
 func Raw(on bool) {
@@ -335,7 +337,7 @@ func StdScr() *Window {
 
 // UnGetChar places the character back into the input queue
 func UnGetChar(ch Char) {
-	C.ungetch(C.int(ch))
+	C.ncurses_ungetch(C.int(ch))
 }
 
 // Update the screen, refreshing all windows
