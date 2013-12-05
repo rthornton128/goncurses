@@ -182,7 +182,7 @@ func HasInsertLine() bool {
 
 // HasKey returns true if terminal recognized the given character
 func HasKey(ch Key) bool {
-	if C.has_key(C.int(ch)) == C._Bool(true) {
+	if C.ncurses_has_key(C.int(ch)) == 1 {
 		return true
 	}
 	return false
