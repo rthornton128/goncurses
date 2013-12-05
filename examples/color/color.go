@@ -19,11 +19,15 @@ func main() {
 		log.Fatal("init:", err)
 	}
 	defer End()
-	StartColor()
+	if err := StartColor(); err != nil {
+		log.Fatal(err)
+	}
 
 	Raw(true)
 	Echo(false)
-	InitPair(1, C_BLUE, C_WHITE)
+	if err := InitPair(1, C_BLUE, C_WHITE); err != nil {
+		log.Fatal("InitPair failed: ", err)
+	}
 	InitPair(2, C_BLACK, C_CYAN)
 
 	stdscr.Println("Type 'q' to proceed and again to exit")
