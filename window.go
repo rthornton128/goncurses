@@ -33,7 +33,7 @@ func (w *Window) MoveAddChar(y, x int, ach Char) {
 
 // Turn off character attribute.
 func (w *Window) AttrOff(attr Char) (err error) {
-	if C.wattroff(w.win, C.chtype(attr)) == C.ERR {
+	if C.ncurses_wattroff(w.win, C.int(attr)) == C.ERR {
 		err = errors.New(fmt.Sprintf("Failed to unset attribute: %s",
 			attrList[C.int(attr)]))
 	}
@@ -42,7 +42,7 @@ func (w *Window) AttrOff(attr Char) (err error) {
 
 // Turn on character attribute
 func (w *Window) AttrOn(attr Char) (err error) {
-	if C.wattron(w.win, C.chtype(attr)) == C.ERR {
+	if C.wattron(w.win, C.int(attr)) == C.ERR {
 		err = errors.New(fmt.Sprintf("Failed to set attribute: %s",
 			attrList[C.int(attr)]))
 	}
@@ -129,7 +129,7 @@ func (w *Window) Color(pair int16) {
 
 // ColorOff turns the specified color pair off
 func (w *Window) ColorOff(pair int16) error {
-	if C.wattroff(w.win, C.chtype(ColorPair(pair))) == C.ERR {
+	if C.ncurses_wattroff(w.win, C.int(ColorPair(pair))) == C.ERR {
 		return errors.New("Failed to enable color pair")
 	}
 	return nil
@@ -138,7 +138,7 @@ func (w *Window) ColorOff(pair int16) error {
 // Normally color pairs are turned on via attron() in ncurses but this
 // implementation chose to make it seperate
 func (w *Window) ColorOn(pair int16) error {
-	if C.wattron(w.win, C.chtype(ColorPair(pair))) == C.ERR {
+	if C.ncurses_wattron(w.win, C.int(ColorPair(pair))) == C.ERR {
 		return errors.New("Failed to enable color pair")
 	}
 	return nil
