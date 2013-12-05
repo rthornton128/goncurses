@@ -42,7 +42,7 @@ func (w *Window) AttrOff(attr Char) (err error) {
 
 // Turn on character attribute
 func (w *Window) AttrOn(attr Char) (err error) {
-	if C.wattron(w.win, C.int(attr)) == C.ERR {
+	if C.ncurses_wattron(w.win, C.int(attr)) == C.ERR {
 		err = errors.New(fmt.Sprintf("Failed to set attribute: %s",
 			attrList[C.int(attr)]))
 	}
