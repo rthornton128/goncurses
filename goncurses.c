@@ -7,9 +7,6 @@
 #include <curses.h>
 
 #ifdef PDCURSES
-int ncurses_COLOR_PAIR(int n) { 
-	return (((chtype)(n) << PDC_COLOR_SHIFT) & A_COLOR);
-}
 bool is_term_resized(int y, int x) { return is_termresized(); }
 int resizeterm(int y, int x) { return resize_term(y, x); }
 int ncurses_getmouse(MEVENT *me) { return nc_getmouse(me); }
@@ -22,7 +19,6 @@ int ncurses_wattron(WINDOW *win, int attr) {
 	return wattron(win, (chtype) attr);
 }
 #else
-int ncurses_COLOR_PAIR(int p) { return COLOR_PAIR(p); }
 int ncurses_getmouse(MEVENT *me) { return getmouse(me); }
 int ncurses_has_key(int ch) { return has_key(ch); }
 int ncurses_ungetch(int ch) { return ungetch(ch); }
@@ -30,6 +26,7 @@ int ncurses_wattroff(WINDOW *win, int attr) { return wattroff(win, attr); }
 int ncurses_wattron(WINDOW *win, int attr) { return wattron(win, attr); }
 #endif
 
+int ncurses_COLOR_PAIR(int p) { return COLOR_PAIR(p); }
 chtype ncurses_getbkgd(WINDOW *win) { return getbkgd(win); }
 void ncurses_getyx(WINDOW *win, int *y, int *x) { getyx(win, *y, *x); }
 void ncurses_getmaxyx(WINDOW *win, int *y, int *x) { getmaxyx(win, *y, *x); }

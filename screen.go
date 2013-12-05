@@ -5,6 +5,9 @@
 package goncurses
 
 // #include <stdio.h>
+// #if defined(__MINGW32__) || defined(__MINGW64__)
+// FILE *fdopen(int fildes, const char *mode) { return _fdopen(fildes, mode); }
+// #endif
 // #include <stdlib.h>
 // #include <curses.h>
 import "C"

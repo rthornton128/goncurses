@@ -16,6 +16,8 @@ const (
 	SYNC_UP     // Sync change in all child windows
 )
 
+type Char int
+
 // Definitions for printed characters not found on most keyboards. Ideally,
 // these would not be hard-coded as they are potentially different on
 // different systems. However, some ncurses implementations seem to be
@@ -24,41 +26,39 @@ const (
 // to use them until either a) the Go team works out a way to overcome this
 // limitation in godefs/cgo or b) an alternative method is found. Work is
 // being done to find a solution from the ncurses source code.
-type Char int
-
 const (
-	ACS_DEGREE Char = iota + 4194406
-	ACS_PLMINUS
-	ACS_BOARD
-	ACS_LANTERN
-	ACS_LRCORNER
-	ACS_URCORNER
-	ACS_LLCORNER
-	ACS_ULCORNER
-	ACS_PLUS
-	ACS_S1
-	ACS_S3
-	ACS_HLINE
-	ACS_S7
-	ACS_S9
-	ACS_LTEE
-	ACS_RTEE
-	ACS_BTEE
-	ACS_TTEE
-	ACS_VLINE
-	ACS_LEQUAL
-	ACS_GEQUAL
-	ACS_PI
-	ACS_NEQUAL
-	ACS_STERLING
-	ACS_BULLET
-	ACS_LARROW  = 4194347
-	ACS_RARROW  = 4194348
-	ACS_DARROW  = 4194349
-	ACS_UARROW  = 4194350
-	ACS_BLOCK   = 4194352
-	ACS_DIAMOND = 4194400
-	ACS_CKBOARD = 4194401
+	ACS_DEGREE   Char = C.ACS_DEGREE
+	ACS_PLMINUS       = C.ACS_PLMINUS
+	ACS_BOARD         = C.ACS_BOARD
+	ACS_LANTERN       = C.ACS_LANTERN
+	ACS_LRCORNER      = C.ACS_LRCORNER
+	ACS_URCORNER      = C.ACS_URCORNER
+	ACS_LLCORNER      = C.ACS_LLCORNER
+	ACS_ULCORNER      = C.ACS_ULCORNER
+	ACS_PLUS          = C.ACS_PLUS
+	ACS_S1            = C.ACS_S1
+	ACS_S3            = C.ACS_S3
+	ACS_HLINE         = C.ACS_HLINE
+	ACS_S7            = C.ACS_S7
+	ACS_S9            = C.ACS_S9
+	ACS_LTEE          = C.ACS_LTEE
+	ACS_RTEE          = C.ACS_RTEE
+	ACS_BTEE          = C.ACS_BTEE
+	ACS_TTEE          = C.ACS_TTEE
+	ACS_VLINE         = C.ACS_VLINE
+	ACS_LEQUAL        = C.ACS_LEQUAL
+	ACS_GEQUAL        = C.ACS_GEQUAL
+	ACS_PI            = C.ACS_PI
+	ACS_NEQUAL        = C.ACS_NEQUAL
+	ACS_STERLING      = C.ACS_STERLING
+	ACS_BULLET        = C.ACS_BULLET
+	ACS_LARROW        = C.ACS_LARROW
+	ACS_RARROW        = C.ACS_RARROW
+	ACS_DARROW        = C.ACS_DARROW
+	ACS_UARROW        = C.ACS_UARROW
+	ACS_BLOCK         = C.ACS_BLOCK
+	ACS_DIAMOND       = C.ACS_DIAMOND
+	ACS_CKBOARD       = C.ACS_CKBOARD
 )
 
 // Text attributes
