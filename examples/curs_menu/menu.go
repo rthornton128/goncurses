@@ -57,13 +57,13 @@ func main() {
 				active += 1
 			}
 		case "enter":
-			stdscr.MovePrint(23, 0, "Choice #%d: %s selected",
+			stdscr.MovePrintf(23, 0, "Choice #%d: %s selected",
 				active,
 				menu[active])
 			stdscr.ClearToEOL()
 			stdscr.Refresh()
 		default:
-			stdscr.MovePrint(23, 0, "Character pressed = %3d/%c",
+			stdscr.MovePrintf(23, 0, "Character pressed = %3d/%c",
 				ch, ch)
 			stdscr.ClearToEOL()
 			stdscr.Refresh()

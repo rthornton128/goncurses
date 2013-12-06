@@ -14,7 +14,7 @@ func main() {
 	var pts *os.File
 	pts, err = os.OpenFile("/dev/pts/0", os.O_RDWR, os.FileMode(666))
 	if err != nil {
-		log.Fatal(nil)
+		log.Fatal(err)
 	}
 	defer pts.Close()
 
