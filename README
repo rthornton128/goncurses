@@ -23,23 +23,3 @@ same as any other window.
 Whenever possible, versions of ncurses functions which could potentially
 have a buffer overflow, like the getstr() family of functions, have not been
 implemented. Instead, only the mvwgetnstr() and wgetnstr() are used.
-
-
-TODO
-----
-
- * complete core library implementation
- * complete form library implementation
- * complete menu library implementation
- * better handling of variable input
- 
-
-See the following matrix for a basic overview of each module's completion
-status:
-
-    Module | Complete
-    -----------------
-     Core  |   24%
-     Form  |   41%
-     Menu  |   78%
-     Panel |  100%

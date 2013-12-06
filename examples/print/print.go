@@ -17,7 +17,7 @@ func main() {
 	msg := "Just a string "
 	stdscr.MovePrint(row/2, (col-len(msg))/2, msg)
 
-	stdscr.MovePrint(row-3, 0, "This screen has %d rows and %d columns. ",
+	stdscr.MovePrintf(row-3, 0, "This screen has %d rows and %d columns. ",
 		row, col)
 	stdscr.MovePrint(row-2, 0, "Try resizing your terminal window and then "+
 		"run this program again.")
