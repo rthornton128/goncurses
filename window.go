@@ -494,6 +494,6 @@ func (w *Window) UnTouch() {
 
 // VLine draws a verticle line starting at y, x and ending at height using
 // the specified character
-func (w *Window) VLine(y, x, ch Char, wid int) {
+func (w *Window) VLine(y, x int, ch Char, wid int) {
 	C.mvwvline(w.win, C.int(y), C.int(x), C.chtype(ch), C.int(wid))
 }
