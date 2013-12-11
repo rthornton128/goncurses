@@ -17,14 +17,8 @@ func NewPad(lines, cols int) Pad {
 	return Pad{C.newpad(C.int(lines), C.int(cols))}
 }
 
-/* TODO: No equiv. in PDCurses; implement as slower version in goncurses.c
-// Echo prints a single character to the pad immediately. This has the
-// same effect of calling AddChar() + Refresh() but has a significant
-// speed advantage
-func (p Pad) Echo(ch int) {
-	C.pechochar(p.win, C.chtype(ch))
-}
-*/
+// NoutRefresh() refreshes the pad for drawing but the screen will not
+// be updated until Update() has been called on the underlying window.
 func (p Pad) NoutRefresh(py, px, ty, tx, by, bx int) {
 	C.pnoutrefresh(p.win, C.int(py), C.int(px), C.int(ty),
 		C.int(tx), C.int(by), C.int(bx))

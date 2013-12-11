@@ -222,7 +222,11 @@ func (w *Window) Erase() {
 // Timeout() has been set to zero or a positive value and no characters have
 // been received) the value returned will be zero (0)
 func (w *Window) GetChar() Key {
-	return Key(C.wgetch(w.win))
+	ch := C.wgetch(w.win)
+	if ch == C.ERR {
+		ch = 0
+	}
+	return Key(ch)
 }
 
 // MoveGetChar moves the cursor to the given position and gets a character
