@@ -273,8 +273,8 @@ func MouseMask(mask MouseButton, old *MouseButton) int {
 		(*C.mmask_t)(unsafe.Pointer(old))))
 }
 
-// NapMilliseconds is used to sleep for ms milliseconds
-func NapMilliseconds(ms int) {
+// Nap (sleep; halt execution) for 'ms' milliseconds
+func Nap(ms int) {
 	C.napms(C.int(ms))
 }
 
@@ -287,8 +287,8 @@ func NewWindow(h, w, y, x int) (window Window, err error) {
 	return
 }
 
-// NL turns newline translation on/off.
-func NL(on bool) {
+// NewLines turns newline translation on/off.
+func NewLines(on bool) {
 	if on {
 		C.nl()
 		return
