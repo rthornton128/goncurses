@@ -247,9 +247,7 @@ func (w *Window) GetString(n int) (string, error) {
 
 // Getyx returns the current cursor location in the Window. Note that it uses
 // ncurses idiom of returning y then x.
-func (w *Window) Getyx() (int, int) {
-	// In some cases, getxy() and family are macros which don't play well with
-	// cgo
+func (w *Window) CursorYX() (int, int) {
 	var cy, cx C.int
 	C.ncurses_getyx(w.win, &cy, &cx)
 	return int(cy), int(cx)
@@ -500,4 +498,12 @@ func (w *Window) UnTouch() {
 // the specified character
 func (w *Window) VLine(y, x int, ch Char, wid int) {
 	C.mvwvline(w.win, C.int(y), C.int(x), C.chtype(ch), C.int(wid))
+}
+
+// YX returns the current coordinates of the Window. Note that it uses
+// ncurses idiom of returning y then x.
+func (w *Window) YX() (int, int) {
+	var y, x C.int
+	C.ncurses_getbegyx(w.win, &y, &x)
+	return int(y), int(x)
 }
