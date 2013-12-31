@@ -29,6 +29,7 @@ int ncurses_wattron(WINDOW *win, int attr) { return wattron(win, attr); }
 int ncurses_COLOR_PAIR(int p) { return COLOR_PAIR(p); }
 chtype ncurses_getbkgd(WINDOW *win) { return getbkgd(win); }
 void ncurses_getyx(WINDOW *win, int *y, int *x) { getyx(win, *y, *x); }
+void ncurses_getbegyx(WINDOW *win, int *y, int *x) { getbegyx(win, *y, *x); }
 void ncurses_getmaxyx(WINDOW *win, int *y, int *x) { getmaxyx(win, *y, *x); }
 
 WINDOW *ncurses_wgetparent(const WINDOW *win) {

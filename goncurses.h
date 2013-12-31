@@ -11,6 +11,7 @@ int resizeterm(int y, int x);
 
 int ncurses_COLOR_PAIR(int p);
 chtype ncurses_getbkgd(WINDOW *win);
+void ncurses_getbegyx(WINDOW *win, int *y, int *x);
 void ncurses_getmaxyx(WINDOW *win, int *y, int *x);
 int ncurses_getmouse(MEVENT *me);
 void ncurses_getyx(WINDOW *win, int *y, int *x);
