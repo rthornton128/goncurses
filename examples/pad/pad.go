@@ -15,11 +15,11 @@ func main() {
 	// create a new pad of 30 rows and 100 columns and fill it
 	pad := gc.NewPad(30, 100)
 	for x := 1; x < 30; x++ {
-		pad.Window().MovePrint(x, x, "This is a pad.")
+		pad.MovePrint(x, x, "This is a pad.")
 	}
 	// show a 10x15 portion of the pad located at the coordinates
 	// 5, 10 on the stdscr. The portion of the pad shown is a box
 	// starting at 0, 5 to 10, 20
 	pad.Refresh(0, 5, 5, 10, 15, 25)
-	pad.Window().GetChar()
+	pad.GetChar()
 }
