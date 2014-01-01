@@ -297,7 +297,7 @@ func (w *Window) LineTouched(line int) bool {
 
 // Returns the maximum size of the Window. Note that it uses ncurses idiom
 // of returning y then x.
-func (w *Window) Maxyx() (int, int) {
+func (w *Window) MaxYX() (int, int) {
 	var cy, cx C.int
 	C.ncurses_getmaxyx(w.win, &cy, &cx)
 	return int(cy), int(cx)
@@ -315,9 +315,12 @@ func (w *Window) MoveWindow(y, x int) {
 	return
 }
 
-// NoutRefresh flags the window for redrawing. In order to actually perform
-// the changes, Update() must be called. This function when coupled with
-// Update() provides a speed increase over using Refresh() on each window.
+// NoutRefresh, or No Output Refresh, flags the window for redrawing but does
+// not output the changes to the terminal (screen). Essentially, the output is
+// buffered and a call to Update() flushes the buffer to the terminal. This
+// function provides a speed increase over calling Refresh() when multiple
+// windows are involved because only the final output is
+// transmitted to the terminal.
 func (w *Window) NoutRefresh() {
 	C.wnoutrefresh(w.win)
 	return

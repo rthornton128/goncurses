@@ -22,7 +22,7 @@ func main() {
 	defer gc.End()
 
 	msg := "Enter a string: "
-	row, col := stdscr.Maxyx()
+	row, col := stdscr.MaxYX()
 	row, col = (row/2)-1, (col-len(msg))/2
 	stdscr.MovePrint(row, col, msg)
 

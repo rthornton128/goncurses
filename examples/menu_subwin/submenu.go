@@ -43,7 +43,7 @@ func main() {
 	menu.Mark(" * ")
 
 	// Print centered menu title
-	y, x := menuwin.Maxyx()
+	y, x := menuwin.MaxYX()
 	title := "My Menu"
 	menuwin.Box(0, 0)
 	menuwin.ColorOn(1)
@@ -53,7 +53,7 @@ func main() {
 	menuwin.HLine(2, 1, gc.ACS_HLINE, x-3)
 	menuwin.MoveAddChar(2, x-2, gc.ACS_RTEE)
 
-	y, x = stdscr.Maxyx()
+	y, x = stdscr.MaxYX()
 	stdscr.MovePrint(y-2, 1, "'q' to exit")
 	stdscr.Refresh()
 

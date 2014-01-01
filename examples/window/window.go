@@ -21,7 +21,7 @@ func main() {
 	stdscr.Print("Use arrow keys to move window. Press 'q' to exit")
 	stdscr.Refresh()
 
-	rows, cols := stdscr.Maxyx()
+	rows, cols := stdscr.MaxYX()
 	height, width := 3, 10
 	y, x := (rows-height)/2, (cols-width)/2
 	win := createWin(height, width, y, x)

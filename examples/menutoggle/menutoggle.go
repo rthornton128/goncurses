@@ -42,7 +42,7 @@ func main() {
 
 	menu.Option(gc.O_ONEVALUE, false)
 
-	y, _ := stdscr.Maxyx()
+	y, _ := stdscr.MaxYX()
 	stdscr.MovePrint(y-3, 0, "Use up/down arrows to move, spacebar to "+
 		"toggle and enter to print. 'q' to exit")
 	stdscr.Refresh()

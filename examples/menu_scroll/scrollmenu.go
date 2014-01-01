@@ -69,7 +69,7 @@ func main() {
 	menuwin.HLine(2, 1, gc.ACS_HLINE, WIDTH-2)
 	menuwin.MoveAddChar(2, WIDTH-1, gc.ACS_RTEE)
 
-	y, _ := stdscr.Maxyx()
+	y, _ := stdscr.MaxYX()
 	stdscr.ColorOn(2)
 	stdscr.MovePrint(y-3, 1,
 		"Use up/down arrows or page up/down to navigate. 'q' to exit")
