@@ -28,7 +28,7 @@ func main() {
 	stdscr.Clear()
 	stdscr.Keypad(true)
 
-	rows, cols := stdscr.Maxyx()
+	rows, cols := stdscr.MaxYX()
 	y, x := (rows-HEIGHT)/2, (cols-WIDTH)/2
 
 	win, _ := NewWindow(HEIGHT, WIDTH, y, x)

@@ -13,7 +13,7 @@ func main() {
 	stdscr, _ := gc.Init()
 	defer gc.End()
 
-	row, col := stdscr.Maxyx()
+	row, col := stdscr.MaxYX()
 	msg := "Just a string "
 	stdscr.MovePrint(row/2, (col-len(msg))/2, msg)
 

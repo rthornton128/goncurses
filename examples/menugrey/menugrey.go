@@ -51,7 +51,7 @@ func main() {
 	menu, _ := gc.NewMenu(items)
 	defer menu.Free()
 
-	y, _ := stdscr.Maxyx()
+	y, _ := stdscr.MaxYX()
 	stdscr.MovePrint(y-3, 0, "Use up/down arrows to move; 'q' to exit")
 	stdscr.Refresh()
 
