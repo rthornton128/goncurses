@@ -6,14 +6,7 @@
 
 package goncurses
 
-// Definitions for printed characters not found on most keyboards. Ideally,
-// these would not be hard-coded as they are potentially different on
-// different systems. However, some ncurses implementations seem to be
-// heavily reliant on macros which prevent these definitions from being
-// handled by cgo properly. If they don't work for you, you won't be able
-// to use them until either a) the Go team works out a way to overcome this
-// limitation in godefs/cgo or b) an alternative method is found. Work is
-// being done to find a solution from the ncurses source code.
+// Definitions for printed characters not found on most keyboards.
 const (
 	ACS_DEGREE Char = iota + 4194406
 	ACS_PLMINUS
