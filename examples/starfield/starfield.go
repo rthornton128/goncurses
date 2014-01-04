@@ -3,7 +3,9 @@ package main
 import (
 	gc "code.google.com/p/goncurses"
 
+	"log"
 	"math/rand"
+	"os"
 	"time"
 )
 
@@ -57,28 +59,22 @@ func handleInput(stdscr *gc.Window, ship *Ship) bool {
 		}
 	case 'd':
 		x++
-		if x > cols/2 {
-			x = cols / 2
+		if x > cols-3 {
+			x = cols - 3
 		}
 	case 's':
 		y++
-		if y > lines-5 {
-			y = lines - 5
+		if y > lines-4 {
+			y = lines - 4
 		}
 	case 'w':
 		y--
-		if y < 5 {
-			y = 5
+		if y < 2 {
+			y = 2
 		}
 	case ' ':
-		w1, _ := gc.NewWindow(1, 1, y+1, x+4)
-		w2, _ := gc.NewWindow(1, 1, y+3, x+4)
-		w1.AttrOn(gc.A_BOLD | gc.ColorPair(4))
-		w2.AttrOn(gc.A_BOLD | gc.ColorPair(4))
-		w1.Print("-")
-		w2.Print("-")
-		objects = append(objects, &Bullet{&w1, true})
-		objects = append(objects, &Bullet{&w2, true})
+		objects = append(objects, newBullet(y+1, x+4))
+		objects = append(objects, newBullet(y+3, x+4))
 	default:
 		return false
 	}
@@ -119,7 +115,10 @@ func spawnAsteroid(my, mx int) {
 		y, x = my-2, rand.Intn(mx-2)+1
 		sy, sx = speeds[rand.Intn(4)], speeds[rand.Intn(9)]
 	}
-	w, _ := gc.NewWindow(1, 1, y, x)
+	w, err := gc.NewWindow(1, 1, y, x)
+	if err != nil {
+		log.Println("spawnAsteroid:", err)
+	}
 	a := &Asteroid{Window: &w, alive: true, sy: sy, sx: sx, y: y * 100,
 		x: x * 100}
 	a.ColorOn(2)
@@ -135,9 +134,6 @@ func (a *Asteroid) Collide(i int) {
 }
 
 func (a *Asteroid) Draw(w *gc.Window) {
-	if !a.alive {
-		objects = append(objects, newExplosion(a.YX()))
-	}
 	w.Overlay(a.Window)
 }
 
@@ -160,6 +156,16 @@ type Bullet struct {
 	alive bool
 }
 
+func newBullet(y, x int) *Bullet {
+	w, err := gc.NewWindow(1, 1, y, x)
+	if err != nil {
+		log.Println("newBullet:", err)
+	}
+	w.AttrOn(gc.A_BOLD | gc.ColorPair(4))
+	w.Print("-")
+	return &Bullet{&w, true}
+}
+
 func (b *Bullet) Cleanup() {
 	b.Delete()
 }
@@ -169,12 +175,13 @@ func (b *Bullet) Collide(i int) {
 		if k == i {
 			continue
 		}
-		switch t := v.(type) {
+		switch a := v.(type) {
 		case *Asteroid:
-			ay, ax := t.YX()
+			ay, ax := a.YX()
 			by, bx := b.YX()
 			if ay == by && ax == bx {
-				t.alive = false
+				objects = append(objects, newExplosion(a.YX()))
+				a.alive = false
 				b.alive = false
 			}
 		}
@@ -204,7 +211,10 @@ type Explosion struct {
 }
 
 func newExplosion(y, x int) *Explosion {
-	w, _ := gc.NewWindow(3, 3, y-1, x-1)
+	w, err := gc.NewWindow(3, 3, y-1, x-1)
+	if err != nil {
+		log.Println("newExplosion:", err)
+	}
 	w.ColorOn(4)
 	w.MovePrint(0, 0, `\ /`)
 	w.AttrOn(gc.A_BOLD)
@@ -238,7 +248,10 @@ type Ship struct {
 }
 
 func newShip(y, x int) *Ship {
-	w, _ := gc.NewWindow(5, 7, y, x)
+	w, err := gc.NewWindow(5, 7, y, x)
+	if err != nil {
+		log.Fatal("newShip:", err)
+	}
 	for i := 0; i < len(ship_ascii); i++ {
 		w.MovePrint(i, 0, ship_ascii[i])
 	}
@@ -256,6 +269,7 @@ func (s *Ship) Collide(i int) {
 		if a, ok := ob.(*Asteroid); ok {
 			ay, ax := a.YX()
 			if ay >= ty && ay+1 <= ty+by && ax >= tx && ax+1 <= tx+bx {
+				objects = append(objects, newExplosion(a.YX()))
 				a.alive = false
 				s.life--
 			}
@@ -276,7 +290,8 @@ func (s *Ship) Update() {}
 var objects = make([]Object, 0, 16)
 
 func updateObjects(my, mx int) {
-	tmp := make([]Object, 0, 16)
+	end := len(objects)
+	tmp := make([]Object, 0, end)
 	for i, ob := range objects {
 		ob.Update()
 		ob.Collide(i)
@@ -286,7 +301,11 @@ func updateObjects(my, mx int) {
 			tmp = append(tmp, ob)
 		}
 	}
-	objects = tmp
+	if len(objects) > end {
+		objects = append(tmp, objects[end:]...)
+	} else {
+		objects = tmp
+	}
 }
 
 func drawObjects(s *gc.Window) {
@@ -304,14 +323,26 @@ func lifeToText(n int) string {
 }
 
 func main() {
-	stdscr, _ := gc.Init()
+	f, err := os.Create("err.log")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	log.SetOutput(f)
+
+	var stdscr gc.Window
+	stdscr, err = gc.Init()
+	if err != nil {
+		log.Println("Init:", err)
+	}
 	defer gc.End()
 
 	rand.Seed(time.Now().Unix())
 	gc.StartColor()
 	gc.Cursor(0)
 	gc.Echo(false)
-	gc.Raw(true)
+	gc.HalfDelay(1)
 
 	gc.InitPair(1, gc.C_WHITE, gc.C_BLACK)
 	gc.InitPair(2, gc.C_YELLOW, gc.C_BLACK)
@@ -320,8 +351,6 @@ func main() {
 
 	gc.InitPair(5, gc.C_BLUE, gc.C_BLACK)
 	gc.InitPair(6, gc.C_GREEN, gc.C_BLACK)
-
-	stdscr.Timeout(0)
 
 	lines, cols := stdscr.MaxYX()
 	pl, pc := lines, cols*3
@@ -339,8 +368,7 @@ func main() {
 loop:
 	for {
 		text.MovePrintf(0, 0, "Life: [%-5s]", lifeToText(ship.life))
-		text.MovePrintf(1, 0, "Number of objects: %3d", len(objects))
-		stdscr.Clear()
+		stdscr.Erase()
 		stdscr.Copy(field.Window, 0, px, 0, 0, lines-1, cols-1, true)
 		drawObjects(&stdscr)
 		stdscr.Overlay(&text)
@@ -361,4 +389,13 @@ loop:
 			}
 		}
 	}
+	msg := "Game Over"
+	end, err := gc.NewWindow(5, len(msg)+4, (lines/2)-2, (cols/2)-(len(msg)/2))
+	if err != nil {
+		log.Fatal("game over:", err)
+	}
+	end.MovePrint(2, 2, msg)
+	end.Box(gc.ACS_VLINE, gc.ACS_HLINE)
+	end.Refresh()
+	gc.Nap(2000)
 }
