@@ -89,7 +89,12 @@ func (w *Window) Box(vch, hch Char) error {
 	return nil
 }
 
-// Clear the screen
+// Clears the screen and the underlying virtual screen. This forces the entire
+// screen to be rewritten from scratch. This will cause likely cause a
+// noticeable flicker because the screen is completely cleared before
+// redrawing it. This is probably not what you want. Instead, you should
+// probably use the Erase() function. It is the same as called Erase() followed
+// by a call to ClearOk().
 func (w *Window) Clear() error {
 	if C.wclear(w.win) == C.ERR {
 		return errors.New("Failed to clear screen")
@@ -160,31 +165,30 @@ func (w *Window) Copy(src *Window, sy, sx, dtr, dtc, dbr, dbc int,
 	return nil
 }
 
-// DelChar
-func (w *Window) DelChar(coord ...int) error {
-	if len(coord) > 2 {
-		return errors.New(fmt.Sprintf("Invalid number of arguments, "+
-			"expected 2, got %d", len(coord)))
-	}
-	var err C.int
-	if len(coord) > 1 {
-		var x int
-		y := coord[0]
-		if len(coord) > 2 {
-			x = coord[1]
-		}
-		err = C.mvwdelch(w.win, C.int(y), C.int(x))
-	} else {
-		err = C.wdelch(w.win)
-	}
-	if err != C.OK {
+// DelChar deletes the character at the current cursor position, moving all
+// characters to the right of that position one space to the left and appends
+// a blank character at the end.
+func (w *Window) DelChar() error {
+	if err := C.wdelch(w.win); err != C.OK {
 		return errors.New("An error occurred when trying to delete " +
 			"character")
 	}
 	return nil
 }
 
-// Delete the window
+// MoveDelChar deletes the character at the givin cursor coordinates, moving all
+// characters to the right of that position one space to the left and appends
+// a blank character at the end.
+func (w *Window) MoveDelChar() error {
+	if err := C.mvwdelch(w.win, C.int(y), C.int(x)); err != C.OK {
+		return errors.New("An error occurred when trying to delete " +
+			"character")
+	}
+	return nil
+}
+
+// Delete the window. This function must be called to ensure memory is freed
+// to prevent memory leaks once you are done with the window.
 func (w *Window) Delete() error {
 	if C.delwin(w.win) == C.ERR {
 		return errors.New("Failed to delete window")
@@ -207,12 +211,15 @@ func (w *Window) Duplicate() Window {
 	return Window{C.dupwin(w.win)}
 }
 
-// Test whether the given mouse coordinates are within the window or not
+// Test whether the given coordinates are within the window or not
 func (w *Window) Enclose(y, x int) bool {
 	return bool(C.wenclose(w.win, C.int(y), C.int(x)))
 }
 
-// Erase the contents of the window, effectively clearing it
+// Erase the contents of the window, clearing it. This function allows the
+// underlying structures to be updated efficiently and thereby provide smooth
+// updates to the terminal when frequently clearing and re-writing the window
+// or screen.
 func (w *Window) Erase() {
 	C.werase(w.win)
 }
@@ -291,6 +298,8 @@ func (w *Window) Keypad(keypad bool) error {
 	return nil
 }
 
+// LineTouched returns true if the line has been touched; returns false
+// otherwise
 func (w *Window) LineTouched(line int) bool {
 	return bool(C.is_linetouched(w.win, C.int(line)))
 }
@@ -345,8 +354,14 @@ func (w *Window) Overwrite(src *Window) error {
 	return nil
 }
 
+// Parent returns a pointer to a Sub-window's parent, or nil if the window
+// has no parent
 func (w *Window) Parent() *Window {
-	return &Window{C.ncurses_wgetparent(w.win)}
+	w := C.ncurses_wgetparent(w.win)
+	if w == C.NULL {
+		return nil
+	}
+	return &Window{w}
 }
 
 // Print a string to the given window. See the fmt package in the standard
