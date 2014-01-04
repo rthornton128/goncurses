@@ -179,7 +179,7 @@ func (w *Window) DelChar() error {
 // MoveDelChar deletes the character at the givin cursor coordinates, moving all
 // characters to the right of that position one space to the left and appends
 // a blank character at the end.
-func (w *Window) MoveDelChar() error {
+func (w *Window) MoveDelChar(y, x int) error {
 	if err := C.mvwdelch(w.win, C.int(y), C.int(x)); err != C.OK {
 		return errors.New("An error occurred when trying to delete " +
 			"character")
@@ -357,11 +357,11 @@ func (w *Window) Overwrite(src *Window) error {
 // Parent returns a pointer to a Sub-window's parent, or nil if the window
 // has no parent
 func (w *Window) Parent() *Window {
-	w := C.ncurses_wgetparent(w.win)
-	if w == C.NULL {
+  p := C.ncurses_wgetparent(w.win)
+	if p == nil {
 		return nil
 	}
-	return &Window{w}
+	return &Window{p}
 }
 
 // Print a string to the given window. See the fmt package in the standard
