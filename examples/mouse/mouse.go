@@ -3,8 +3,10 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/* This example show a basic menu similar to that found in the ncurses
- * examples from TLDP */
+/*
+ * Expanding on the basic menu example, the example demonstrates how you
+ * could possibly utilize the mouse to navigate a menu and select options
+ */
 
 package main
 
@@ -31,33 +33,40 @@ func main() {
 	gc.Raw(true)
 	gc.Echo(false)
 	gc.Cursor(0)
-	stdscr.Clear()
 	stdscr.Keypad(true)
 
-	rows, cols := stdscr.MaxYX()
-	y, x := (rows-HEIGHT)/2, (cols-WIDTH)/2
+	y, x := 5, 2
 
 	win, err := gc.NewWindow(HEIGHT, WIDTH, y, x)
 	if err != nil {
 		log.Fatal("new_window:", err)
 	}
-	win.Keypad(true)
-	stdscr.MovePrint(0, 0,
-		"Use arrow keys to go up and down, Press enter to select")
+	stdscr.MovePrint(0, 0, "Use up/down arrow keys, enter to "+
+		"select or 'q' to quit")
+	stdscr.MovePrint(1, 0, "You may also left mouse click on an entry to select")
 	stdscr.Refresh()
 
 	printmenu(win, menu, active)
-	if gc.Mouse() {
+
+	// Check to see if the Mouse is available. This function was not available
+	// in older versions of ncurses (5.7 and older) and may return false even
+	// if the mouse is in fact avaiable for use.
+	if gc.MouseOk() {
 		stdscr.MovePrint(3, 0, "WARN: Mouse support not detected.")
 	}
+
+	// Adjust the default mouse-click sensitivity to make it more responsive
+	gc.MouseInterval(50)
+
 	// If, for example, you are temporarily disabling the mouse or are
 	// otherwise altering mouse button detection temporarily, you could
 	// pass a pointer to a MouseButton object as the 2nd argument to
 	// record that information. Invocation may look something like:
-	// var old gc.MouseButton
-	// gc.MouseMask(gc.M_ALL, &old) /* temporarily enable all mouse clicks */
-	// gc.MouseMask(old, nil)		/* change it back */
-	gc.MouseMask(gc.M_B1_PRESSED, nil)
+
+	var prev gc.MouseButton
+	gc.MouseMask(gc.M_B1_PRESSED, nil) // only detect left mouse clicks
+	gc.MouseMask(gc.M_ALL, &prev)      // temporarily enable all mouse clicks
+	gc.MouseMask(prev, nil)            // change it back
 
 	for {
 		ch := stdscr.GetChar()
@@ -77,11 +86,9 @@ func main() {
 				active += 1
 			}
 		case gc.KEY_MOUSE:
-			md, err := gc.GetMouse()
-			if err != nil {
-				stdscr.MovePrint(20, 0, "%s", err)
-			}
-			new := getactive(x, y, md[0], md[1], menu)
+			/* pull the mouse event off the queue */
+			md := gc.GetMouse()
+			new := getactive(x, y, md.X, md.Y, menu)
 			if new != -1 {
 				active = new
 			}
@@ -89,7 +96,7 @@ func main() {
 				menu[active])
 			stdscr.ClearToEOL()
 			stdscr.Refresh()
-		case gc.KEY_RETURN:
+		case gc.KEY_RETURN, gc.KEY_ENTER, gc.Key('\r'):
 			stdscr.MovePrintf(23, 0, "Choice #%d: %s selected", active+1,
 				menu[active])
 			stdscr.ClearToEOL()

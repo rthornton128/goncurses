@@ -103,21 +103,6 @@ func FlushInput() error {
 	return nil
 }
 
-// Returns an array of integers representing the following, in order:
-// x, y and z coordinates, id of the device, and a bit masked state of
-// the devices buttons
-func GetMouse() ([]int, error) {
-	if bool(C.ncurses_has_mouse()) != true {
-		return nil, errors.New("Mouse support not enabled")
-	}
-	var event C.MEVENT
-	if C.ncurses_getmouse(&event) != C.OK {
-		return nil, errors.New("Failed to get mouse event")
-	}
-	return []int{int(event.x), int(event.y), int(event.z), int(event.id),
-		int(event.bstate)}, nil
-}
-
 // Behaves like cbreak() but also adds a timeout for input. If timeout is
 // exceeded after a call to Getch() has been made then GetChar will return
 // with an error.
@@ -216,30 +201,6 @@ func PairContent(pair int16) (fg int16, bg int16, err error) {
 		return -1, -1, errors.New("Invalid color pair")
 	}
 	return int16(f), int16(b), nil
-}
-
-// Mouse returns true if ncurses has built-in mouse support. On ncurses 5.7
-// and earlier, this function is not present and so will always return false
-func Mouse() bool {
-	return bool(C.ncurses_has_mouse())
-}
-
-// MouseInterval sets the maximum time in milliseconds that can elapse
-// between press and release mouse events and returns the previous setting.
-// Use a value of 0 (zero) to disable click resolution. Use a value of -1
-// to get the previous value without changing the current value. Default
-// value is 1/6 of a second.
-func MouseInterval(ms int) int {
-	return int(C.mouseinterval(C.int(ms)))
-}
-
-// MouseMask accepts a single int of OR'd mouse events. If a mouse event
-// is triggered, GetChar() will return KEY_MOUSE. To retrieve the actual
-// event use GetMouse() to pop it off the queue. Pass a pointer as the
-// second argument to store the prior events being monitored or nil.
-func MouseMask(mask MouseButton, old *MouseButton) int {
-	return int(C.mousemask((C.mmask_t)(mask),
-		(*C.mmask_t)(unsafe.Pointer(old))))
 }
 
 // Nap (sleep; halt execution) for 'ms' milliseconds

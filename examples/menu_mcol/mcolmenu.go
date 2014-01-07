@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/* This example shows a basic multi-column menu similar to that found in the 
+/* This example shows a basic multi-column menu similar to that found in the
  * ncurses examples from TLDP */
 
 package main
