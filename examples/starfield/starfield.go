@@ -1,3 +1,4 @@
+// Starfield is a simple Goncurses game demo.
 package main
 
 import (
@@ -292,8 +293,10 @@ var objects = make([]Object, 0, 16)
 func updateObjects(my, mx int) {
 	end := len(objects)
 	tmp := make([]Object, 0, end)
-	for i, ob := range objects {
+	for _, ob := range objects {
 		ob.Update()
+	}
+	for i, ob := range objects {
 		ob.Collide(i)
 		if ob.Expired(my, mx) {
 			ob.Cleanup()
