@@ -53,9 +53,9 @@ func main() {
 	menuwin, _ := gc.NewWindow(HEIGHT, WIDTH, 4, 14)
 	menuwin.Keypad(true)
 
-	menu.SetWindow(&menuwin)
+	menu.SetWindow(menuwin)
 	dwin := menuwin.Derived(6, 38, 3, 1)
-	menu.SubWindow(&dwin)
+	menu.SubWindow(dwin)
 	menu.Format(5, 1)
 	menu.Mark(" * ")
 
