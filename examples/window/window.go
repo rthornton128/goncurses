@@ -3,58 +3,89 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/* This simnple example mirrors one in the TLDP ncurses howto. It demonstrates
- * how to move a window around the screen. It is advisable not to  */
+/* This simple example demonstrates how one might move a window about the
+* screen. It is worthy of note that the window must be erased each time it
+* is moved. This is because a 'ghost' of the prior window will be left
+* behind. There are other techniques you could use depending on what you
+* need to achieve but this demonstrates a fairly simple method */
 
 package main
 
-import "code.google.com/p/goncurses"
+import (
+	gc "code.google.com/p/goncurses"
+	"log"
+)
 
 func main() {
-	stdscr, _ := goncurses.Init()
-	defer goncurses.End()
-
-	goncurses.Echo(false)
-	goncurses.CBreak(true)
-	goncurses.Cursor(0)
-	stdscr.Keypad(true)
-	stdscr.Print("Use arrow keys to move window. Press 'q' to exit")
-	stdscr.Refresh()
-
-	rows, cols := stdscr.MaxYX()
-	height, width := 3, 10
-	y, x := (rows-height)/2, (cols-width)/2
-	win := createWin(height, width, y, x)
-
-	for {
-		switch stdscr.GetChar() {
-		case 'q':
-			return
-		case goncurses.KEY_LEFT:
-			x -= 1
-		case goncurses.KEY_RIGHT:
-			x += 1
-		case goncurses.KEY_UP:
-			y -= 1
-		case goncurses.KEY_DOWN:
-			y += 1
-		}
-		destroy(win)
-		win = createWin(height, width, y, x)
+	stdscr, err := gc.Init()
+	if err != nil {
+		log.Fatal(err)
 	}
-	destroy(win)
-}
+	defer gc.End()
 
-func createWin(h, w, y, x int) *goncurses.Window {
-	new, _ := goncurses.NewWindow(h, w, y, x)
-	new.Box(0, 0)
-	new.Refresh()
-	return new
-}
+	// Turn off character echo, hide the cursor and disable input buffering
+	gc.Echo(false)
+	gc.CBreak(true)
+	gc.Cursor(0)
 
-func destroy(w *goncurses.Window) {
-	w.Erase()
-	w.Refresh()
-	w.Delete()
-	return
+	stdscr.Print("Use arrow keys to move the window. Press 'q' to exit")
+	stdscr.NoutRefresh()
+
+	// Determine the center of the screen and offset those coordinates by
+	// half of the window size we are about to create. These coordinates will
+	// be used to move our window around the screen
+	rows, cols := stdscr.MaxYX()
+	height, width := 5, 10
+	y, x := (rows-height)/2, (cols-width)/2
+
+	// Create a new window centered on the screen and enable the use of the
+	// keypad on it so the arrow keys are available
+	var win *gc.Window
+	win, err = gc.NewWindow(height, width, y, x)
+	if err != nil {
+		log.Fatal(err)
+	}
+	win.Keypad(true)
+
+main:
+	for {
+		// Clear the section of screen where the box is currently located so
+		// that it is blanked by calling Erase on the window and refreshing it
+		// so that the chances are sent to the virtual screen but not actually
+		// output to the terminal
+		win.Erase()
+		win.NoutRefresh()
+		// Move the window to it's new location (if any) and redraw it
+		win.MoveWindow(y, x)
+		win.Box(0, 0)
+		win.NoutRefresh()
+		// Update will flush only the characters which have changed between the
+		// physical screen and the virtual screen, minimizing the number of
+		// characters which must be sent
+		gc.Update()
+
+		// In order for the window to display correctly, we must call GetChar()
+		// on it rather than stdscr
+		switch win.GetChar() {
+		case 'q':
+			break main
+		case gc.KEY_LEFT:
+			if x > 0 {
+				x--
+			}
+		case gc.KEY_RIGHT:
+			if x < cols-width {
+				x++
+			}
+		case gc.KEY_UP:
+			if y > 1 {
+				y--
+			}
+		case gc.KEY_DOWN:
+			if y < rows-height {
+				y++
+			}
+		}
+	}
+	win.Delete()
 }
