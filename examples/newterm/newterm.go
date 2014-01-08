@@ -1,7 +1,18 @@
+// goncurses - ncurses library for Go.
+// Copyright 2011 Rob Thornton. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+// This example demonstrates how one might write to multiple terminals from a
+// single program or redirect output. In order to run the program you must
+// supply a single argument with is a path to a pseudo-terminal device.
+//
+// This example should compile on Windows but running it may be problematic
 package main
 
 import (
 	gc "code.google.com/p/goncurses"
+	"flag"
 	"log"
 	"os"
 )
@@ -10,9 +21,16 @@ func main() {
 	var term1, term2 *gc.Screen
 	var err error
 
+	flag.Parse()
+
+	if flag.NArg() != 1 {
+		log.Fatal("Must supply path to a pseudo-terminal (ie. /dev/pts/0)")
+	}
+
 	// You can, for example, use the current psuedo-terminal to read/write to
+	// You may need to change the  to one you have read/write access to
 	var pts *os.File
-	pts, err = os.OpenFile("/dev/pts/0", os.O_RDWR, os.FileMode(666))
+	pts, err = os.OpenFile(flag.Arg(0), os.O_RDWR, os.FileMode(666))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -42,7 +60,7 @@ func main() {
 	term1.Set()
 
 	// Get the Standard Screen Window and write to the active terminal
-	mw := gc.StdScr() // misleading...use a StdScr() method instead?
+	mw := gc.StdScr()
 	mw.MovePrint(0, 0, "Term 1 works! Press any key to exit...")
 	mw.Refresh()
 	mw.GetChar()

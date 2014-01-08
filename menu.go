@@ -104,7 +104,7 @@ func (m *Menu) Free() error {
 }
 
 // Grey sets the attributes of non-selectable items in the menu
-func (m *Menu) Grey(ch int) {
+func (m *Menu) Grey(ch Char) {
 	C.set_menu_grey(m.menu, C.chtype(ch))
 }
 
@@ -170,13 +170,13 @@ func (m *Menu) Scale() (int, int, error) {
 
 // SetBackground set the attributes of the un-highlighted items in the
 // menu
-func (m *Menu) SetBackground(ch int) error {
+func (m *Menu) SetBackground(ch Char) error {
 	err := C.set_menu_back(m.menu, C.chtype(ch))
 	return ncursesError(syscall.Errno(err))
 }
 
 // SetForeground sets the attributes of the highlighted items in the menu
-func (m *Menu) SetForeground(ch int) error {
+func (m *Menu) SetForeground(ch Char) error {
 	err := C.set_menu_fore(m.menu, C.chtype(ch))
 	return ncursesError(syscall.Errno(err))
 }
@@ -194,7 +194,7 @@ func (m *Menu) SetItems(items []*MenuItem) error {
 }
 
 // SetPad sets the padding character for menu items.
-func (m *Menu) SetPad(ch int) error {
+func (m *Menu) SetPad(ch Char) error {
 	err := C.set_menu_pad(m.menu, C.int(ch))
 	return ncursesError(syscall.Errno(err))
 }

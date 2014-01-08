@@ -210,8 +210,8 @@ func (w *Window) Delete() error {
 // y, x.  These coordinates are relative to the original window thereby
 // confining the derived window to the area of original window. See the
 // SubWindow function for additional notes.
-func (w *Window) Derived(height, width, y, x int) Window {
-	return Window{C.derwin(w.win, C.int(height), C.int(width), C.int(y),
+func (w *Window) Derived(height, width, y, x int) *Window {
+	return &Window{C.derwin(w.win, C.int(height), C.int(width), C.int(y),
 		C.int(x))}
 }
 

@@ -37,9 +37,9 @@ func main() {
 	menuwin, _ := gc.NewWindow(10, 40, 4, 14)
 	menuwin.Keypad(true)
 
-	menu.SetWindow(&menuwin)
+	menu.SetWindow(menuwin)
 	dwin := menuwin.Derived(6, 38, 3, 1)
-	menu.SubWindow(&dwin)
+	menu.SubWindow(dwin)
 	menu.Mark(" * ")
 
 	// Print centered menu title

@@ -59,7 +59,7 @@ func main() {
 			return
 		case ' ':
 			menu.Driver(gc.REQ_TOGGLE)
-		case gc.KEY_RETURN:
+		case gc.KEY_RETURN, gc.KEY_ENTER:
 			var list string
 			for _, item := range menu.Items() {
 				if item.Value() {
