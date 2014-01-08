@@ -165,8 +165,8 @@ func InitPair(pair, fg, bg int16) error {
 
 // Initialize the ncurses library. You must run this function prior to any
 // other goncurses function in order for the library to work
-func Init() (stdscr Window, err error) {
-	stdscr = Window{C.initscr()}
+func Init() (stdscr *Window, err error) {
+	stdscr = &Window{C.initscr()}
 	if unsafe.Pointer(stdscr.win) == nil {
 		err = errors.New("An error occurred initializing ncurses")
 	}
@@ -206,15 +206,6 @@ func PairContent(pair int16) (fg int16, bg int16, err error) {
 // Nap (sleep; halt execution) for 'ms' milliseconds
 func Nap(ms int) {
 	C.napms(C.int(ms))
-}
-
-// NewWindow creates a window of size h(eight) and w(idth) at y, x
-func NewWindow(h, w, y, x int) (window Window, err error) {
-	window = Window{C.newwin(C.int(h), C.int(w), C.int(y), C.int(x))}
-	if window.win == nil {
-		err = errors.New("Failed to create a new window")
-	}
-	return
 }
 
 // NewLines turns newline translation on/off.

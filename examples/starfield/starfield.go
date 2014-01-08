@@ -120,7 +120,7 @@ func spawnAsteroid(my, mx int) {
 	if err != nil {
 		log.Println("spawnAsteroid:", err)
 	}
-	a := &Asteroid{Window: &w, alive: true, sy: sy, sx: sx, y: y * 100,
+	a := &Asteroid{Window: w, alive: true, sy: sy, sx: sx, y: y * 100,
 		x: x * 100}
 	a.ColorOn(2)
 	a.Print("@")
@@ -164,7 +164,7 @@ func newBullet(y, x int) *Bullet {
 	}
 	w.AttrOn(gc.A_BOLD | gc.ColorPair(4))
 	w.Print("-")
-	return &Bullet{&w, true}
+	return &Bullet{w, true}
 }
 
 func (b *Bullet) Cleanup() {
@@ -222,7 +222,7 @@ func newExplosion(y, x int) *Explosion {
 	w.MovePrint(1, 0, ` X `)
 	w.AttrOn(gc.A_DIM)
 	w.MovePrint(2, 0, `/ \`)
-	return &Explosion{&w, 5}
+	return &Explosion{w, 5}
 }
 
 func (e *Explosion) Cleanup() {
@@ -256,7 +256,7 @@ func newShip(y, x int) *Ship {
 	for i := 0; i < len(ship_ascii); i++ {
 		w.MovePrint(i, 0, ship_ascii[i])
 	}
-	return &Ship{&w, 5}
+	return &Ship{w, 5}
 }
 
 func (s *Ship) Cleanup() {
@@ -334,7 +334,7 @@ func main() {
 
 	log.SetOutput(f)
 
-	var stdscr gc.Window
+	var stdscr *gc.Window
 	stdscr, err = gc.Init()
 	if err != nil {
 		log.Println("Init:", err)
@@ -373,8 +373,8 @@ loop:
 		text.MovePrintf(0, 0, "Life: [%-5s]", lifeToText(ship.life))
 		stdscr.Erase()
 		stdscr.Copy(field.Window, 0, px, 0, 0, lines-1, cols-1, true)
-		drawObjects(&stdscr)
-		stdscr.Overlay(&text)
+		drawObjects(stdscr)
+		stdscr.Overlay(text)
 		stdscr.Refresh()
 		select {
 		case <-c.C:
@@ -385,9 +385,9 @@ loop:
 			px++
 		case <-c2.C:
 			updateObjects(stdscr.MaxYX())
-			drawObjects(&stdscr)
+			drawObjects(stdscr)
 		default:
-			if !handleInput(&stdscr, ship) || ship.Expired(-1, -1) {
+			if !handleInput(stdscr, ship) || ship.Expired(-1, -1) {
 				break loop
 			}
 		}

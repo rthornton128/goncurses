@@ -30,7 +30,7 @@ func main() {
 	// Accept input concurrently via a goroutine and connect a channel
 	in := make(chan gc.Char)
 	ready := make(chan bool)
-	go func(w gc.Window, ch chan<- gc.Char) {
+	go func(w *gc.Window, ch chan<- gc.Char) {
 		for {
 			// Block until all write operations are complete
 			<-ready
