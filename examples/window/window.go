@@ -42,17 +42,18 @@ func main() {
 		destroy(win)
 		win = createWin(height, width, y, x)
 	}
+	destroy(win)
 }
 
-func createWin(h, w, y, x int) goncurses.Window {
+func createWin(h, w, y, x int) *goncurses.Window {
 	new, _ := goncurses.NewWindow(h, w, y, x)
 	new.Box(0, 0)
 	new.Refresh()
 	return new
 }
 
-func destroy(w goncurses.Window) {
-	w.Border(' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ')
+func destroy(w *goncurses.Window) {
+	w.Erase()
 	w.Refresh()
 	w.Delete()
 	return

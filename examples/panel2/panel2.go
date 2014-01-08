@@ -39,7 +39,7 @@ func main() {
 		window.ColorOn(int16(i + 1))
 		window.MovePrintf(1, (w/2)-(len(title)/2), title, i+1)
 		window.ColorOff(int16(i + 1))
-		panels[i] = gc.NewPanel(&window)
+		panels[i] = gc.NewPanel(window)
 
 	}
 

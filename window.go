@@ -19,6 +19,15 @@ type Window struct {
 	win *C.WINDOW
 }
 
+// NewWindow creates a window of size h(eight) and w(idth) at y, x
+func NewWindow(h, w, y, x int) (window *Window, err error) {
+	window = &Window{C.newwin(C.int(h), C.int(w), C.int(y), C.int(x))}
+	if window.win == nil {
+		err = errors.New("Failed to create a new window")
+	}
+	return
+}
+
 // AddChar prints a single character to the window. The character can be
 // OR'd together with attributes and colors.
 func (w *Window) AddChar(ach Char) {
@@ -207,8 +216,8 @@ func (w *Window) Derived(height, width, y, x int) Window {
 }
 
 // Duplicate the window, creating an exact copy.
-func (w *Window) Duplicate() Window {
-	return Window{C.dupwin(w.win)}
+func (w *Window) Duplicate() *Window {
+	return &Window{C.dupwin(w.win)}
 }
 
 // Test whether the given coordinates are within the window or not
@@ -357,7 +366,7 @@ func (w *Window) Overwrite(src *Window) error {
 // Parent returns a pointer to a Sub-window's parent, or nil if the window
 // has no parent
 func (w *Window) Parent() *Window {
-  p := C.ncurses_wgetparent(w.win)
+	p := C.ncurses_wgetparent(w.win)
 	if p == nil {
 		return nil
 	}
@@ -436,8 +445,8 @@ func (w *Window) ScrollOk(ok bool) {
 // made to one window are reflected in the other. It is necessary to call
 // Touch() on this window prior to calling Refresh in order for it to be
 // displayed.
-func (w *Window) Sub(height, width, y, x int) Window {
-	return Window{C.subwin(w.win, C.int(height), C.int(width), C.int(y),
+func (w *Window) Sub(height, width, y, x int) *Window {
+	return &Window{C.subwin(w.win, C.int(height), C.int(width), C.int(y),
 		C.int(x))}
 }
 

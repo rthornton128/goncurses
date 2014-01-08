@@ -127,7 +127,7 @@ func getactive(x, y, mx, my int, menu []string) int {
 	return -1
 }
 
-func printmenu(w gc.Window, menu []string, active int) {
+func printmenu(w *gc.Window, menu []string, active int) {
 	y, x := 2, 2
 	w.Box(0, 0)
 	for i, s := range menu {

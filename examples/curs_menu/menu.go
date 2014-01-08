@@ -28,8 +28,8 @@ func main() {
 	stdscr.Clear()
 	stdscr.Keypad(true)
 
-	rows, cols := stdscr.MaxYX()
-	y, x := (rows-HEIGHT)/2, (cols-WIDTH)/2
+	my, mx := stdscr.MaxYX()
+	y, x := 2, (mx/2)-(WIDTH/2)
 
 	win, _ := NewWindow(HEIGHT, WIDTH, y, x)
 	win.Keypad(true)
@@ -37,39 +37,39 @@ func main() {
 	stdscr.Print("Use arrow keys to go up and down, Press enter to select")
 	stdscr.Refresh()
 
-	printmenu(&win, menu, active)
+	printmenu(win, menu, active)
 
 	for {
 		ch := stdscr.GetChar()
-		switch KeyString(ch) {
-		case "q":
+		switch Key(ch) {
+		case 'q':
 			return
-		case "up":
+		case KEY_UP:
 			if active == 0 {
 				active = len(menu) - 1
 			} else {
 				active -= 1
 			}
-		case "down":
+		case KEY_DOWN:
 			if active == len(menu)-1 {
 				active = 0
 			} else {
 				active += 1
 			}
-		case "enter":
-			stdscr.MovePrintf(23, 0, "Choice #%d: %s selected",
+		case KEY_RETURN, KEY_ENTER, Key('\r'):
+			stdscr.MovePrintf(my-2, 0, "Choice #%d: %s selected",
 				active,
 				menu[active])
 			stdscr.ClearToEOL()
 			stdscr.Refresh()
 		default:
-			stdscr.MovePrintf(23, 0, "Character pressed = %3d/%c",
+			stdscr.MovePrintf(my-2, 0, "Character pressed = %3d/%c",
 				ch, ch)
 			stdscr.ClearToEOL()
 			stdscr.Refresh()
 		}
 
-		printmenu(&win, menu, active)
+		printmenu(win, menu, active)
 	}
 }
 
