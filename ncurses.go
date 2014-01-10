@@ -154,8 +154,8 @@ func InitColor(col, r, g, b int16) error {
 
 // InitPair sets a colour pair designated by 'pair' to fg and bg colors
 func InitPair(pair, fg, bg int16) error {
-	if pair == 0 || C.int(pair) > C.int(C.COLOR_PAIRS-1) {
-		return errors.New("Invalid color pair selected")
+	if pair <= 0 || C.int(pair) > C.int(C.COLOR_PAIRS-1) {
+		return errors.New("Color pair out of range")
 	}
 	if C.init_pair(C.short(pair), C.short(fg), C.short(bg)) == C.ERR {
 		return errors.New("Failed to init color pair")
