@@ -22,7 +22,10 @@ var ship_ascii = []string{
 }
 
 func genStarfield(pl, pc int) *gc.Pad {
-	pad := gc.NewPad(pl, pc)
+	pad, err := gc.NewPad(pl, pc)
+	if err != nil {
+		log.Fatal(err)
+	}
 	stars := int(float64(pc*pl) * density)
 	planets := int(float64(pc*pl) * planet_density)
 	for i := 0; i < stars; i++ {
@@ -393,7 +396,7 @@ loop:
 		}
 	}
 	msg := "Game Over"
-	end, err := gc.NewWindow(5, len(msg)+4, (lines/2)-2, (cols/2)-(len(msg)/2))
+	end, err := gc.NewWindow(5, len(msg)+4, (lines/2)-2, (cols-len(msg))/2)
 	if err != nil {
 		log.Fatal("game over:", err)
 	}
