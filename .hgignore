@@ -2,6 +2,11 @@ syntax: glob
 
 _*
 *.8
-*.txt
+*.a
+*.bat
+*.c
+*.dll
+*.h
 *.o
 *.swp
+*.txt
