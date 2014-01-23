@@ -4,11 +4,13 @@
 // license that can be found in the LICENSE file.
 
 /* This example show a basic menu similar to that found in the ncurses
- * examples from TLDP. Errors are intentionally discarded */
-
+ * examples from TLDP */
 package main
 
-import . "code.google.com/p/goncurses"
+import (
+	. "code.google.com/p/goncurses"
+	"log"
+)
 
 const (
 	HEIGHT = 10
@@ -19,7 +21,10 @@ func main() {
 	var active int
 	menu := []string{"Choice 1", "Choice 2", "Choice 3", "Choice 4", "Exit"}
 
-	stdscr, _ := Init()
+	stdscr, err := Init()
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer End()
 
 	Raw(true)

@@ -6,7 +6,6 @@
 // This example demonstrates using goncurses with Go's built-in concurrency
 // primatives. It is key to ensure no reads or writes occur concurrently to
 // a window or screen. Another method would be to use a global mutex.
-
 package main
 
 import (

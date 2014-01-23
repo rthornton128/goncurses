@@ -1,3 +1,9 @@
+// goncurses - ncurses library for Go.
+// Copyright 2011 Rob Thornton. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+/* Demonstarates the use of the SLK Soft-Keys facilities */
 package main
 
 import (

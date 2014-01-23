@@ -6,7 +6,6 @@
 /* An example of using AddChar to show a non-standard character. Some common
  * VT100 symbols do not work on the windows command line (like ACS_DIAMOND) or
  * may require the use of chcp to change the codepage to 437 or 850 */
-
 package main
 
 import (

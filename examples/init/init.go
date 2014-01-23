@@ -3,10 +3,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/* This example mirrors the second example in the TLDP ncurses howto,
-   demonstrating some of the initilization options for ncurses;
+/* Demonstrates some of the initilization options for ncurses;
    In gnome, the F1 key launches help, so F2 is tested for instead */
-
 package main
 
 import (
@@ -23,6 +21,7 @@ func main() {
 
 	goncurses.Raw(true)   // turn on raw "uncooked" input
 	goncurses.Echo(false) // turn echoing of typed characters off
+	goncurses.Cursor(0)   // hide cursor
 	stdscr.Keypad(true)   // allow keypad input
 
 	stdscr.Print("Press a key...")

@@ -3,11 +3,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/*
- * Expanding on the basic menu example, the example demonstrates how you
+/* Expanding on the basic menu example, the example demonstrates how you
  * could possibly utilize the mouse to navigate a menu and select options
  */
-
 package main
 
 import (

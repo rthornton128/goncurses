@@ -5,7 +5,6 @@
 
 /* This example shows a basic multi-column menu similar to that found in the
  * ncurses examples from TLDP */
-
 package main
 
 import gc "code.google.com/p/goncurses"
