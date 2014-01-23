@@ -4,7 +4,6 @@
 // license that can be found in the LICENSE file.
 
 /* This simple example demonstrates how to implement a form */
-
 package main
 
 import gc "code.google.com/p/goncurses"

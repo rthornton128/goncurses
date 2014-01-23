@@ -3,9 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/* This example demonstrates the use of the menu library, similar to that 
- * found in the ncurses examples from TLDP */
-
+/* This example demonstrates the use of the menu library */
 package main
 
 import (

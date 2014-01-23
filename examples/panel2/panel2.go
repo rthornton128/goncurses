@@ -3,8 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/* A simmple example of how to use the panel ncurses library */
-
+/* A slightly more advanced example of how to use the panel routines */
 package main
 
 import gc "code.google.com/p/goncurses"

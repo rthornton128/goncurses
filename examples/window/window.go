@@ -8,7 +8,6 @@
 * is moved. This is because a 'ghost' of the prior window will be left
 * behind. There are other techniques you could use depending on what you
 * need to achieve but this demonstrates a fairly simple method */
-
 package main
 
 import (

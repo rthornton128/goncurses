@@ -3,8 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/* This example demonstrates some of the color facilities of ncurses */
-
+/* Demonstrates some of the color facilities of ncurses */
 package main
 
 import (

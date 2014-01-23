@@ -4,7 +4,6 @@
 // license that can be found in the LICENSE file.
 
 /* The classic "Hello, World!" program in Goncurses! */
-
 package main
 
 import (
