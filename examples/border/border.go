@@ -12,7 +12,7 @@ func main() {
 	}
 	defer gc.End()
 
-	stdscr.Border(gc.VLINE, gc.ACS_ACS_VLINE, gc.ACS_HLINE, gc.ACS_HLINE,
-		gc.ACS_ULCORNER, gc.ACS_LRCORNER, gc.ACS_ULCORNER, gc.ACS_LRCORNER)
+	stdscr.Border(gc.ACS_VLINE, gc.ACS_VLINE, gc.ACS_HLINE, gc.ACS_HLINE,
+		gc.ACS_ULCORNER, gc.ACS_URCORNER, gc.ACS_LLCORNER, gc.ACS_LRCORNER)
 	stdscr.GetChar()
 }
