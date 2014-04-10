@@ -6,38 +6,46 @@
 
 package goncurses
 
+// #include <curses.h>
+import "C"
+
 // Definitions for printed characters not found on most keyboards.
 const (
-	ACS_DEGREE Char = iota + 4194406
-	ACS_PLMINUS
-	ACS_BOARD
-	ACS_LANTERN
-	ACS_LRCORNER
-	ACS_URCORNER
-	ACS_LLCORNER
-	ACS_ULCORNER
-	ACS_PLUS
-	ACS_S1
-	ACS_S3
-	ACS_HLINE
-	ACS_S7
-	ACS_S9
-	ACS_LTEE
-	ACS_RTEE
-	ACS_BTEE
-	ACS_TTEE
-	ACS_VLINE
-	ACS_LEQUAL
-	ACS_GEQUAL
-	ACS_PI
-	ACS_NEQUAL
-	ACS_STERLING
-	ACS_BULLET
-	ACS_LARROW  = 4194347
-	ACS_RARROW  = 4194348
-	ACS_DARROW  = 4194349
-	ACS_UARROW  = 4194350
-	ACS_BLOCK   = 4194352
-	ACS_DIAMOND = 4194400
-	ACS_CKBOARD = 4194401
+	/* VT100 symbols */
+	ACS_ULCORNER Char = C.A_ALTCHARSET + 'l'
+	ACS_LLCORNER      = C.A_ALTCHARSET + 'm'
+	ACS_URCORNER      = C.A_ALTCHARSET + 'k'
+	ACS_LRCORNER      = C.A_ALTCHARSET + 'j'
+	ACS_LTEE          = C.A_ALTCHARSET + 't'
+	ACS_RTEE          = C.A_ALTCHARSET + 'u'
+	ACS_BTEE          = C.A_ALTCHARSET + 'v'
+	ACS_TTEE          = C.A_ALTCHARSET + 'w'
+	ACS_HLINE         = C.A_ALTCHARSET + 'q'
+	ACS_VLINE         = C.A_ALTCHARSET + 'x'
+	ACS_PLUS          = C.A_ALTCHARSET + 'n'
+	ACS_S1            = C.A_ALTCHARSET + 'o'
+	ACS_S9            = C.A_ALTCHARSET + 's'
+	ACS_DIAMOND       = C.A_ALTCHARSET + '`'
+	ACS_CKBOARD       = C.A_ALTCHARSET + 'a'
+	ACS_DEGREE        = C.A_ALTCHARSET + 'f'
+	ACS_PLMINUS       = C.A_ALTCHARSET + 'g'
+	ACS_BULLET        = C.A_ALTCHARSET + '~'
+
+	/* Teletype 5410v1 symbols */
+	ACS_LARROW  = C.A_ALTCHARSET + ','
+	ACS_RARROW  = C.A_ALTCHARSET + '+'
+	ACS_DARROW  = C.A_ALTCHARSET + '.'
+	ACS_UARROW  = C.A_ALTCHARSET + '-'
+	ACS_BOARD   = C.A_ALTCHARSET + 'h'
+	ACS_LANTERN = C.A_ALTCHARSET + 'i'
+	ACS_BLOCK   = C.A_ALTCHARSET + '0'
+
+	/* Undocumented, not well supported */
+	ACS_S3       = C.A_ALTCHARSET + 'p'
+	ACS_S7       = C.A_ALTCHARSET + 'r'
+	ACS_LEQUAL   = C.A_ALTCHARSET + 'y'
+	ACS_GEQUAL   = C.A_ALTCHARSET + 'z'
+	ACS_PI       = C.A_ALTCHARSET + '{'
+	ACS_NEQUAL   = C.A_ALTCHARSET + '|'
+	ACS_STERLING = C.A_ALTCHARSET + '}'
 )
