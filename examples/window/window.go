@@ -56,7 +56,7 @@ main:
 		win.NoutRefresh()
 		// Move the window to it's new location (if any) and redraw it
 		win.MoveWindow(y, x)
-		win.Box(0, 0)
+		win.Box(gc.ACS_VLINE, gc.ACS_HLINE)
 		win.NoutRefresh()
 		// Update will flush only the characters which have changed between the
 		// physical screen and the virtual screen, minimizing the number of

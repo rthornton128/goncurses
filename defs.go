@@ -16,7 +16,7 @@ const (
 	SYNC_UP     // Sync change in all child windows
 )
 
-type Char int
+type Char C.chtype
 
 // Text attributes
 const (
