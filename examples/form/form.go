@@ -40,24 +40,32 @@ func main() {
 	defer form.Free()
 	stdscr.Refresh()
 
+	fields[0].SetBuffer("Buffer 0")
+
 	stdscr.AttrOn(gc.ColorPair(2) | gc.A_BOLD)
 	stdscr.MovePrint(4, 10, "Value 1:")
 	stdscr.AttrOff(gc.ColorPair(2) | gc.A_BOLD)
 	stdscr.MovePrint(6, 10, "Value 2:")
 	stdscr.Refresh()
 
+	form.Driver(gc.REQ_FIRST_FIELD)
+
 	ch := stdscr.GetChar()
 	for ch != 'q' {
 		switch ch {
-		case gc.KEY_DOWN:
+		case gc.KEY_DOWN, gc.KEY_TAB:
 			form.Driver(gc.REQ_NEXT_FIELD)
 			form.Driver(gc.REQ_END_LINE)
 		case gc.KEY_UP:
 			form.Driver(gc.REQ_PREV_FIELD)
 			form.Driver(gc.REQ_END_LINE)
+		case gc.KEY_BACKSPACE:
+			form.Driver(gc.REQ_CLR_FIELD)
 		default:
 			form.Driver(ch)
 		}
 		ch = stdscr.GetChar()
 	}
+	stdscr.MovePrint(20, 0, fields[1].Buffer())
+	stdscr.GetChar()
 }
