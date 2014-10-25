@@ -8,6 +8,7 @@ package goncurses
 
 // #cgo pkg-config: form
 // #include <form.h>
+// #include <stdlib.h>
 import "C"
 
 import (
@@ -34,6 +35,15 @@ func NewField(h, w, tr, lc, oscr, nbuf int) (*Field, error) {
 // Background returns the field's background character attributes
 func (f *Field) Background() Char {
 	return Char(C.field_back(f.field))
+}
+
+// Buffer returns a string containing the contents of the buffer. The returned
+// string will contain whitespace up to the buffer size as set by SetMax or
+// the value by the call to NewField
+func (f *Field) Buffer() string {
+	str := C.field_buffer(f.field, C.int(0))
+
+	return C.GoString(str)
 }
 
 // Duplicate the field at the specified coordinates, returning a pointer
@@ -94,9 +104,25 @@ func (f *Field) Pad() int {
 	return int(C.field_pad(f.field))
 }
 
+// SetBuffer sets the visible characters in the field. A buffer is empty by
+// default.
+func (f *Field) SetBuffer(s string) error {
+	cstr := C.CString(s)
+	defer C.free(unsafe.Pointer(cstr))
+
+	err := C.set_field_buffer(f.field, C.int(0), cstr)
+	return ncursesError(syscall.Errno(err))
+}
+
 // SetJustification of the field
 func (f *Field) SetJustification(just int) error {
 	err := C.set_field_just(f.field, C.int(just))
+	return ncursesError(syscall.Errno(err))
+}
+
+// SetMax sets the maximum size of a field
+func (f *Field) SetMax(max int) error {
+	err := C.set_max_field(f.field, C.int(max))
 	return ncursesError(syscall.Errno(err))
 }
 
