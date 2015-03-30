@@ -2,8 +2,8 @@
 package goncurses_test
 
 import (
-	"code.google.com/p/goncurses"
 	"fmt"
+	"github.com/rthornton128/goncurses"
 	"os"
 )
 

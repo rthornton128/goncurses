@@ -7,7 +7,7 @@
 package main
 
 import (
-	"code.google.com/p/goncurses"
+	"github.com/rthornton128/goncurses"
 	"log"
 )
 

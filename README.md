@@ -2,7 +2,7 @@ Installation
 ------------
 The go tool is probably the best method of installing goncurses.
 
-go get "code.google.com/p/goncurses"
+go get "github.com/rthornton128/goncurses"
 
 Alternatively you could use mercurial to install goncurses.
 
@@ -15,7 +15,7 @@ on Windows without using either a VM running an OS with ncurses or Cygwin.
 Instead, Goncurses uses PDCurses which is not 100% compatible with ncurses.
 As a result, 
 
-NOTES
+Notes
 -----
 
 No functions which operate only on stdscr have been implemented because 
