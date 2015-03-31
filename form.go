@@ -16,32 +16,28 @@ import (
 	"unsafe"
 )
 
-type Field struct {
-	field *C.FIELD
-}
+type Field C.FIELD
 
 type Form struct {
 	form *C.FORM
 }
 
 func NewField(h, w, tr, lc, oscr, nbuf int) (*Field, error) {
-	var new_field Field
-	var err error
-	new_field.field, err = C.new_field(C.int(h), C.int(w), C.int(tr), C.int(lc),
+	f, err := C.new_field(C.int(h), C.int(w), C.int(tr), C.int(lc),
 		C.int(oscr), C.int(nbuf))
-	return &new_field, ncursesError(err)
+	return (*Field)(f), ncursesError(err)
 }
 
 // Background returns the field's background character attributes
 func (f *Field) Background() Char {
-	return Char(C.field_back(f.field))
+	return Char(C.field_back((*C.FIELD)(f)))
 }
 
 // Buffer returns a string containing the contents of the buffer. The returned
 // string will contain whitespace up to the buffer size as set by SetMax or
 // the value by the call to NewField
 func (f *Field) Buffer() string {
-	str := C.field_buffer(f.field, C.int(0))
+	str := C.field_buffer((*C.FIELD)(f), C.int(0))
 
 	return C.GoString(str)
 }
@@ -49,21 +45,19 @@ func (f *Field) Buffer() string {
 // Duplicate the field at the specified coordinates, returning a pointer
 // to the newly allocated object.
 func (f *Field) Duplicate(y, x int) (*Field, error) {
-	var new_field Field
-	var err error
-	new_field.field, err = C.dup_field(f.field, C.int(y), C.int(x))
-	return &new_field, ncursesError(err)
+	nf, err := C.dup_field((*C.FIELD)(f), C.int(y), C.int(x))
+	return (*Field)(nf), ncursesError(err)
 }
 
 // Foreground returns the field's foreground character attributes
 func (f *Field) Foreground() Char {
-	return Char(C.field_fore(f.field))
+	return Char(C.field_fore((*C.FIELD)(f)))
 }
 
 // Free field's allocated memory. This must be called to prevent memory
 // leaks
 func (f *Field) Free() error {
-	err := C.free_field(f.field)
+	err := C.free_field((*C.FIELD)(f))
 	f = nil
 	return ncursesError(syscall.Errno(err))
 }
@@ -72,7 +66,7 @@ func (f *Field) Free() error {
 // given field. Pass the memory addess of the variable to store the data
 // in or nil.
 func (f *Field) Info(h, w, y, x, off, nbuf *int) error {
-	err := C.field_info(f.field, (*C.int)(unsafe.Pointer(h)),
+	err := C.field_info((*C.FIELD)(f), (*C.int)(unsafe.Pointer(h)),
 		(*C.int)(unsafe.Pointer(w)), (*C.int)(unsafe.Pointer(y)),
 		(*C.int)(unsafe.Pointer(x)), (*C.int)(unsafe.Pointer(off)),
 		(*C.int)(unsafe.Pointer(nbuf)))
@@ -81,27 +75,27 @@ func (f *Field) Info(h, w, y, x, off, nbuf *int) error {
 
 // Just returns the justification type of the field
 func (f *Field) Justification() int {
-	return int(C.field_just(f.field))
+	return int(C.field_just((*C.FIELD)(f)))
 }
 
 // Move the field to the location of the specified coordinates
 func (f *Field) Move(y, x int) error {
-	err := C.move_field(f.field, C.int(y), C.int(x))
+	err := C.move_field((*C.FIELD)(f), C.int(y), C.int(x))
 	return ncursesError(syscall.Errno(err))
 }
 
 // Options turns features on and off
 func (f *Field) Options(opts int, on bool) {
 	if on {
-		C.field_opts_on(f.field, C.Field_Options(opts))
+		C.field_opts_on((*C.FIELD)(f), C.Field_Options(opts))
 		return
 	}
-	C.field_opts_off(f.field, C.Field_Options(opts))
+	C.field_opts_off((*C.FIELD)(f), C.Field_Options(opts))
 }
 
 // Pad returns the padding character of the field
 func (f *Field) Pad() int {
-	return int(C.field_pad(f.field))
+	return int(C.field_pad((*C.FIELD)(f)))
 }
 
 // SetBuffer sets the visible characters in the field. A buffer is empty by
@@ -110,25 +104,25 @@ func (f *Field) SetBuffer(s string) error {
 	cstr := C.CString(s)
 	defer C.free(unsafe.Pointer(cstr))
 
-	err := C.set_field_buffer(f.field, C.int(0), cstr)
+	err := C.set_field_buffer((*C.FIELD)(f), C.int(0), cstr)
 	return ncursesError(syscall.Errno(err))
 }
 
 // SetJustification of the field
 func (f *Field) SetJustification(just int) error {
-	err := C.set_field_just(f.field, C.int(just))
+	err := C.set_field_just((*C.FIELD)(f), C.int(just))
 	return ncursesError(syscall.Errno(err))
 }
 
 // SetMax sets the maximum size of a field
 func (f *Field) SetMax(max int) error {
-	err := C.set_max_field(f.field, C.int(max))
+	err := C.set_max_field((*C.FIELD)(f), C.int(max))
 	return ncursesError(syscall.Errno(err))
 }
 
 // OptionsOff turns feature(s) off
 func (f *Field) SetOptionsOff(opts Char) error {
-	err := int(C.field_opts_off(f.field, C.Field_Options(opts)))
+	err := int(C.field_opts_off((*C.FIELD)(f), C.Field_Options(opts)))
 	if err != C.E_OK {
 		return ncursesError(syscall.Errno(err))
 	}
@@ -137,7 +131,7 @@ func (f *Field) SetOptionsOff(opts Char) error {
 
 // OptionsOn turns feature(s) on
 func (f *Field) SetOptionsOn(opts Char) error {
-	err := int(C.field_opts_on(f.field, C.Field_Options(opts)))
+	err := int(C.field_opts_on((*C.FIELD)(f), C.Field_Options(opts)))
 	if err != C.E_OK {
 		return ncursesError(syscall.Errno(err))
 	}
@@ -146,34 +140,36 @@ func (f *Field) SetOptionsOn(opts Char) error {
 
 // SetPad sets the padding character of the field
 func (f *Field) SetPad(padch int) error {
-	err := C.set_field_pad(f.field, C.int(padch))
+	err := C.set_field_pad((*C.FIELD)(f), C.int(padch))
 	return ncursesError(syscall.Errno(err))
 }
 
 // SetBackground character and attributes (colours, etc)
 func (f *Field) SetBackground(ch Char) error {
-	err := C.set_field_back(f.field, C.chtype(ch))
+	err := C.set_field_back((*C.FIELD)(f), C.chtype(ch))
 	return ncursesError(syscall.Errno(err))
 }
 
 // SetForeground character and attributes (colours, etc)
 func (f *Field) SetForeground(ch Char) error {
-	err := C.set_field_fore(f.field, C.chtype(ch))
+	err := C.set_field_fore((*C.FIELD)(f), C.chtype(ch))
 	return ncursesError(syscall.Errno(err))
 }
 
 // NewForm returns a new form object using the fields array supplied as
 // an argument
 func NewForm(fields []*Field) (Form, error) {
-	cfields := make([]*C.FIELD, len(fields)+1)
-	for index, field := range fields {
-		cfields[index] = field.field
-	}
-	cfields[len(fields)] = nil
+	//cfields := make([]*C.FIELD, len(fields)+1)
+	//for index, field := range fields {
+	//cfields[index] = field.field
+	//}
+	//cfields[len(fields)] = nil
 
-	var form *C.FORM
-	var err error
-	form, err = C.new_form((**C.FIELD)(&cfields[0]))
+	/* append nil field? */
+
+	//var form *C.FORM
+	//var err error
+	form, err := C.new_form((**C.FIELD)(unsafe.Pointer(&fields[0])))
 
 	return Form{form}, ncursesError(err)
 }
@@ -209,12 +205,12 @@ func (f *Form) Post() error {
 // It is important to make sure all prior fields have been freed otherwise
 // this action will result in a memory leak
 func (f *Form) SetFields(fields []*Field) error {
-	cfields := make([]*C.FIELD, len(fields)+1)
-	for index, field := range fields {
-		cfields[index] = field.field
-	}
-	cfields[len(fields)] = nil
-	err := C.set_form_fields(f.form, (**C.FIELD)(&cfields[0]))
+	//cfields := make([]*C.FIELD, len(fields)+1)
+	//for index, field := range fields {
+	//cfields[index] = field.field
+	//}
+	//cfields[len(fields)] = nil
+	err := C.set_form_fields(f.form, (**C.FIELD)(unsafe.Pointer(&fields[0])))
 	return ncursesError(syscall.Errno(err))
 }
 
