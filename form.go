@@ -22,7 +22,7 @@ type Form struct {
 	form *C.FORM
 }
 
-func NewField(h, w, tr, lc, oscr, nbuf int) (*Field, error) {
+func NewField(h, w, tr, lc, oscr, nbuf int32) (*Field, error) {
 	f, err := C.new_field(C.int(h), C.int(w), C.int(tr), C.int(lc),
 		C.int(oscr), C.int(nbuf))
 	return (*Field)(f), ncursesError(err)
@@ -44,7 +44,7 @@ func (f *Field) Buffer() string {
 
 // Duplicate the field at the specified coordinates, returning a pointer
 // to the newly allocated object.
-func (f *Field) Duplicate(y, x int) (*Field, error) {
+func (f *Field) Duplicate(y, x int32) (*Field, error) {
 	nf, err := C.dup_field((*C.FIELD)(f), C.int(y), C.int(x))
 	return (*Field)(nf), ncursesError(err)
 }
@@ -79,7 +79,7 @@ func (f *Field) Justification() int {
 }
 
 // Move the field to the location of the specified coordinates
-func (f *Field) Move(y, x int) error {
+func (f *Field) Move(y, x int32) error {
 	err := C.move_field((*C.FIELD)(f), C.int(y), C.int(x))
 	return ncursesError(syscall.Errno(err))
 }
@@ -159,16 +159,9 @@ func (f *Field) SetForeground(ch Char) error {
 // NewForm returns a new form object using the fields array supplied as
 // an argument
 func NewForm(fields []*Field) (Form, error) {
-	//cfields := make([]*C.FIELD, len(fields)+1)
-	//for index, field := range fields {
-	//cfields[index] = field.field
-	//}
-	//cfields[len(fields)] = nil
-
-	/* append nil field? */
-
-	//var form *C.FORM
-	//var err error
+	if fields[len(fields)-1] != nil {
+		fields = append(fields, nil)
+	}
 	form, err := C.new_form((**C.FIELD)(unsafe.Pointer(&fields[0])))
 
 	return Form{form}, ncursesError(err)
