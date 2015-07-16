@@ -64,7 +64,7 @@ func main() {
 
 	menu.SetWindow(menuwin)
 	dwin := menuwin.Derived(6, 38, 3, 1)
-	menu.SubWindow(&dwin)
+	menu.SubWindow(dwin)
 	menu.Option(gc.O_SHOWDESC, true)
 	menu.Format(5, 3)
 	menu.Mark(" * ")
