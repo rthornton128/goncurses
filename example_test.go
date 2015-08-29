@@ -10,7 +10,7 @@ import (
 func ExampleInit() {
 	// You should always test to make sure ncurses has initialized properly.
 	// In order for your error messages to be visible on the terminal you will
-	// need to either log error messages or output them to to stderr.
+	// need to either log error messages or output them to stderr.
 	stdscr, err := goncurses.Init()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
