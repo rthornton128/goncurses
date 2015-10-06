@@ -40,6 +40,11 @@ func CBreak(on bool) {
 	C.nocbreak()
 }
 
+func TypeAhead(fd int) int {
+
+	return int(C.typeahead(C.int(fd)))
+}
+
 // Test whether colour values can be changed
 func CanChangeColor() bool {
 	return bool(C.bool(C.can_change_color()))
