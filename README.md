@@ -20,6 +20,12 @@ the "extended" curses functionality found in the form and menu extentions.
 For installation instructions, please see the
 [wiki](https://github.com/rthornton128/goncurses/wiki/WindowsInstallation).
 
+OSX Users
+---------
+For installation instructions, please refer
+[here](http://mrcook.uk/how-to-install-go-ncurses-on-mac-osx).
+
+
 Notes
 -----
 
