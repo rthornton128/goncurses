@@ -1,24 +1,18 @@
+Overview
+--------
+Goncurses is an ncurses library for the Go programming language. It
+requires both pkg-config and ncurses C development files be installed.
+
 Installation
 ------------
 The go tool is the recommended method of installing goncurses. Issue the
 following command on the command line:
 
-$ go get "github.com/rthornton128/goncurses"
+$ go get github.com/rthornton128/goncurses
 
-Alternatively, you could use _git_ to install goncurses.
-
-
-Windows Users
--------------
-
-Goncurses is, strictly speaking, an ncurses library. Ncurses is not available
-on Windows without using either a VM running an OS with ncurses or Cygwin.
-Instead, Goncurses uses PDCurses which is not 100% compatible with ncurses.
-As a result, some features of ncurses will not be available to you. Namely,
-the "extended" curses functionality found in the form and menu extentions.
-
-For installation instructions, please see the
-[wiki](https://github.com/rthornton128/goncurses/wiki/WindowsInstallation).
+OSX and Windows users should visit the 
+[Wiki](https://github.com/rthornton128/goncurses/wiki) for installation
+instructions.
 
 Notes
 -----
