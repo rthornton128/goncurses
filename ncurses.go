@@ -5,10 +5,11 @@
 
 package goncurses
 
-// #cgo !windows pkg-config: ncurses
+// #cgo !windows pkg-config: ncursesw
 // #cgo windows CFLAGS: -DNCURSES_MOUSE_VERSION
 // #cgo windows LDFLAGS: -lpdcurses
 // #include <curses.h>
+// #include <locale.h>
 // #include "goncurses.h"
 import "C"
 
@@ -17,6 +18,25 @@ import (
 	"fmt"
 	"unsafe"
 )
+
+func init() {
+	setLocale(LC_ALL, "")
+}
+
+const (
+	LC_ALL      = 0
+	LC_COLLATE  = 1
+	LC_CTYPE    = 2
+	LC_MONETARY = 3
+	LC_NUMERIC  = 5
+	LC_TIME     = 6
+)
+
+func setLocale(lc C.int, locale string) string {
+	param := C.CString(locale)
+	ret := C.setlocale(lc, param)
+	return C.GoString(ret)
+}
 
 // BaudRate returns the speed of the terminal in bits per second
 func BaudRate() int {
