@@ -9,8 +9,9 @@
 package main
 
 import (
-	gc "github.com/rthornton128/goncurses"
 	"log"
+
+	gc "github.com/rthornton128/goncurses"
 )
 
 const (
@@ -66,11 +67,10 @@ func main() {
 	gc.MouseMask(gc.M_ALL, &prev)      // temporarily enable all mouse clicks
 	gc.MouseMask(prev, nil)            // change it back
 
-	for {
-		ch := stdscr.GetChar()
-		switch ch {
-		case 'q':
-			return
+	var key gc.Key
+	for key != 'q' {
+		key = stdscr.GetChar()
+		switch key {
 		case gc.KEY_UP:
 			if active == 0 {
 				active = len(menu) - 1
@@ -85,22 +85,20 @@ func main() {
 			}
 		case gc.KEY_MOUSE:
 			/* pull the mouse event off the queue */
-			md := gc.GetMouse()
-			new := getactive(x, y, md.X, md.Y, menu)
-			if new != -1 {
-				active = new
+			if md := gc.GetMouse(); md != nil {
+				new := getactive(x, y, md.X, md.Y, menu)
+				if new != -1 {
+					active = new
+				}
 			}
-			stdscr.MovePrintf(23, 0, "Choice #%d: %s selected", active+1,
-				menu[active])
-			stdscr.ClearToEOL()
-			stdscr.Refresh()
+			fallthrough
 		case gc.KEY_RETURN, gc.KEY_ENTER, gc.Key('\r'):
 			stdscr.MovePrintf(23, 0, "Choice #%d: %s selected", active+1,
 				menu[active])
 			stdscr.ClearToEOL()
 			stdscr.Refresh()
 		default:
-			stdscr.MovePrintf(23, 0, "Character pressed = %3d/%c", ch, ch)
+			stdscr.MovePrintf(23, 0, "Character pressed = %3d/%c", key, key)
 			stdscr.ClearToEOL()
 			stdscr.Refresh()
 		}
