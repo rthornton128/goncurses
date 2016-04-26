@@ -57,7 +57,7 @@ bool ncurses_is_keypad(const WINDOW *win) {
 }
 
 bool ncurses_is_pad(const WINDOW *win) {
-#ifdef PDCURSES
+#if defined(PDCURSES) || NCURSES_VERSION_MAJOR < 6
 	return false; /* no known built-in way to test for this */
 #else
 	return is_pad(win);
@@ -67,8 +67,10 @@ bool ncurses_is_pad(const WINDOW *win) {
 bool ncurses_is_subwin(const WINDOW *win) {
 #ifdef PDCURSES
 	return win->_parent != NULL;
-#else
+#elseif NCURSES_VERSION_MAJOR > 5
 	return is_subwin(win);
+#else
+	return false; /* FIXME */
 #endif
 }
 
