@@ -102,6 +102,14 @@ const (
 	C_YELLOW        = C.COLOR_YELLOW
 )
 
+// COLORS defines the maximum number of colors the terminal supports
+// and COLOR_PAIRS defintes the maximum number of color pairs the
+// terminal supports
+const (
+	COLORS      = C.COLORS
+	COLOR_PAIRS = C.COLOR_PAIRS
+)
+
 type Key int
 
 const (
