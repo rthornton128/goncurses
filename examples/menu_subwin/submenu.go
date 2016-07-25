@@ -49,8 +49,8 @@ func main() {
 	menuwin.MovePrint(1, (x/2)-(len(title)/2), title)
 	menuwin.ColorOff(1)
 	menuwin.MoveAddChar(2, 0, gc.ACS_LTEE)
-	menuwin.HLine(2, 1, gc.ACS_HLINE, x-3)
-	menuwin.MoveAddChar(2, x-2, gc.ACS_RTEE)
+	menuwin.HLine(2, 1, gc.ACS_HLINE, x-2)
+	menuwin.MoveAddChar(2, x-1, gc.ACS_RTEE)
 
 	y, x = stdscr.MaxYX()
 	stdscr.MovePrint(y-2, 1, "'q' to exit")
