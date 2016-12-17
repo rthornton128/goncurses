@@ -14,6 +14,12 @@ OSX and Windows users should visit the
 [Wiki](https://github.com/rthornton128/goncurses/wiki) for installation
 instructions.
 
+OSX Users
+---------
+For installation instructions, please refer
+[here](http://mrcook.uk/how-to-install-go-ncurses-on-mac-osx).
+
+
 Notes
 -----
 
