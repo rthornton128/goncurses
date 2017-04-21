@@ -64,7 +64,7 @@ func (f *Field) Free() error {
 }
 
 // Info retrieves the height, width, y, x, offset and buffer size of the
-// given field. Pass the memory addess of the variable to store the data
+// given field. Pass the memory address of the variable to store the data
 // in or nil.
 func (f *Field) Info(h, w, y, x, off, nbuf *int) error {
 	err := C.field_info((*C.FIELD)(f), (*C.int)(unsafe.Pointer(h)),
@@ -182,7 +182,7 @@ func (f *Form) Driver(drvract Key) error {
 
 // Free the memory allocated to the form. Forms are not automatically
 // free'd by Go's garbage collection system so the memory allocated to
-// it must be explicitely free'd
+// it must be explicitly free'd
 func (f *Form) Free() error {
 	err := C.free_form(f.form)
 	f = nil
@@ -226,7 +226,7 @@ func (f *Form) SetWindow(w *Window) error {
 	return ncursesError(syscall.Errno(err))
 }
 
-// Sub returns the subwindow assocaiated with the form
+// Sub returns the subwindow associated with the form
 func (f *Form) Sub() Window {
 	return Window{C.form_sub(f.form)}
 }

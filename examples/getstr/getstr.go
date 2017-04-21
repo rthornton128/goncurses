@@ -24,8 +24,8 @@ func main() {
 	row, col = (row/2)-1, (col-len(msg))/2
 	stdscr.MovePrint(row, col, msg)
 
-	/* GetString will only retieve the specified number of characters. Any
-	attempts by the user to enter more characters will elicit an audiable
+	/* GetString will only retrieve the specified number of characters. Any
+	attempts by the user to enter more characters will elicit an audible
 	beep */
 	var str string
 	str, err = stdscr.GetString(10)

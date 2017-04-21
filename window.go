@@ -136,7 +136,7 @@ func (w *Window) ClearToEOL() error {
 	return nil
 }
 
-// Color sets the forground/background color pair for the entire window
+// Color sets the foreground/background color pair for the entire window
 func (w *Window) Color(pair int16) {
 	C.wcolor_set(w.win, C.short(ColorPair(pair)), nil)
 }
@@ -150,7 +150,7 @@ func (w *Window) ColorOff(pair int16) error {
 }
 
 // Normally color pairs are turned on via attron() in ncurses but this
-// implementation chose to make it seperate
+// implementation chose to make it separate
 func (w *Window) ColorOn(pair int16) error {
 	if C.ncurses_wattron(w.win, C.int(ColorPair(pair))) == C.ERR {
 		return errors.New("Failed to enable color pair")
@@ -185,7 +185,7 @@ func (w *Window) DelChar() error {
 	return nil
 }
 
-// MoveDelChar deletes the character at the givin cursor coordinates, moving all
+// MoveDelChar deletes the character at the given cursor coordinates, moving all
 // characters to the right of that position one space to the left and appends
 // a blank character at the end.
 func (w *Window) MoveDelChar(y, x int) error {
@@ -234,7 +234,7 @@ func (w *Window) Erase() {
 }
 
 // GetChar retrieves a character from standard input stream and returns it.
-// In the event of an error or if the input timeout has expired (ie. if
+// In the event of an error or if the input timeout has expired (i.e. if
 // Timeout() has been set to zero or a positive value and no characters have
 // been received) the value returned will be zero (0)
 func (w *Window) GetChar() Key {
@@ -261,8 +261,8 @@ func (w *Window) GetString(n int) (string, error) {
 	return C.GoString(&cstr[0]), nil
 }
 
-// Getyx returns the current cursor location in the Window. Note that it uses
-// ncurses idiom of returning y then x.
+// CursorYX returns the current cursor location in the Window. Note that it
+// uses ncurses idiom of returning y then x.
 func (w *Window) CursorYX() (int, int) {
 	var cy, cx C.int
 	C.ncurses_getyx(w.win, &cy, &cx)
@@ -382,7 +382,7 @@ func (w *Window) Print(args ...interface{}) {
 	w.Printf("%s", fmt.Sprint(args...))
 }
 
-// Printf functions the same as the stardard library's fmt package. See Print
+// Printf functions the same as the standard library's fmt package. See Print
 // for more details.
 func (w *Window) Printf(format string, args ...interface{}) {
 	cstr := C.CString(fmt.Sprintf(format, args...))
@@ -391,7 +391,7 @@ func (w *Window) Printf(format string, args ...interface{}) {
 	C.waddstr(w.win, cstr)
 }
 
-// Println behaves the s as Println in the stanard library's fmt package.
+// Println behaves the same as the standard library's fmt package.
 // See Print for more information.
 func (w *Window) Println(args ...interface{}) {
 	w.Printf("%s", fmt.Sprintln(args...))
@@ -485,7 +485,7 @@ func (w *Window) Sync(sync int) {
 
 // Timeout sets the window to blocking or non-blocking read mode. Calls to
 // GetCh will behave in the following manor depending on the value of delay:
-// <= -1 - blocking mode is set (blocks indefinately)
+// <= -1 - blocking mode is set (blocks indefinitely)
 // ==  0 - non-blocking; returns zero (0)
 // >=  1 - blocks for delay in milliseconds; returns zero (0)
 func (w *Window) Timeout(delay int) {
@@ -521,7 +521,7 @@ func (w *Window) UnTouch() {
 	C.ncurses_untouchwin(w.win)
 }
 
-// VLine draws a verticle line starting at y, x and ending at height using
+// VLine draws a vertical line starting at y, x and ending at height using
 // the specified character
 func (w *Window) VLine(y, x int, ch Char, wid int) {
 	C.mvwvline(w.win, C.int(y), C.int(x), C.chtype(ch), C.int(wid))

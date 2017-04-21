@@ -4,7 +4,7 @@
 // license that can be found in the LICENSE file.
 
 // This example demonstrates using goncurses with Go's built-in concurrency
-// primatives. It is key to ensure no reads or writes occur concurrently to
+// primitives. It is key to ensure no reads or writes occur concurrently to
 // a window or screen. Another method would be to use a global mutex.
 package main
 
@@ -40,10 +40,10 @@ func main() {
 	}(scr, in)
 
 	// Once a character has been received on the 'in' channel the
-	// 'ready' channel will block until it recieves another piece of data.
+	// 'ready' channel will block until it receives another piece of data.
 	// This happens only once the received character has been written to
 	// the screen. The 'in' channel then blocks on the next loop until
-	// another 'true' is sent down the 'ready' channel signalling to the
+	// another 'true' is sent down the 'ready' channel signaling to the
 	// input goroutine that it's okay to receive input
 	for {
 		var c gc.Char

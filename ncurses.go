@@ -190,7 +190,7 @@ func IsTermResized(nlines, ncols int) bool {
 	return bool(C.is_term_resized(C.int(nlines), C.int(ncols)))
 }
 
-// Returns a string representing the value of input returned by Getch
+// Returns a string representing the value of input returned by GetChar
 func KeyString(k Key) string {
 	key, ok := keyList[k]
 	if !ok {
@@ -277,7 +277,7 @@ func Update() error {
 
 // UseDefaultColors tells the curses library to assign the terminal's default
 // foreground and background colors to color number -1. This will allow you to
-// call InitPair(x, -1, -1) to set both the foreground and backgroun colours
+// call InitPair(x, -1, -1) to set both the foreground and background colours
 // of pair x to the terminal's default. This function can fail if the terminal
 // does not support certain ncurses features like orig_pair or initialize_pair.
 func UseDefaultColors() error {
