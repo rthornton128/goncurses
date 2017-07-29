@@ -79,7 +79,7 @@ func (m *Menu) Current(mi *MenuItem) *MenuItem {
 }
 
 // Driver controls how the menu is activated. Action usually corresponds
-// to the string return by the Key() function in goncurses.
+// to the string returned by the Key() function in goncurses.
 func (m *Menu) Driver(daction int) error {
 	err := C.menu_driver(m.menu, C.int(daction))
 	return ncursesError(syscall.Errno(err))
@@ -208,8 +208,8 @@ func (m *Menu) SetPattern(pattern string) error {
 	return ncursesError(syscall.Errno(err))
 }
 
-// SetSpacing of the the menu's items. 'desc' is the space between the
-// item and it's description andmay not be larger than TAB_SIZE. 'row'
+// SetSpacing of the menu's items. 'desc' is the space between the
+// item and it's description and may not be larger than TAB_SIZE. 'row'
 // is the number of rows separating each item and may not be larger than
 // three. 'col' is the spacing between each column of items in
 // multi-column mode. Use values of 0 or 1 to reset spacing to default,

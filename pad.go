@@ -16,7 +16,7 @@ type Pad struct {
 }
 
 // NewPad creates a window which is not restricted by the terminal's
-// dimentions (unlike a Window). Pads accept all functions which can be
+// dimensions (unlike a Window). Pads accept all functions which can be
 // called on a window. It returns a pointer to a new Pad of h(eight) by
 // w(idth).
 func NewPad(h, w int) (*Pad, error) {
@@ -28,7 +28,7 @@ func NewPad(h, w int) (*Pad, error) {
 }
 
 // NoutRefresh indicates that a section of the screen should be redrawn but
-// does not update the phsyical screen until Update() is called. See
+// does not update the physical screen until Update() is called. See
 // Pad.Refresh() for details on the arguments and Window.NoutRefresh for
 // more details on the workings of this function
 func (p *Pad) NoutRefresh(py, px, sy, sx, h, w int) error {
@@ -45,7 +45,7 @@ func (p *Pad) NoutRefresh(py, px, sy, sx, h, w int) error {
 // The coordinates py, px specify the location on the pad from which the
 // characters we want to display are located. sy and sx specify the location
 // on the screen where this data should be displayed. h and w are the height
-// and width of the rectangle to be displayed. The coodinates and the size
+// and width of the rectangle to be displayed. The coordinates and the size
 // of the rectangle must be contained within both the Pad's and Window's
 // respective areas
 func (p *Pad) Refresh(py, px, sy, sx, h, w int) error {

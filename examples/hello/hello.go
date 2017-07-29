@@ -20,7 +20,7 @@ func main() {
 	}
 	defer goncurses.End()
 
-	// (Go)ncurses draws by cursor position and uses reverse cartisian
+	// (Go)ncurses draws by cursor position and uses reverse Cartesian
 	// coordinate system (y,x). Initially, the cursor is positioned at the
 	// coordinates 0,0 so the first call to Print will output the text at the
 	// top, left position of the screen since stdscr is a window which

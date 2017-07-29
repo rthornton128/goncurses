@@ -32,6 +32,6 @@
 // concurrently. Failure to do so will result in unpredictable and
 // undefined behaviour in your program.
 //
-// The examples directory contains demontrations of many of the capabilities
+// The examples directory contains demonstrations of many of the capabilities
 // goncurses can provide.
 package goncurses

@@ -114,7 +114,7 @@ const (
 	O_ONEVALUE   = C.O_ONEVALUE   // Only one item can be selected
 	O_SHOWDESC   = C.O_SHOWDESC   // Display item descriptions
 	O_ROWMAJOR   = C.O_ROWMAJOR   // Display in row-major order
-	O_IGNORECASE = C.O_IGNORECASE // Ingore case when pattern-matching
+	O_IGNORECASE = C.O_IGNORECASE // Ignore case when pattern-matching
 	O_SHOWMATCH  = C.O_SHOWMATCH  // Move cursor to item when pattern-matching
 	O_NONCYCLIC  = C.O_NONCYCLIC  // Don't wrap next/prev item
 )

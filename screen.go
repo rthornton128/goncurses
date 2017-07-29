@@ -27,7 +27,7 @@ type Screen struct{ scrPtr *C.SCREEN }
 // call End() in reverse order that each terminal was created in. After you
 // are finished with the screen you must call Delete to free the memory
 // allocated to it. This function is usually only useful for programs using
-// multiple terminals or test for terminal capabilites. The argument termType
+// multiple terminals or test for terminal capabilities. The argument termType
 // is the type of terminal to be used ($TERM is used if value is "" which also
 // has the same effect of using os.Getenv("TERM"))
 func NewTerm(termType string, out, in *os.File) (*Screen, error) {
