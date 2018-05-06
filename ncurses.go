@@ -243,6 +243,11 @@ func ResizeTerm(nlines, ncols int) error {
 	return nil
 }
 
+// Set the ESCDELAY
+func SetEscDelay(size int) {
+	C.set_escdelay(C.int(size))
+}
+
 // Enables colors to be displayed. Will return an error if terminal is not
 // capable of displaying colors
 func StartColor() error {
