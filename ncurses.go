@@ -51,6 +51,11 @@ func CanChangeColor() bool {
 	return bool(C.bool(C.can_change_color()))
 }
 
+// Colors returns the number of colors that the terminal supports
+func Colors() int {
+	return int(C.COLORS)
+}
+
 // Get RGB values for specified colour
 func ColorContent(col int16) (int16, int16, int16) {
 	var r, g, b C.short
@@ -63,6 +68,11 @@ func ColorContent(col int16) (int16, int16, int16) {
 // accept attributes like AddChar, AttrOn/Off and Background.
 func ColorPair(pair int16) Char {
 	return Char(C.ncurses_COLOR_PAIR(C.int(pair)))
+}
+
+// ColorPairs returns the maximum number of color pairs that the terminal supports
+func ColorPairs() int {
+	return int(C.COLOR_PAIRS)
 }
 
 // CursesVersion returns the version of the ncurses library currently linked to
