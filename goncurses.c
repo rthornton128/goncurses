@@ -88,3 +88,13 @@ int ncurses_untouchwin(WINDOW *win) { return untouchwin(win); }
 int ncurses_wattrset(WINDOW *win, int attr) { return wattrset(win, attr); }
 int ncurses_wstandend(WINDOW *win) { return wstandend(win); }
 int ncurses_wstandout(WINDOW *win) { return wstandout(win); }
+
+bool goncurses_set_escdelay(int size) {
+  bool code = true;
+#ifdef PDCURSES
+  code = false;
+#else
+  ESCDELAY = size;
+#endif
+  return code;
+}
