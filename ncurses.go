@@ -307,3 +307,14 @@ func UseDefaultColors() error {
 func UseEnvironment(use bool) {
 	C.use_env(C.bool(use))
 }
+
+// SetTabSize allows for modification of the tab width. This setting is global
+// and affects all windows.
+func SetTabSize(tabSize int) {
+	C.TABSIZE = C.int(tabSize)
+}
+
+// TabSize returns the configured tab width.
+func TabSize() int {
+	return int(C.TABSIZE)
+}
