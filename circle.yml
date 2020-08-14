@@ -1,0 +1,10 @@
+dependencies:
+  pre:
+    - sudo apt-get -qq update; sudo apt-get install -y debhelper dh-golang golang-go pkg-config
+    - sudo apt-get install -y libncurses5-dev
+  override:
+    - "go get -d -v ./..."
+    - "go build -v"
+    - dpkg-buildpackage -b -rfakeroot -us -uc
+    - ls -lah ../
+

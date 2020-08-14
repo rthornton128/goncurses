@@ -208,6 +208,24 @@ func (f *Form) SetFields(fields []*Field) error {
 	return ncursesError(syscall.Errno(err))
 }
 
+// CurrentField returns the current field of the form
+func (f *Form) CurrentField() *Field {
+	return (*Field)(C.current_field(f.form))
+}
+
+// SetCurrentField sets the current field of the form
+func (f *Form) SetCurrentField(field *Field) error {
+	err := int(C.set_current_field(f.form, (*C.FIELD)(field)))
+	return ncursesError(syscall.Errno(err))
+}
+
+// UnfocusCurrentField removes the focus from the current field of the form.
+// Is such state, inquiries via CurrentField shall return a nil pointer.
+func (f *Form) UnfocusCurrentField() error {
+	err := int(C.unfocus_current_field(f.form))
+	return ncursesError(syscall.Errno(err))
+}
+
 // SetOptions for the form
 func (f *Form) SetOptions(opts int) error {
 	_, err := C.set_form_opts(f.form, (C.Form_Options)(opts))

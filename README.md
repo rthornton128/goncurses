@@ -8,10 +8,12 @@ Installation
 The go tool is the recommended method of installing goncurses. Issue the
 following command on the command line:
 
-$ go get github.com/rthornton128/goncurses
+```sh
+go get github.com/rthornton128/goncurses
+```
 
 OSX and Windows users should visit the 
-[Wiki](https://github.com/rthornton128/goncurses/wiki) for installation
+[rthornton128/goncurses/wiki](https://github.com/rthornton128/goncurses/wiki) for installation
 instructions.
 
 Notes

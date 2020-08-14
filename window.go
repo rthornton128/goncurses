@@ -307,6 +307,15 @@ func (w *Window) Keypad(keypad bool) error {
 	return nil
 }
 
+// Nodelay on causes GetChar() to be a non-blocking call.
+func (w *Window) Nodelay(nodelay bool) error {
+	var err C.int
+	if err = C.nodelay(w.win, C.bool(nodelay)); err == C.ERR {
+		return errors.New("Unable to set nodelay mode")
+	}
+	return nil
+}
+
 // LineTouched returns true if the line has been touched; returns false
 // otherwise
 func (w *Window) LineTouched(line int) bool {

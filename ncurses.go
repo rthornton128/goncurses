@@ -302,3 +302,25 @@ func UseDefaultColors() error {
 func UseEnvironment(use bool) {
 	C.use_env(C.bool(use))
 }
+
+// DefProgMode saves the current terminal modes as the "program" (in Curses)
+// state for use by reset_prog_mode().
+func DefProgMode() int {
+	return int(C.def_prog_mode())
+}
+
+// ResetProgMode restores the terminal to the "program" (in Curses) state.
+func ResetProgMode() int {
+	return int(C.reset_prog_mode())
+}
+
+// DefShellMode saves the current terminal modes as the "shell" (not in Curses)
+// state for use by reset_prog_mode().
+func DefShellMode() int {
+	return int(C.def_shell_mode())
+}
+
+// ResetShellMode restores the terminal to the "shell" (not in Curses) state.
+func ResetShellMode() int {
+	return int(C.reset_shell_mode())
+}
