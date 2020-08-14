@@ -30,5 +30,6 @@ int ncurses_wattrset(WINDOW *win, int attr);
 WINDOW * ncurses_wgetparent(const WINDOW *win);
 int ncurses_wstandend(WINDOW *win);
 int ncurses_wstandout(WINDOW *win);
+bool goncurses_set_escdelay(int size);
 
 #endif /* _GONCURSES_ */

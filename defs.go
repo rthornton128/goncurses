@@ -107,6 +107,7 @@ type Key int
 const (
 	KEY_TAB       Key = 9               // tab
 	KEY_RETURN        = 10              // enter key vs. KEY_ENTER
+	KEY_ESC           = 27              // esc key
 	KEY_DOWN          = C.KEY_DOWN      // down arrow key
 	KEY_UP            = C.KEY_UP        // up arrow key
 	KEY_LEFT          = C.KEY_LEFT      // left arrow key
@@ -235,6 +236,7 @@ var keyList = map[Key]string{
 	KEY_MOUSE:     "mouse",
 	KEY_PAGEUP:    "page up",
 	KEY_PAGEDOWN:  "page down",
+	KEY_ESC:       "esc",
 }
 
 type MouseButton int

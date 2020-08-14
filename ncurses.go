@@ -253,6 +253,11 @@ func ResizeTerm(nlines, ncols int) error {
 	return nil
 }
 
+// Sets the delay from when the escape key is pressed until recognition.
+func SetEscDelay(size int) {
+	C.goncurses_set_escdelay(C.int(size))
+}
+
 // Enables colors to be displayed. Will return an error if terminal is not
 // capable of displaying colors
 func StartColor() error {
@@ -323,4 +328,15 @@ func DefShellMode() int {
 // ResetShellMode restores the terminal to the "shell" (not in Curses) state.
 func ResetShellMode() int {
 	return int(C.reset_shell_mode())
+}
+
+// SetTabSize allows for modification of the tab width. This setting is global
+// and affects all windows.
+func SetTabSize(tabSize int) {
+	C.TABSIZE = C.int(tabSize)
+}
+
+// TabSize returns the configured tab width.
+func TabSize() int {
+	return int(C.TABSIZE)
 }
