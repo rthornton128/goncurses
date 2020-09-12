@@ -80,7 +80,7 @@ func (m *Menu) Current(mi *MenuItem) *MenuItem {
 
 // Driver controls how the menu is activated. Action usually corresponds
 // to the string returned by the Key() function in goncurses.
-func (m *Menu) Driver(daction int) error {
+func (m *Menu) Driver(daction MenuDriverReq) error {
 	err := C.menu_driver(m.menu, C.int(daction))
 	return ncursesError(syscall.Errno(err))
 }
