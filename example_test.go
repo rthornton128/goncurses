@@ -2,21 +2,15 @@
 package goncurses_test
 
 import (
-	"fmt"
+	"testing"
+
 	"github.com/rthornton128/goncurses"
-	"os"
 )
 
-func ExampleInit() {
-	// You should always test to make sure ncurses has initialized properly.
-	// In order for your error messages to be visible on the terminal you will
-	// need to either log error messages or output them to stderr.
-	stdscr, err := goncurses.Init()
+func TestInit(t *testing.T) {
+	_, err := goncurses.Init()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		t.Fatal(err)
 	}
 	defer goncurses.End()
-	stdscr.Print("Press enter to continue...")
-	stdscr.Refresh()
 }
