@@ -1,6 +1,7 @@
 goncurses - ncurses library for Go.
 
 Copyright (c) 2011, Rob Thornton 
+Copyright (c) 2018, Dmitry Okunev
 
 All rights reserved.
 

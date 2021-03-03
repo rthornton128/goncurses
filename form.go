@@ -6,8 +6,8 @@
 
 package goncurses
 
-// #cgo !darwin,!openbsd pkg-config: form
-// #cgo darwin openbsd LDFLAGS: -lform
+// #cgo !darwin,!freebsd,!openbsd pkg-config: form
+// #cgo darwin freebsd openbsd LDFLAGS: -lform
 // #include <form.h>
 // #include <stdlib.h>
 import "C"
@@ -205,6 +205,24 @@ func (f *Form) SetFields(fields []*Field) error {
 	//}
 	//cfields[len(fields)] = nil
 	err := C.set_form_fields(f.form, (**C.FIELD)(unsafe.Pointer(&fields[0])))
+	return ncursesError(syscall.Errno(err))
+}
+
+// CurrentField returns the current field of the form
+func (f *Form) CurrentField() *Field {
+	return (*Field)(C.current_field(f.form))
+}
+
+// SetCurrentField sets the current field of the form
+func (f *Form) SetCurrentField(field *Field) error {
+	err := int(C.set_current_field(f.form, (*C.FIELD)(field)))
+	return ncursesError(syscall.Errno(err))
+}
+
+// UnfocusCurrentField removes the focus from the current field of the form.
+// Is such state, inquiries via CurrentField shall return a nil pointer.
+func (f *Form) UnfocusCurrentField() error {
+	err := int(C.unfocus_current_field(f.form))
 	return ncursesError(syscall.Errno(err))
 }
 

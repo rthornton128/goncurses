@@ -1,0 +1,21 @@
+Source: golang-github-xaionaro-go-goncurses
+Section: devel
+Priority: extra
+Maintainer: Debian Go Packaging Team <pkg-go-maintainers@lists.alioth.debian.org>
+Uploaders: root <TODO>
+Build-Depends: debhelper (>= 9),
+               dh-golang,
+               golang-go
+Standards-Version: 3.9.7
+Homepage: https://github.com/xaionaro-go/goncurses
+Vcs-Browser: https://anonscm.debian.org/cgit/pkg-go/packages/golang-github-xaionaro-go-goncurses.git
+Vcs-Git: https://anonscm.debian.org/git/pkg-go/packages/golang-github-xaionaro-go-goncurses.git
+XS-Go-Import-Path: github.com/xaionaro-go/goncurses
+
+Package: golang-github-xaionaro-go-goncurses-dev
+Architecture: all
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         golang-go
+Description:
+ TODO: long description
