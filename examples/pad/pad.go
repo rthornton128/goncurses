@@ -34,11 +34,18 @@ func main() {
 	// Refresh the pad to show only a portion of the pad. Understanding
 	// what these coordinates mean can be a bit tricky. The first two
 	// coordinates are the position in the pad, in this case 0,5 (remember
-	// the coordinates in ncurses are y,x). The second set of numbers are the
-	// coordinates on the screen on which to display the content, so row 5,
-	// column 10. The last set of numbers tell how high and how wide the
-	// rectangle to displayed should be, in this case 15 rows long and 25
-	// columns wide.
+	// the coordinates in ncurses are y,x). The next four set of numbers
+	// are the coordinates of the pad on the screen (y1, x1, y2, x2):
+	//
+	//   (y1,x1) +-------------+
+	//           |             |
+	//           |             |
+	//           |             |
+	//           |             |
+	//           |             |
+	//           |             |
+	//           +-------------+ (y2, x2)
+	//
 	pad.Refresh(0, 5, 5, 10, 15, 25)
 	pad.GetChar()
 }
