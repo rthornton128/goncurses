@@ -2,20 +2,16 @@
 
 package main
 
+// #include <sys/ioctl.h>
+import "C"
+
 import (
 	"syscall"
 	"unsafe"
 )
 
-type winsize struct {
-	Row     uint16
-	Col     uint16
-	XOffset uint16
-	YOffset uint16
-}
-
 func osTermSize() (int, int, error) {
-	w := &winsize{}
+	w := &C.struct_winsize{}
 	// See http://www.delorie.com/djgpp/doc/libc/libc_495.html
 	res, _, err := syscall.Syscall(syscall.SYS_IOCTL,
 		uintptr(syscall.Stdin),
@@ -26,5 +22,5 @@ func osTermSize() (int, int, error) {
 		return 0, 0, err
 	}
 
-	return int(w.Row), int(w.Col), nil
+	return int(w.ws_row), int(w.ws_col), nil
 }
