@@ -47,6 +47,7 @@ func main() {
 		stdscr.MovePrintf(2, 1, "osTermSize shows %d rows and %d columns", tRow, tCol)
 		stdscr.MovePrintf(3, 1, "  SIGWINCH has been sent %d times", sigWinChCount)
 		stdscr.MovePrintf(4, 1, "KEY_RESIZE has been sent %d times", keyResizeCount)
+		stdscr.MovePrint(6, 1, "Press 'q' to quit")
 		stdscr.Box(0, 0)
 		stdscr.Refresh()
 	}
