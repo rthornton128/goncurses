@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	gc "github.com/rthornton128/goncurses"
 )
@@ -17,12 +16,12 @@ import (
 var stdscr *gc.Window
 
 func main() {
-	start := time.Now()
 	sigWinChCount := 0
 	keyResizeCount := 0
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGWINCH)
 
+	// Errors should not be ignored in production code
 	stdscr, _ = gc.Init()
 	stdscr.Timeout(0)
 	defer gc.End()
@@ -34,22 +33,21 @@ func main() {
 			resize()
 		default:
 			c := stdscr.GetChar()
-			if c == 'q' {
+			switch c {
+			case 'q':
 				return
-			} else if c == gc.KEY_RESIZE {
+			case gc.KEY_RESIZE:
 				keyResizeCount++
 				//resize()
 			}
 		}
 		row, col := stdscr.MaxYX()
 		tRow, tCol, _ := osTermSize()
-		runtime := int(time.Since(start).Seconds())
 		stdscr.MovePrintf(1, 1, "     MaxYX shows %d rows and %d columns", row, col)
 		stdscr.MovePrintf(2, 1, "osTermSize shows %d rows and %d columns", tRow, tCol)
 		stdscr.MovePrintf(3, 1, "  SIGWINCH has been sent %d times", sigWinChCount)
 		stdscr.MovePrintf(4, 1, "KEY_RESIZE has been sent %d times", keyResizeCount)
-		stdscr.MovePrintf(5, 1, "The program has been running for %d seconds", runtime)
-		_ = stdscr.Box(0, 0)
+		stdscr.Box(0, 0)
 		stdscr.Refresh()
 	}
 }
@@ -57,10 +55,11 @@ func main() {
 func resize() {
 	gc.End()
 
+	// Errors should not be ignored in production code
 	row, col, _ := osTermSize()
-	_ = gc.ResizeTerm(row, col)
+	gc.ResizeTerm(row, col)
 
 	stdscr, _ = gc.Init()
-	_ = stdscr.Clear()
+	stdscr.Clear()
 	stdscr.Timeout(0)
 }
