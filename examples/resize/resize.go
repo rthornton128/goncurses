@@ -23,8 +23,10 @@ func main() {
 	signal.Notify(sigs, syscall.SIGWINCH)
 
 	// Errors should not be ignored in production code
-	initDisplay()
+	stdscr, _ = gc.Init()
 	defer gc.End()
+	stdscr.Timeout(0)
+	redrawDisplay()
 
 	for {
 		select {
@@ -34,21 +36,19 @@ func main() {
 		default:
 			c := stdscr.GetChar()
 			switch c {
-			case 'q':
-				return
 			case gc.KEY_RESIZE:
 				keyResizeCount++
 				//resize()
+			case 'q':
+				return
 			}
 		}
 	}
 }
 
-func initDisplay() {
+func redrawDisplay() {
 	// Errors should not be ignored in production code
-	stdscr, _ = gc.Init()
 	stdscr.Clear()
-	stdscr.Timeout(0)
 	row, col := stdscr.MaxYX()
 	tRow, tCol, _ := osTermSize()
 	stdscr.MovePrintf(1, 1, "     MaxYX shows %d rows and %d columns", row, col)
@@ -61,11 +61,9 @@ func initDisplay() {
 }
 
 func resize() {
-	gc.End()
-
 	// Errors should not be ignored in production code
 	tRow, tCol, _ := osTermSize()
 	gc.ResizeTerm(tRow, tCol)
 
-	initDisplay()
+	redrawDisplay()
 }
