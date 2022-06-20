@@ -18,7 +18,7 @@ import (
 
 // DriverActions is a convenience mapping for common responses
 // to keyboard input
-var DriverActions = map[Key]int{
+var DriverActions = map[Key]MenuDriverReq{
 	KEY_DOWN:     C.REQ_DOWN_ITEM,
 	KEY_HOME:     C.REQ_FIRST_ITEM,
 	KEY_END:      C.REQ_LAST_ITEM,
