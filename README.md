@@ -5,8 +5,14 @@ requires both pkg-config and ncurses C development files be installed.
 # Installation
 The go tool is the recommended method of installing goncurses. Issue the
 following command on the command line:
-
+``` shell
 $ go get github.com/rthornton128/goncurses
+```
+
+On debian you can install the ncurses C development files by running:
+``` shell
+$ sudo apt install libncurses-dev
+```
 
 OSX and Windows users should visit the 
 [Wiki](https://github.com/rthornton128/goncurses/wiki) for installation
