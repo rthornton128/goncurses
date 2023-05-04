@@ -13,7 +13,7 @@ $ go get github.com/rthornton128/goncurses
 The ncurses C development library must be installed on your system in order to build and install Goncurses. For example, on Debian based systems you can run:
 ``` shell
 $ sudo apt install libncurses-dev
-``
+```
 
 OSX and Windows users should visit the 
 [Wiki](https://github.com/rthornton128/goncurses/wiki) for installation
