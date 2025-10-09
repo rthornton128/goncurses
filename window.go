@@ -23,7 +23,7 @@ type Window struct {
 func NewWindow(h, w, y, x int) (window *Window, err error) {
 	window = &Window{C.newwin(C.int(h), C.int(w), C.int(y), C.int(x))}
 	if window.win == nil {
-		err = errors.New("Failed to create a new window")
+		err = errors.New("failed to create a new window")
 	}
 	return
 }
@@ -43,8 +43,7 @@ func (w *Window) MoveAddChar(y, x int, ach Char) {
 // Turn off character attribute.
 func (w *Window) AttrOff(attr Char) (err error) {
 	if C.ncurses_wattroff(w.win, C.int(attr)) == C.ERR {
-		err = errors.New(fmt.Sprintf("Failed to unset attribute: %s",
-			attrList[C.int(attr)]))
+		err = fmt.Errorf("failed to unset attribute: %s", attrList[C.int(attr)])
 	}
 	return
 }
@@ -52,8 +51,7 @@ func (w *Window) AttrOff(attr Char) (err error) {
 // Turn on character attribute
 func (w *Window) AttrOn(attr Char) (err error) {
 	if C.ncurses_wattron(w.win, C.int(attr)) == C.ERR {
-		err = errors.New(fmt.Sprintf("Failed to set attribute: %s",
-			attrList[C.int(attr)]))
+		err = fmt.Errorf("failed to set attribute: %s", attrList[C.int(attr)])
 	}
 	return
 }
@@ -61,7 +59,7 @@ func (w *Window) AttrOn(attr Char) (err error) {
 // AttrSet sets the attributes to the given value
 func (w *Window) AttrSet(attr Char) error {
 	if C.ncurses_wattrset(w.win, C.int(attr)) == C.ERR {
-		return errors.New("Failed to set attributes")
+		return errors.New("failed to set attributes")
 	}
 	return nil
 }
@@ -84,7 +82,7 @@ func (w *Window) Border(ls, rs, ts, bs, tl, tr, bl, br Char) error {
 		C.chtype(bs), C.chtype(tl), C.chtype(tr), C.chtype(bl),
 		C.chtype(br))
 	if res == C.ERR {
-		return errors.New("Failed to draw box around window")
+		return errors.New("failed to draw box around window")
 	}
 	return nil
 }
@@ -93,7 +91,7 @@ func (w *Window) Border(ls, rs, ts, bs, tl, tr, bl, br Char) error {
 // characters used to draw the border use Border()
 func (w *Window) Box(vch, hch Char) error {
 	if C.box(w.win, C.chtype(vch), C.chtype(hch)) == C.ERR {
-		return errors.New("Failed to draw box around window")
+		return errors.New("failed to draw box around window")
 	}
 	return nil
 }
@@ -106,7 +104,7 @@ func (w *Window) Box(vch, hch Char) error {
 // by a call to ClearOk().
 func (w *Window) Clear() error {
 	if C.wclear(w.win) == C.ERR {
-		return errors.New("Failed to clear screen")
+		return errors.New("failed to clear screen")
 	}
 	return nil
 }
@@ -122,7 +120,7 @@ func (w *Window) ClearOk(ok bool) {
 // bottom of window
 func (w *Window) ClearToBottom() error {
 	if C.wclrtobot(w.win) == C.ERR {
-		return errors.New("Failed to clear bottom of window")
+		return errors.New("failed to clear bottom of window")
 	}
 	return nil
 }
@@ -131,7 +129,7 @@ func (w *Window) ClearToBottom() error {
 // of the line
 func (w *Window) ClearToEOL() error {
 	if C.wclrtoeol(w.win) == C.ERR {
-		return errors.New("Failed to clear to end of line")
+		return errors.New("failed to clear to end of line")
 	}
 	return nil
 }
@@ -144,7 +142,7 @@ func (w *Window) Color(pair int16) {
 // ColorOff turns the specified color pair off
 func (w *Window) ColorOff(pair int16) error {
 	if C.ncurses_wattroff(w.win, C.int(ColorPair(pair))) == C.ERR {
-		return errors.New("Failed to enable color pair")
+		return errors.New("failed to enable color pair")
 	}
 	return nil
 }
@@ -153,7 +151,7 @@ func (w *Window) ColorOff(pair int16) error {
 // implementation chose to make it separate
 func (w *Window) ColorOn(pair int16) error {
 	if C.ncurses_wattron(w.win, C.int(ColorPair(pair))) == C.ERR {
-		return errors.New("Failed to enable color pair")
+		return errors.New("failed to enable color pair")
 	}
 	return nil
 }
@@ -169,7 +167,7 @@ func (w *Window) Copy(src *Window, sy, sx, dtr, dtc, dbr, dbc int,
 	if C.copywin(src.win, w.win, C.int(sy), C.int(sx),
 		C.int(dtr), C.int(dtc), C.int(dbr), C.int(dbc), C.int(ol)) ==
 		C.ERR {
-		return errors.New("Failed to copy window")
+		return errors.New("failed to copy window")
 	}
 	return nil
 }
@@ -179,7 +177,7 @@ func (w *Window) Copy(src *Window, sy, sx, dtr, dtc, dbr, dbc int,
 // a blank character at the end.
 func (w *Window) DelChar() error {
 	if err := C.wdelch(w.win); err != C.OK {
-		return errors.New("An error occurred when trying to delete " +
+		return errors.New("an error occurred when trying to delete " +
 			"character")
 	}
 	return nil
@@ -190,7 +188,7 @@ func (w *Window) DelChar() error {
 // a blank character at the end.
 func (w *Window) MoveDelChar(y, x int) error {
 	if err := C.mvwdelch(w.win, C.int(y), C.int(x)); err != C.OK {
-		return errors.New("An error occurred when trying to delete " +
+		return errors.New("an error occurred when trying to delete " +
 			"character")
 	}
 	return nil
@@ -200,7 +198,7 @@ func (w *Window) MoveDelChar(y, x int) error {
 // to prevent memory leaks once you are done with the window.
 func (w *Window) Delete() error {
 	if C.delwin(w.win) == C.ERR {
-		return errors.New("Failed to delete window")
+		return errors.New("failed to delete window")
 	}
 	w = nil
 	return nil
@@ -256,7 +254,7 @@ func (w *Window) MoveGetChar(y, x int) Key {
 func (w *Window) GetString(n int) (string, error) {
 	cstr := make([]C.char, n)
 	if C.wgetnstr(w.win, (*C.char)(&cstr[0]), C.int(n)) == C.ERR {
-		return "", errors.New("Failed to retrieve string from input stream")
+		return "", errors.New("failed to retrieve string from input stream")
 	}
 	return C.GoString(&cstr[0]), nil
 }
@@ -273,7 +271,6 @@ func (w *Window) CursorYX() (int, int) {
 // the specified character
 func (w *Window) HLine(y, x int, ch Char, wid int) {
 	C.mvwhline(w.win, C.int(y), C.int(x), C.chtype(ch), C.int(wid))
-	return
 }
 
 // InChar returns the character at the current position in the curses window
@@ -302,7 +299,7 @@ func (w *Window) IsKeypad() bool {
 func (w *Window) Keypad(keypad bool) error {
 	var err C.int
 	if err = C.keypad(w.win, C.bool(keypad)); err == C.ERR {
-		return errors.New("Unable to set keypad mode")
+		return errors.New("unable to set keypad mode")
 	}
 	return nil
 }
@@ -324,13 +321,11 @@ func (w *Window) MaxYX() (int, int) {
 // Move the cursor to the specified coordinates within the window
 func (w *Window) Move(y, x int) {
 	C.wmove(w.win, C.int(y), C.int(x))
-	return
 }
 
 // MoveWindow moves the location of the window to the specified coordinates
 func (w *Window) MoveWindow(y, x int) {
 	C.mvwin(w.win, C.int(y), C.int(x))
-	return
 }
 
 // NoutRefresh, or No Output Refresh, flags the window for redrawing but does
@@ -341,14 +336,13 @@ func (w *Window) MoveWindow(y, x int) {
 // transmitted to the terminal.
 func (w *Window) NoutRefresh() {
 	C.wnoutrefresh(w.win)
-	return
 }
 
 // Overlay copies overlapping sections of src window onto the destination
 // window. Non-blank elements are not overwritten.
 func (w *Window) Overlay(src *Window) error {
 	if C.overlay(src.win, w.win) == C.ERR {
-		return errors.New("Failed to overlay window")
+		return errors.New("failed to overlay window")
 	}
 	return nil
 }
@@ -358,7 +352,7 @@ func (w *Window) Overlay(src *Window) error {
 // elements of src onto the destination window.
 func (w *Window) Overwrite(src *Window) error {
 	if C.overwrite(src.win, w.win) == C.ERR {
-		return errors.New("Failed to overwrite window")
+		return errors.New("failed to overwrite window")
 	}
 	return nil
 }
@@ -453,7 +447,7 @@ func (w *Window) Sub(height, width, y, x int) *Window {
 // Standend turns off Standout mode, which is equivalent AttrSet(A_NORMAL)
 func (w *Window) Standend() error {
 	if C.ncurses_wstandend(w.win) == C.ERR {
-		return errors.New("Failed to set standend")
+		return errors.New("failed to set standend")
 	}
 	return nil
 }
@@ -461,7 +455,7 @@ func (w *Window) Standend() error {
 // Standout is equivalent to AttrSet(A_STANDOUT)
 func (w *Window) Standout() error {
 	if C.ncurses_wstandout(w.win) == C.ERR {
-		return errors.New("Failed to set standout")
+		return errors.New("failed to set standout")
 	}
 	return nil
 }
@@ -496,7 +490,7 @@ func (w *Window) Timeout(delay int) {
 // on the next call to Refresh
 func (w *Window) Touch() error {
 	if C.ncurses_touchwin(w.win) == C.ERR {
-		return errors.New("Failed to Touch window")
+		return errors.New("failed to Touch window")
 	}
 	return nil
 }
@@ -510,7 +504,7 @@ func (w *Window) Touched() bool {
 // beginning at start
 func (w *Window) TouchLine(start, count int) error {
 	if C.touchline(w.win, C.int(start), C.int(count)) == C.ERR {
-		return errors.New("Error in call to TouchLine")
+		return errors.New("error in call to TouchLine")
 	}
 	return nil
 }

@@ -46,7 +46,7 @@ func SlkSet(labnum int, label string, just SlkJustify) error {
 	defer C.free(unsafe.Pointer(cstr))
 
 	if C.slk_set(C.int(labnum), (*C.char)(cstr), C.int(just)) == C.ERR {
-		return errors.New("Soft-keys or terminal not initialized")
+		return errors.New("soft-keys or terminal not initialized")
 	}
 	return nil
 }
@@ -55,7 +55,7 @@ func SlkSet(labnum int, label string, just SlkJustify) error {
 // SlkNoutRefresh because a Window.Refresh is likely to follow
 func SlkRefresh() error {
 	if C.slk_refresh() == C.ERR {
-		return errors.New("Soft-keys or terminal not initialized.")
+		return errors.New("soft-keys or terminal not initialized")
 	}
 	return nil
 }
@@ -63,7 +63,7 @@ func SlkRefresh() error {
 // SlkNoutFresh behaves like Window.NoutRefresh
 func SlkNoutRefresh() error {
 	if C.slk_noutrefresh() == C.ERR {
-		return errors.New("Soft-keys or terminal not initialized.")
+		return errors.New("soft-keys or terminal not initialized")
 	}
 	return nil
 }
@@ -76,7 +76,7 @@ func SlkLabel(labnum int) string {
 // SlkClear removes the soft-key labels from the screen
 func SlkClear() error {
 	if C.slk_clear() == C.ERR {
-		return errors.New("Soft-keys or terminal not initialized.")
+		return errors.New("soft-keys or terminal not initialized")
 	}
 	return nil
 }
@@ -84,7 +84,7 @@ func SlkClear() error {
 // SlkRestore restores the soft-key labels to the screen after an SlkClear()
 func SlkRestore() error {
 	if C.slk_restore() == C.ERR {
-		return errors.New("Soft-keys or terminal not initialized.")
+		return errors.New("soft-keys or terminal not initialized")
 	}
 	return nil
 }
@@ -92,7 +92,7 @@ func SlkRestore() error {
 // SlkTouch behaves just like Window.Touch
 func SlkTouch() error {
 	if C.slk_touch() == C.ERR {
-		return errors.New("Soft-keys or terminal not initialized.")
+		return errors.New("soft-keys or terminal not initialized")
 	}
 	return nil
 }
@@ -100,7 +100,7 @@ func SlkTouch() error {
 // SlkColor sets the color pair for the soft-keys
 func SlkColor(cp int16) error {
 	if C.slk_color(C.short(cp)) == C.ERR {
-		return errors.New("Invalid color pair or soft-keys not initialized.")
+		return errors.New("invalid color pair or soft-keys not initialized")
 	}
 	return nil
 }
@@ -114,7 +114,7 @@ func SlkAttribute() Char {
 // SlkSetAttribute sets the OR'd attributes to use
 func SlkSetAttribute(attr Char) error {
 	if C.slk_attrset(C.chtype(attr)) == C.ERR {
-		return errors.New("Soft-keys or terminal not initialized.")
+		return errors.New("soft-keys or terminal not initialized")
 	}
 	return nil
 }
@@ -122,7 +122,7 @@ func SlkSetAttribute(attr Char) error {
 // SlkAttributeOn turns on the given OR'd attributes without turning any off
 func SlkAttributeOn(attr Char) error {
 	if C.slk_attron(C.chtype(attr)) == C.ERR {
-		return errors.New("Soft-keys or terminal not initialized.")
+		return errors.New("soft-keys or terminal not initialized")
 	}
 	return nil
 }
@@ -130,7 +130,7 @@ func SlkAttributeOn(attr Char) error {
 // SlkAttributeOff turns off the given OR'd attributes without turning any on
 func SlkAttributeOff(attr Char) error {
 	if C.slk_attroff(C.chtype(attr)) == C.ERR {
-		return errors.New("Soft-keys or terminal not initialized.")
+		return errors.New("soft-keys or terminal not initialized")
 	}
 	return nil
 }

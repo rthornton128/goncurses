@@ -84,7 +84,7 @@ func CursesVersion() string {
 // and 2 (extra-visible)
 func Cursor(vis byte) error {
 	if C.curs_set(C.int(vis)) == C.ERR {
-		return errors.New("Failed to enable ")
+		return errors.New("failed to enable ")
 	}
 	return nil
 }
@@ -114,7 +114,7 @@ func Flash() {
 // FlushInput flushes all input
 func FlushInput() error {
 	if C.flushinp() == C.ERR {
-		return errors.New("Flush input failed")
+		return errors.New("flush input failed")
 	}
 	return nil
 }
@@ -128,7 +128,7 @@ func HalfDelay(delay int) error {
 		cerr = C.halfdelay(C.int(delay))
 	}
 	if cerr == C.ERR {
-		return errors.New("Unable to set delay mode")
+		return errors.New("unable to set delay mode")
 	}
 	return nil
 }
@@ -163,7 +163,7 @@ func HasKey(ch Key) bool {
 func InitColor(col, r, g, b int16) error {
 	if C.init_color(C.short(col), C.short(r), C.short(g),
 		C.short(b)) == C.ERR {
-		return errors.New("Failed to set new color definition")
+		return errors.New("failed to set new color definition")
 	}
 	return nil
 }
@@ -171,10 +171,10 @@ func InitColor(col, r, g, b int16) error {
 // InitPair sets a colour pair designated by 'pair' to fg and bg colors
 func InitPair(pair, fg, bg int16) error {
 	if pair <= 0 || C.int(pair) > C.int(C.COLOR_PAIRS-1) {
-		return errors.New("Color pair out of range")
+		return errors.New("color pair out of range")
 	}
 	if C.init_pair(C.short(pair), C.short(fg), C.short(bg)) == C.ERR {
-		return errors.New("Failed to init color pair")
+		return errors.New("failed to init color pair")
 	}
 	return nil
 }
@@ -184,7 +184,7 @@ func InitPair(pair, fg, bg int16) error {
 func Init() (stdscr *Window, err error) {
 	stdscr = &Window{C.initscr()}
 	if unsafe.Pointer(stdscr.win) == nil {
-		err = errors.New("An error occurred initializing ncurses")
+		err = errors.New("an error occurred initializing ncurses")
 	}
 	return
 }
@@ -214,7 +214,7 @@ func KeyString(k Key) string {
 func PairContent(pair int16) (fg int16, bg int16, err error) {
 	var f, b C.short
 	if C.pair_content(C.short(pair), &f, &b) == C.ERR {
-		return -1, -1, errors.New("Invalid color pair")
+		return -1, -1, errors.New("invalid color pair")
 	}
 	return int16(f), int16(b), nil
 }
@@ -248,7 +248,7 @@ func Raw(on bool) {
 // the terminal is in an XWindows (GUI) environment.
 func ResizeTerm(nlines, ncols int) error {
 	if C.resizeterm(C.int(nlines), C.int(ncols)) == C.ERR {
-		return errors.New("Failed to resize terminal")
+		return errors.New("failed to resize terminal")
 	}
 	return nil
 }
@@ -262,10 +262,10 @@ func SetEscDelay(size int) {
 // capable of displaying colors
 func StartColor() error {
 	if C.has_colors() == C.bool(false) {
-		return errors.New("Terminal does not support colors")
+		return errors.New("terminal does not support colors")
 	}
 	if C.start_color() == C.ERR {
-		return errors.New("Failed to enable color mode")
+		return errors.New("failed to enable color mode")
 	}
 	return nil
 }
@@ -285,7 +285,7 @@ func UnGetChar(ch Char) {
 // Update the screen, refreshing all windows
 func Update() error {
 	if C.doupdate() == C.ERR {
-		return errors.New("Failed to update")
+		return errors.New("failed to update")
 	}
 	return nil
 }
@@ -297,7 +297,7 @@ func Update() error {
 // does not support certain ncurses features like orig_pair or initialize_pair.
 func UseDefaultColors() error {
 	if C.use_default_colors() == C.ERR {
-		return errors.New("Failed to assume default colours.")
+		return errors.New("failed to assume default colours")
 	}
 	return nil
 }

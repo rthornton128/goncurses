@@ -44,7 +44,7 @@ func NewTerm(termType string, out, in *os.File) (*Screen, error) {
 	cout, cin := C.fdopen(C.int(out.Fd()), wr), C.fdopen(C.int(in.Fd()), rd)
 	screen := C.newterm(tt, cout, cin)
 	if screen == nil {
-		return nil, errors.New("Failed to create new screen")
+		return nil, errors.New("failed to create new screen")
 	}
 	return &Screen{screen}, nil
 }
@@ -53,7 +53,7 @@ func NewTerm(termType string, out, in *os.File) (*Screen, error) {
 func (s *Screen) Set() (*Screen, error) {
 	screen := C.set_term(s.scrPtr)
 	if screen == nil {
-		return nil, errors.New("Failed to set screen")
+		return nil, errors.New("failed to set screen")
 	}
 	return &Screen{screen}, nil
 }

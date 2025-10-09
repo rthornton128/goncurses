@@ -28,7 +28,6 @@ func NewPanel(w *Window) *Panel {
 // using ncurses's DoUpdate()
 func UpdatePanels() {
 	C.update_panels()
-	return
 }
 
 // Returns a pointer to the panel above in the stack or nil. Passing nil will
@@ -46,7 +45,7 @@ func Below(p *Panel) *Panel {
 // Move the panel to the bottom of the stack.
 func (p *Panel) Bottom() error {
 	if C.bottom_panel(p.pan) == C.ERR {
-		return errors.New("Failed to move panel to bottom of stack")
+		return errors.New("failed to move panel to bottom of stack")
 	}
 	return nil
 }
@@ -54,7 +53,7 @@ func (p *Panel) Bottom() error {
 // Delete panel, removing from the stack.
 func (p *Panel) Delete() error {
 	if C.del_panel(p.pan) == C.ERR {
-		return errors.New("Failed to delete panel")
+		return errors.New("failed to delete panel")
 	}
 	p = nil
 	return nil
@@ -68,7 +67,7 @@ func (p *Panel) Hidden() bool {
 // Hide the panel
 func (p *Panel) Hide() error {
 	if C.hide_panel(p.pan) == C.ERR {
-		return errors.New("Failed to hide panel")
+		return errors.New("failed to hide panel")
 	}
 	return nil
 }
@@ -78,7 +77,7 @@ func (p *Panel) Hide() error {
 // this function
 func (p *Panel) Move(y, x int) error {
 	if C.move_panel(p.pan, C.int(y), C.int(x)) == C.ERR {
-		return errors.New("Failed to move panel")
+		return errors.New("failed to move panel")
 	}
 	return nil
 }
@@ -86,7 +85,7 @@ func (p *Panel) Move(y, x int) error {
 // Replace panel's associated window with a new one.
 func (p *Panel) Replace(w *Window) error {
 	if C.replace_panel(p.pan, w.win) == C.ERR {
-		return errors.New("Failed to replace window")
+		return errors.New("failed to replace window")
 	}
 	return nil
 }
@@ -94,7 +93,7 @@ func (p *Panel) Replace(w *Window) error {
 // Show the panel, if hidden, and place it on the top of the stack.
 func (p *Panel) Show() error {
 	if C.show_panel(p.pan) == C.ERR {
-		return errors.New("Failed to show panel")
+		return errors.New("failed to show panel")
 	}
 	return nil
 }
@@ -102,7 +101,7 @@ func (p *Panel) Show() error {
 // Move panel to the top of the stack
 func (p *Panel) Top() error {
 	if C.top_panel(p.pan) == C.ERR {
-		return errors.New("Failed to move panel to top of stack")
+		return errors.New("failed to move panel to top of stack")
 	}
 	return nil
 }
