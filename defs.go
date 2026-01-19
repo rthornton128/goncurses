@@ -4,7 +4,7 @@
 
 package goncurses
 
-// #cgo !darwin,!openbsd,!windows pkg-config: ncurses
+// #cgo !darwin,!openbsd,!windows pkg-config: ncursesw
 // #include <curses.h>
 import "C"
 
